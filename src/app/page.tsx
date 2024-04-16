@@ -1,95 +1,43 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/dist/client/components/navigation'
+import { useEffect } from 'react'
 
 export default function Home() {
+  const router = useRouter()
+  const params = useSearchParams()
+  const accessToken = params.get('accessToken')
+  useEffect(() => {
+    if (accessToken) {
+      localStorage.setItem('token', accessToken)
+      router.replace('/', undefined)
+    }
+
+    const token = localStorage.getItem('token')
+    if (token) {
+      router.push('/main')
+    }
+  }, [])
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="full-center flex justify-center ">
+      <div className="w-[1400px] flex justify-between">
+        <div className="flex max-w-full">
+          <img className="min-w-[800px]" src="/images/tofu.webp" />
+        </div>
+        <div className="noselect flex flex-col justify-between w-full">
+          <div className="text-white bg-gray-400 text-center w-full min-h-[300px] flex items-center justify-center text-[30px] duration-300 hover:font-bold hover:bg-white hover:text-black hover:cursor-pointer hover:text-[35px]">
+            게임이름(미정)
+          </div>
+          <div
+            onClick={() => router.push('/register')}
+            className="text-white bg-gray-400 text-center w-full min-h-[300px] flex items-center justify-center text-[30px] duration-300 hover:font-bold hover:bg-white hover:text-black hover:cursor-pointer hover:text-[35px]"
           >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+            디스코드로 로그인
+          </div>
         </div>
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+    </div>
+  )
 }
