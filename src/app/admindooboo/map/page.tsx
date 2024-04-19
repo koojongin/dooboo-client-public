@@ -3,10 +3,12 @@
 import { useEffect, useState } from 'react'
 import { Card, CardBody, Chip } from '@material-tailwind/react'
 import Swal from 'sweetalert2'
+import { useRouter } from 'next/navigation'
 import { fetchDeleteMap, fetchGetMap } from '@/services/api-fetch'
 import { DbMap } from '@/interfaces/map.interface'
 
 export default function MapPage() {
+  const router = useRouter()
   const [maps, setMaps] = useState<(DbMap & { totalWeight: number })[]>([])
   const getMapList = async () => {
     const { maps: rMaps } = await fetchGetMap()
@@ -24,6 +26,10 @@ export default function MapPage() {
       return newMap
     })
     setMaps(newMaps)
+  }
+
+  const goToEditMonster = (monsterId: string) => {
+    router.push(`/admindooboo/monster/edit/${monsterId}`)
   }
 
   const editMap = (map: DbMap) => {
@@ -86,11 +92,15 @@ export default function MapPage() {
                       <div className="">총 무게 {map.totalWeight}</div>
                       {map?.monsters!.map((monster) => {
                         return (
-                          <Chip
-                            color="amber"
+                          <div
                             key={monster._id}
-                            value={`${monster.name}(${monster.weight}) : ${((monster.weight / map.totalWeight) * 100).toFixed(1)}%`}
-                          />
+                            onClick={() => goToEditMonster(monster._id)}
+                          >
+                            <Chip
+                              color="amber"
+                              value={`${monster.name}(${monster.weight}) : ${((monster.weight / map.totalWeight) * 100).toFixed(1)}%`}
+                            />
+                          </div>
                         )
                       })}
                     </div>

@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import { ScaleLoader } from 'react-spinners'
+import { API_SERVER_URL } from '@/constants/constant'
 
 export default function Register() {
   const router = useRouter()
@@ -15,7 +16,7 @@ export default function Register() {
   const [isAvailableNickname, setIsAvailableNickname] = useState(false)
   const [accessToken, setAccessToken] = useState('')
   const loginUrl =
-    'https://discord.com/oauth2/authorize?client_id=1219938115016458331&response_type=code&redirect_uri=http%3A%2F%2Fdooboo.online%3A3001%2Foauth2&scope=email+identify+guilds&&prompt=none'
+    'https://discord.com/oauth2/authorize?client_id=1219938115016458331&response_type=code&redirect_uri=https%3A%2F%2Fdooboo.online%3A3001%2Foauth2&scope=email+identify+guilds&&prompt=none'
 
   const handleChange = useCallback(
     (element: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +33,7 @@ export default function Register() {
   useEffect(() => {
     async function get() {
       const { data } = await axios.post(
-        'http://dooboo.online:3001/auth/check-nickname',
+        `${API_SERVER_URL}/auth/check-nickname`,
         {
           nickname,
         },
@@ -58,7 +59,7 @@ export default function Register() {
     if (!isAvailableNickname) return
     setOnLoading(true)
     const registerResponse = await axios.post(
-      'http://dooboo.online:3001/auth/register',
+      `${API_SERVER_URL}/auth/register`,
       { nickname, accessToken },
     )
     setOnLoading(false)

@@ -78,18 +78,18 @@ export default function UpdateMonsterForm({
 
     handleClose(true)
 
+    setName('')
+    setHp(0)
+    setExperience(0)
+    setGold(0)
+    setWeight(0)
+
     await Swal.fire({
       title: '수정되었습니다',
       text: rMonster.name,
       icon: 'success',
       confirmButtonText: '확인',
     })
-
-    setName('')
-    setHp(0)
-    setExperience(0)
-    setGold(0)
-    setWeight(0)
   }
 
   return (
@@ -98,7 +98,7 @@ export default function UpdateMonsterForm({
         몬스터 수정
       </Typography>
       <div className="flex justify-center">
-        <img src={selectedMonster.thumbnail} />
+        <img src={toAPIHostURL(selectedMonster.thumbnail)} />
       </div>
       <form className="mt-8 mb-2 w-full max-w-screen-lg" onSubmit={onSubmit}>
         <div className="mb-1 flex flex-col gap-3">

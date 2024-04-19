@@ -5,6 +5,7 @@ import { Character, MeResponse } from '@/interfaces/user.interface'
 import {
   BaseWeaponListResponseDto,
   BaseWeaponResponseDto,
+  DropTableListResponseDto,
 } from '@/interfaces/item.interface'
 
 interface CreateMonsterResponse {
@@ -46,6 +47,10 @@ export async function fetchPutMonster(
   return response
 }
 
+export async function fetchGetMonster(id: string) {
+  const { data } = await api.get(`/monster/${id}`)
+  return data
+}
 export async function fetchGetMonsters() {
   const { data } = await api.get('/monster/list')
   return data
@@ -87,5 +92,10 @@ export async function fetchGetBaseWeapon(
 
 export async function fetchGetRankList(): Promise<{ characters: Character[] }> {
   const { data: response } = await api.get(`/character/rank`)
+  return response
+}
+
+export async function fetchGetDropTableList(): Promise<DropTableListResponseDto> {
+  const { data: response } = await api.get('/item/drop/list')
   return response
 }

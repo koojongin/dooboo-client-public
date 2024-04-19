@@ -3,3 +3,10 @@ export interface Pagination {
   total: number // 1
   totalPages: number // 1
 }
+
+export interface MongooseDocument {
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  _id: string
+  id?: string
+}

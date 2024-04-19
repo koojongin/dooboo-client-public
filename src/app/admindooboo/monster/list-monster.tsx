@@ -17,6 +17,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { useRouter } from 'next/navigation'
 import { fetchGetMonsters } from '@/services/api-fetch'
 import createKey from '@/services/key-generator'
 import {
@@ -25,6 +26,7 @@ import {
   UpdateMonsterDialogRef,
 } from '@/interfaces/monster.interface'
 import UpdateMonsterDialog from './update-monster-dialog'
+import {API_SERVER_URL} from "@/constants/constant";
 
 const TABLE_HEAD = ['이미지', 'name', 'experience', 'hp', 'gold', 'weight', '']
 
@@ -32,6 +34,7 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
   { customCss }: any,
   forwardedRef: ForwardedRef<any>,
 ) {
+  const router = useRouter()
   const [monsters, setMonsters] = useState<Monster[]>([])
   const [result, setResult] = useState<any>()
   const monsterUpdateDialogRef = useRef<UpdateMonsterDialogRef>(null)
@@ -39,7 +42,8 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
     monsterUpdateDialogRef?.current?.openDialog(monster)
   }
   const editMonster = (monster: Monster) => {
-    handleOpenUpdateMonsterDialog(monster)
+    // handleOpenUpdateMonsterDialog(monster)
+    router.push(`/admindooboo/monster/edit/${monster._id}`)
   }
   const refreshMonsters = useCallback(async () => {
     const {
@@ -50,7 +54,7 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
     } = await fetchGetMonsters()
     const mixedMonsters = rMonsters.map((m: any) => {
       const monster = { ...m }
-      monster.thumbnail = `http://dooboo.online:3001/${monster.thumbnail}`
+      monster.thumbnail = `${API_SERVER_URL}/${monster.thumbnail}`
       return monster
     })
     setMonsters(mixedMonsters)

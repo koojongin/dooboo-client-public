@@ -2,7 +2,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 
 const api = axios.create({
-  baseURL: 'http://dooboo.online:3001',
+  baseURL: 'https://dooboo.online:3001',
 })
 
 // 요청 인터셉터

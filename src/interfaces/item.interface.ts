@@ -1,5 +1,6 @@
-export interface BaseWeapon {
-  createdAt: string // '2024-03-29T08:39:14.060Z'
+import { MongooseDocument, Pagination } from './common.interface'
+
+export interface BaseWeapon extends MongooseDocument {
   criticalMultiplier: number[] // [0, 0]
   criticalRate: number[] // [0, 0]
   damageOfCold: number[] // [0, 0]
@@ -11,14 +12,9 @@ export interface BaseWeapon {
   name: string // '목도'
   requiredEquipmentLevel: string // 1
   thumbnail: string // 'public/upload/items/08521e812a40a8af.png'
-  updatedAt: string // '2024-03-29T08:39:14.060Z'
-  _id: string // '66067e322cfd9150c0fd3ba8'
 }
 
-export interface BaseWeaponListResponseDto {
-  page: number // 1
-  total: number // 1
-  totalPages: number // 1
+export interface BaseWeaponListResponseDto extends Pagination {
   weapons: BaseWeapon[]
 }
 
@@ -26,9 +22,20 @@ export interface BaseWeaponResponseDto {
   weapon: BaseWeapon
 }
 
-export interface WeaponListResponseDto {
-  page: number // 1
-  total: number // 1
-  totalPages: number // 1
+export interface WeaponListResponseDto extends Pagination {
   // weapons: Weapon[]
+}
+
+export interface DropTableItem {
+  itemId: string
+  item: any
+  iType: 'BaseWeapon' | string
+  roll: number
+}
+export interface DropTable extends MongooseDocument {
+  items: DropTableItem[]
+  monsterId: string
+}
+export interface DropTableListResponseDto extends Pagination {
+  dropTables: DropTable[]
 }

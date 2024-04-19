@@ -16,7 +16,7 @@ export default function InventoryComponent({ borderStyle }: any) {
                 className="flex border-[1px] border-r-2 rounded-md min-w-10 max-w-10 p-1"
               >
                 {/*<img src="/images/sword.png" />*/}
-                <img src="http://dooboo.online:3001/public/upload/items/08521e812a40a8af.png" />
+                <img src="https://dooboo.online:3001/public/upload/items/08521e812a40a8af.png" />
               </div>
             )
           })}
