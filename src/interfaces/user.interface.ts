@@ -1,3 +1,5 @@
+import { Item } from '@/interfaces/item.interface'
+
 export interface CharacterStat {
   criticalMultiplier: number // 10
   criticalRate: number // 5
@@ -8,6 +10,7 @@ export interface MeResponse {
   character: Character
   nextExp: number
   stat: CharacterStat
+  equippedItems: Item[]
 }
 
 export interface User {
@@ -23,4 +26,5 @@ export interface Character {
   updatedAt: string // '2024-03-28T19:19:27.689Z'
   _id: string // '6603b3d5b7868c3b327f4c53'
   user?: User
+  equip?: Item
 }

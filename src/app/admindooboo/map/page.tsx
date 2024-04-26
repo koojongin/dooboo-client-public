@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react'
 import { Card, CardBody, Chip } from '@material-tailwind/react'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/navigation'
-import { fetchDeleteMap, fetchGetMap } from '@/services/api-fetch'
+import { fetchDeleteMap, fetchGetMaps } from '@/services/api-fetch'
 import { DbMap } from '@/interfaces/map.interface'
 
 export default function MapPage() {
   const router = useRouter()
   const [maps, setMaps] = useState<(DbMap & { totalWeight: number })[]>([])
   const getMapList = async () => {
-    const { maps: rMaps } = await fetchGetMap()
+    const { maps: rMaps } = await fetchGetMaps()
     const newMaps: (DbMap & { totalWeight: number })[] = rMaps.map((map) => {
       const newMap: any = { ...map }
 
@@ -88,21 +88,36 @@ export default function MapPage() {
                       </div>
                     </div>
                     <hr className="m-1" />
-                    <div className="flex gap-1 items-center">
+                    <div className="flex flex-col gap-1 items-start w-full">
                       <div className="">총 무게 {map.totalWeight}</div>
-                      {map?.monsters!.map((monster) => {
-                        return (
-                          <div
-                            key={monster._id}
-                            onClick={() => goToEditMonster(monster._id)}
-                          >
-                            <Chip
-                              color="amber"
-                              value={`${monster.name}(${monster.weight}) : ${((monster.weight / map.totalWeight) * 100).toFixed(1)}%`}
-                            />
-                          </div>
-                        )
-                      })}
+                      <div className="flex gap-1">
+                        {map?.monsters!.map((monster) => {
+                          return (
+                            <div
+                              className="cursor-pointer"
+                              key={monster._id}
+                              onClick={() => goToEditMonster(monster._id!)}
+                            >
+                              <Chip
+                                className="bg-gray-100 font-thin text-dark-blue rounded-sm p-[4px] border border-dark-blue"
+                                value={
+                                  <div>
+                                    <div>
+                                      {monster.name}({monster.weight}) :{' '}
+                                      {(
+                                        (monster.weight / map.totalWeight) *
+                                        100
+                                      ).toFixed(1)}
+                                      %
+                                    </div>
+                                    <div>HP:{monster.hp}</div>
+                                  </div>
+                                }
+                              />
+                            </div>
+                          )
+                        })}
+                      </div>
                     </div>
                   </CardBody>
                 </Card>

@@ -6,6 +6,11 @@ export interface DbMap {
   monsters?: Monster[]
   mosterIds?: Monster[] | string[]
 }
-export interface GetMapResponse {
+export interface GetMapsResponse {
   maps: DbMap[]
+}
+
+export interface GetMapResponse {
+  map: DbMap
+  monsters: Monster[]
 }

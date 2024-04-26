@@ -140,7 +140,7 @@ export default function Page({
                 <Input
                   // disabled
                   value={hp}
-                  onChange={(event: any) => setHp(event?.target?.hp)}
+                  onChange={(event: any) => setHp(event?.target?.value)}
                   type="number"
                   size="md"
                   placeholder="100"

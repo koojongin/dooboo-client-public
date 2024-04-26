@@ -92,7 +92,7 @@ export default function Register() {
       >
         <ScaleLoader color="#36d7b7" />
       </div>
-      <div className="w-[1400px] bg-[url('/images/tofu.webp')] isolate relative bg-cover min-h-lvh flex flex-col items-center text-center text-black after:bg-white after:opacity-40 after:content-[''] after:absolute after:-z-10 after:inset-0">
+      <div className="min-w-[900px] bg-[url('/images/tofu.webp')] isolate relative bg-cover min-h-lvh flex flex-col items-center text-center text-black after:bg-white after:opacity-40 after:content-[''] after:absolute after:-z-10 after:inset-0">
         <div className="full-center items-center flex flex-col">
           <div className="py-10 w-full text-4xl">
             <div className="px-10 flex flex-col items-center">

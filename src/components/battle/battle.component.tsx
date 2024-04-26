@@ -6,28 +6,35 @@ import {
   Option,
   Select,
 } from '@material-tailwind/react'
-import { ForwardedRef, forwardRef, useEffect, useState } from 'react'
+import { ForwardedRef, forwardRef, useEffect, useRef, useState } from 'react'
 import Swal from 'sweetalert2'
 import createKey from '@/services/key-generator'
 import { fetchBattle, fetchGetMapsName } from '@/services/api-fetch'
 import toAPIHostURL from '@/services/image-name-parser'
 import { DbMap } from '@/interfaces/map.interface'
+import { ItemBoxComponent } from '@/app/main/inventory.component'
+import { Item } from '@/interfaces/item.interface'
 
-export default (function Battle(
-  { headCss, battleHandler }: any,
-  // battleHandler: ForwardedRef<any>,
-) {
+export default (function Battle({
+  headCss,
+  battleHandler,
+  refreshInventory,
+}: any) {
   const [maps, setMaps] = useState<DbMap[]>([])
   const [selectedMap, setSelectedMap] = useState<string>()
   const [battleResult, setBattleResult]: any = useState()
   const [battleLogs, setBattleLogs]: any = useState([])
+  const [isAutoRunning, setIsAutoRunning] = useState<boolean>(false)
+  const timerRef = useRef<NodeJS.Timeout>()
+
   const onChangeMap = (mapName: string | undefined) => {
     if (!mapName) return
     setSelectedMap(mapName)
   }
-  const battle = async (mapName: string) => {
+  const activateBattle = async (mapName: string) => {
     setBattleResult(null)
     if (!maps!.map((d) => d.name)!.includes(mapName)) {
+      stopBattleInterval()
       return Swal.fire({
         title: '사냥터를 선택해주세요',
         text: '문제가 계속되면 관리자에게 문의해주세요',
@@ -35,7 +42,13 @@ export default (function Battle(
         confirmButtonText: '확인',
       })
     }
+
+    setIsAutoRunning(true)
     const result = await fetchBattle(mapName)
+    if ((result?.drops?.length || 0) > 0) {
+      refreshInventory()
+      playDropSound()
+    }
     setBattleResult(result)
     setBattleLogs(result.battleLogs)
 
@@ -44,52 +57,94 @@ export default (function Battle(
     }
   }
 
+  const startBattleInterval = (mapName: string) => {
+    if (!timerRef.current) {
+      timerRef.current = setInterval(async () => {
+        try {
+          await activateBattle(mapName)
+        } catch (error: any) {
+          stopBattleInterval()
+        }
+      }, 5000)
+    }
+  }
+
+  const stopBattleInterval = () => {
+    setIsAutoRunning(false)
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = undefined
+    }
+  }
+
+  const battle = (mapName: string) => {
+    if (!isAutoRunning) {
+      setIsAutoRunning(true)
+      try {
+        startBattleInterval(mapName)
+      } catch (error: any) {
+        setIsAutoRunning(false)
+      }
+    } else {
+      stopBattleInterval()
+    }
+  }
+
   const refreshMaps = async () => {
     const { maps: rMaps } = await fetchGetMapsName()
     setMaps(rMaps)
   }
 
+  const audio = new Audio('/audio/item_drop.mp3')
+  const playDropSound = () => {
+    audio.volume = 0.1
+    audio.play()
+  }
+
   useEffect(() => {
     refreshMaps()
+    return () => {
+      stopBattleInterval()
+    }
   }, [])
 
   return (
     <Card className={headCss}>
-      <CardBody>
-        <div className="flex mb-5">
-          <div className="w-72">
-            {maps && maps.length > 0 && (
-              <Select
-                className="rounded-r-none"
-                label="선택된 사냥터"
-                value={selectedMap}
-                onChange={(value) => onChangeMap(value)}
-              >
-                {maps.map((map) => {
-                  return (
-                    <Option key={createKey()} value={map.name}>
-                      {map.name}
-                    </Option>
-                  )
-                })}
-              </Select>
-            )}
-          </div>
-          <Button
-            className="rounded-l-none"
-            color="indigo"
-            size="sm"
-            variant="filled"
-            onClick={() => battle(selectedMap!)}
-          >
-            사냥하기
-          </Button>
+      <div className="flex mb-5 px-[24px] pt-[20px]">
+        <div className="w-72">
+          {maps && maps.length > 0 && (
+            <Select
+              disabled={isAutoRunning}
+              className="rounded-r-none"
+              label="선택된 사냥터"
+              value={selectedMap}
+              onChange={(value) => onChangeMap(value)}
+            >
+              {maps.map((map) => {
+                return (
+                  <Option key={createKey()} value={map.name}>
+                    {map.name}
+                  </Option>
+                )
+              })}
+            </Select>
+          )}
         </div>
-
-        {/* 전투로그 */}
+        <Button
+          className="rounded-l-none"
+          color={!isAutoRunning ? 'indigo' : 'red'}
+          size="sm"
+          variant="filled"
+          onClick={() => battle(selectedMap!)}
+        >
+          {isAutoRunning ? '자동사냥중' : '사냥하기'}
+        </Button>
+      </div>
+      {/* 전투로그 */}
+      <div className="px-[24px] overflow-y-scroll max-h-[400px] h-[400px]">
         {battleResult && battleResult.monster && (
           <div>
-            <div className='flex gap-1 text-sm'>
+            <div className="flex gap-1 text-sm">
               <div>전투일시</div>
               <div>
                 {new Date(battleResult.battledAt).toLocaleDateString()}{' '}
@@ -163,25 +218,60 @@ export default (function Battle(
                 했습니다!
               </div>
               {battleResult.isWin && (
-                <div className="flex gap-1">
-                  <Chip
-                    color="teal"
-                    variant="gradient"
-                    size="sm"
-                    value={`+${battleResult.monster.experience} exp`}
-                  />
-                  <Chip
-                    color="yellow"
-                    variant="gradient"
-                    size="sm"
-                    value={`+${battleResult.monster.gold} Gold`}
-                  />
+                <div>
+                  <div className="flex gap-1">
+                    <Chip
+                      color="teal"
+                      variant="gradient"
+                      size="sm"
+                      value={`+${battleResult.monster.experience} exp`}
+                    />
+                    <Chip
+                      color="yellow"
+                      variant="gradient"
+                      size="sm"
+                      value={`+${battleResult.monster.gold} Gold`}
+                    />
+                  </div>
+                  {battleResult.drops.length > 0 && (
+                    <DropListComponent drops={battleResult.drops} />
+                  )}
                 </div>
               )}
             </div>
           </div>
         )}
-      </CardBody>
+      </div>
     </Card>
   )
 })
+
+function DropListComponent({ drops }: { drops: Item[] }) {
+  return (
+    <div className="flex flex-col gap-1 mt-10">
+      <div className="bg-indigo-400 text-white text-[20px] pl-1">
+        획득한 아이템
+      </div>
+      <div className="flex flex-row gap-1">
+        {drops.map((item) => {
+          return (
+            <ItemBoxComponent
+              item={item}
+              key={`drops_${item._id}`}
+              className="border p-[2px]"
+            />
+            // <div
+            //   key={item._id}
+            //   className="w-[40px] h-[40px] border-dark-blue border rounded"
+            // >
+            //   <img
+            //     src={toAPIHostURL(item.thumbnail)}
+            //     className="w-full h-full p-[2px]"
+            //   />
+            // </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}

@@ -22,7 +22,7 @@ export default function Home() {
 
   return (
     <div className="full-center flex justify-center ">
-      <div className="w-[1400px] flex justify-between">
+      <div className="min-w-[900px] flex justify-between">
         <div className="flex max-w-full">
           <img className="min-w-[800px]" src="/images/tofu.webp" />
         </div>

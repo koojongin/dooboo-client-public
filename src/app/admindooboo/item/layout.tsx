@@ -23,7 +23,10 @@ export default function RootLayout({
             <div onClick={() => navigate('/admindooboo/item/weapon')}>
               무기 목록
             </div>
-            <div onClick={() => navigate('/admindooboo/item/weapon/create')}>
+            {/* <div onClick={() => navigate('/admindooboo/item/weapon/create')}> */}
+            <div
+              onClick={() => navigate('/admindooboo/item/weapon/edit/create')}
+            >
               생성
             </div>
           </Breadcrumbs>

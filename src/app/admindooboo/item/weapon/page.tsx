@@ -11,8 +11,12 @@ import {
 } from '@material-tailwind/react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Swal from 'sweetalert2'
 import createKey from '@/services/key-generator'
-import { fetchGetBaseWeaponList } from '@/services/api-fetch'
+import {
+  fetchDeleteBaseWeapon,
+  fetchGetBaseWeaponList,
+} from '@/services/api-fetch'
 import { Pagination } from '@/interfaces/common.interface'
 import { BaseWeapon } from '@/interfaces/item.interface'
 import toAPIHostURL from '@/services/image-name-parser'
@@ -40,7 +44,26 @@ export default function ItemWeaponPage() {
   const editItem = (weapon: BaseWeapon) => {
     router.push(`/admindooboo/item/weapon/edit/${weapon._id}`)
   }
-  const deleteItem = (weapon: BaseWeapon) => {}
+  const deleteItem = async (weapon: BaseWeapon) => {
+    const { isConfirmed } = await Swal.fire({
+      title: '정말로 삭제하시겠습니까?',
+      text: weapon.name || '?',
+      icon: 'question',
+      confirmButtonText: '예',
+      denyButtonText: `닫기`,
+      showDenyButton: true,
+    })
+
+    if (isConfirmed) {
+      await fetchDeleteBaseWeapon(weapon._id!)
+      await Swal.fire({
+        title: '삭제되었습니다.',
+        text: '-',
+        icon: 'success',
+        confirmButtonText: '확인',
+      })
+    }
+  }
 
   const loadList = async () => {
     const {
@@ -97,10 +120,10 @@ export default function ItemWeaponPage() {
                       key={createKey()}
                       className="hover:bg-gray-100 [&>*:nth-child(even)]:bg-blue-gray-50/50"
                     >
-                      <td className={`${classes}`}>
+                      <td className={`${classes} w-[50px]`}>
                         <img
                           src={toAPIHostURL(weapon.thumbnail)}
-                          className="w-15 h-15 border border-blue-gray-50 bg-blue-gray-50/50 object-contain"
+                          className="w-[40px] h-[40px] border border-blue-gray-50 bg-blue-gray-50/50 object-contain"
                         />
                       </td>
                       <td className={classes}>

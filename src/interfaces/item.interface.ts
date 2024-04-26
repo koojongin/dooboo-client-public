@@ -1,5 +1,18 @@
 import { MongooseDocument, Pagination } from './common.interface'
 
+export interface Weapon extends MongooseDocument {
+  criticalMultiplier: number //
+  criticalRate: number //
+  damageOfCold: number
+  damageOfFire: number //
+  damageOfLightning: number //
+  damageOfPhysical: number //
+  iType: string // 'weapon'
+  gold: number
+  name: string // '목도'
+  requiredEquipmentLevel: string // 1
+  thumbnail: string // 'public/upload/items/08521e812a40a8af.png'
+}
 export interface BaseWeapon extends MongooseDocument {
   criticalMultiplier: number[] // [0, 0]
   criticalRate: number[] // [0, 0]
@@ -12,6 +25,9 @@ export interface BaseWeapon extends MongooseDocument {
   name: string // '목도'
   requiredEquipmentLevel: string // 1
   thumbnail: string // 'public/upload/items/08521e812a40a8af.png'
+
+  /// //
+  weight: number
 }
 
 export interface BaseWeaponListResponseDto extends Pagination {
@@ -26,16 +42,29 @@ export interface WeaponListResponseDto extends Pagination {
   // weapons: Weapon[]
 }
 
-export interface DropTableItem {
-  itemId: string
-  item: any
-  iType: 'BaseWeapon' | string
-  roll: number
+export interface SelectItemDialogRef {
+  refresh?: () => void
+  openDialog: (index: number) => void
 }
-export interface DropTable extends MongooseDocument {
-  items: DropTableItem[]
-  monsterId: string
+
+export interface InventoryRef {
+  refresh: () => void
 }
-export interface DropTableListResponseDto extends Pagination {
-  dropTables: DropTable[]
+
+export interface SelectMonsterDialogRef {
+  refresh?: () => void
+  openDialog: () => void
+}
+
+export interface Item extends MongooseDocument {
+  iType: 'weapon' | string
+  weaponId?: string
+  weapon?: any
+
+  item?: BaseWeapon | any
+  roll?: number
+}
+
+export interface InnItem extends Item {
+  isSelected: boolean
 }

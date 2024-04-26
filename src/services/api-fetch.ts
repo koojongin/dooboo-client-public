@@ -1,12 +1,18 @@
 import api from '@/services/api'
-import { GetMapResponse } from '@/interfaces/map.interface'
+import { GetMapResponse, GetMapsResponse } from '@/interfaces/map.interface'
 import { BattleResponseDto } from '@/interfaces/battle.interface'
 import { Character, MeResponse } from '@/interfaces/user.interface'
 import {
+  BaseWeapon,
   BaseWeaponListResponseDto,
   BaseWeaponResponseDto,
-  DropTableListResponseDto,
+  Weapon,
 } from '@/interfaces/item.interface'
+import {
+  DropTable,
+  DropTableListResponseDto,
+  DropTableResponseDto,
+} from '@/interfaces/drop-table.interface'
 
 interface CreateMonsterResponse {
   monster: {
@@ -14,6 +20,10 @@ interface CreateMonsterResponse {
   }
 }
 
+export async function fetchGetJwtToken(): Promise<any> {
+  const { data } = await api.get('/auth/jwt')
+  return data
+}
 export async function fetchMe(): Promise<MeResponse> {
   const { data } = await api.get('/user/me')
   return data
@@ -61,12 +71,17 @@ export async function fetchPostMap(data: any) {
   return response
 }
 
-export async function fetchGetMap(): Promise<GetMapResponse> {
+export async function fetchGetMap(id: string): Promise<GetMapResponse> {
+  const { data: response } = await api.get(`/map/${id}`)
+  return response
+}
+
+export async function fetchGetMaps(): Promise<GetMapsResponse> {
   const { data: response } = await api.get('/map/list')
   return response
 }
 
-export async function fetchGetMapsName(): Promise<GetMapResponse> {
+export async function fetchGetMapsName(): Promise<GetMapsResponse> {
   const { data: response } = await api.get('/map/list-name')
   return response
 }
@@ -90,12 +105,115 @@ export async function fetchGetBaseWeapon(
   return response
 }
 
+export async function fetchPostBaseWeapon(
+  baseWeapon: BaseWeapon,
+): Promise<BaseWeaponResponseDto> {
+  const { data: response } = await api.post(`/item/base-weapon`, baseWeapon)
+  return response
+}
+export async function fetchPutBaseWeapon(
+  baseWeapon: BaseWeapon,
+): Promise<BaseWeaponResponseDto> {
+  const { data: response } = await api.put(
+    `/item/base-weapon/${baseWeapon._id}`,
+    baseWeapon,
+  )
+  return response
+}
+
+export async function fetchDeleteBaseWeapon(
+  id: string,
+): Promise<BaseWeaponResponseDto> {
+  const { data: response } = await api.delete(`/item/base-weapon/${id}`)
+  return response
+}
+
 export async function fetchGetRankList(): Promise<{ characters: Character[] }> {
   const { data: response } = await api.get(`/character/rank`)
   return response
 }
 
+export async function fetchGetMyInventory(): Promise<{
+  items: Array<Weapon | any>
+  slots: number
+  isFulled: boolean
+}> {
+  const { data: response } = await api.get(`/character/inventory`)
+  return response
+}
+
 export async function fetchGetDropTableList(): Promise<DropTableListResponseDto> {
   const { data: response } = await api.get('/item/drop/list')
+  return response
+}
+
+export async function fetchGetDropTable(
+  id: string,
+): Promise<DropTableResponseDto> {
+  const { data: response } = await api.get(`/item/drop/${id}`)
+  return response
+}
+
+export async function fetchPutDropTable(
+  dropTable: DropTable,
+): Promise<DropTableResponseDto> {
+  const { data: response } = await api.put(
+    `/item/drop/${dropTable._id}`,
+    dropTable,
+  )
+  return response
+}
+
+export async function fetchCreateDropTable(
+  dropTable: DropTable,
+): Promise<DropTableResponseDto> {
+  const { data: response } = await api.post(`/item/drop`, dropTable)
+  return response
+}
+export async function fetchDeleteDropTable(
+  id: string,
+): Promise<DropTableResponseDto> {
+  const { data: response } = await api.delete(`/item/drop/${id}`)
+  return response
+}
+
+export async function fetchUploadItemFile(
+  formData: any,
+): Promise<{ path: string }> {
+  const { data: response } = await api.post(
+    '/item/upload',
+    {},
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      transformRequest: [
+        () => {
+          return formData
+        },
+      ],
+    },
+  )
+  return response
+}
+
+export async function fetchEquipItem(
+  id: string,
+): Promise<DropTableResponseDto> {
+  const { data: response } = await api.post(`/item/equip/${id}`)
+  return response
+}
+
+export async function fetchUnequipItem(
+  id: string,
+): Promise<DropTableResponseDto> {
+  const { data: response } = await api.post(`/item/unequip/${id}`)
+  return response
+}
+
+export async function fetchSellItems(
+  itemIds: string[],
+): Promise<DropTableResponseDto> {
+  const { data: response } = await api.post(`/item/sell`, { itemIds })
   return response
 }

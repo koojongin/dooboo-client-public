@@ -15,7 +15,9 @@
     "es6": true
   },
   "ignorePatterns": [
-    "node_modules/","tailwind.config.js","next.config.js"
+    "node_modules/",
+    "tailwind.config.js",
+    "next.config.js"
   ],
   "extends": [
     "airbnb",
@@ -32,6 +34,7 @@
     "@typescript-eslint/no-unused-vars": "off",
     "react/react-in-jsx-scope": "off",
     "react/jsx-props-no-spreading": 0,
+    "react/jsx-no-useless-fragment": "off",
     "jsx-a11y/click-events-have-key-events": "off",
     "@typescript-eslint/semi": "off",
     "react/button-has-type": "off",
@@ -41,7 +44,10 @@
     "@typescript-eslint/no-explicit-any": "off",
     "consistent-return": "off",
     "react/no-array-index-key": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "react/require-default-props": "off",
     "no-underscore-dangle": "off",
+    "import/prefer-default-export": "off",
     "react/jsx-filename-extension": [
       "warn",
       {
