@@ -49,6 +49,7 @@ export default function Page({
       criticalRateMin: 0,
       criticalRateMax: 0,
       gold: 0,
+      iLevel: 1,
     },
   })
 
@@ -93,6 +94,7 @@ export default function Page({
     setValue('criticalMultiplierMax', rWeapon.criticalMultiplier[1])
 
     setValue('gold', rWeapon.gold)
+    setValue('iLevel', rWeapon.iLevel)
   }
 
   const checkValidation = (formData: any) => {
@@ -192,6 +194,7 @@ export default function Page({
       ...weapon,
       gold: getValues('gold'),
       name: getValues('name'),
+      iLevel: getValues('iLevel'),
       damageOfPhysical: [
         getValues('damageOfPhysicalMin'),
         getValues('damageOfPhysicalMax'),
@@ -480,10 +483,22 @@ export default function Page({
                 {/* ================================================================= */}
 
                 <div>
-                  <div>획득 골드</div>
+                  <div>판매가</div>
                   <div className="flex">
                     <Controller
                       name="gold"
+                      control={control}
+                      render={({ field }) => <Input label="gold" {...field} />}
+                    />
+                  </div>
+                </div>
+                {/* ================================================================= */}
+
+                <div>
+                  <div>아이템 레벨</div>
+                  <div className="flex">
+                    <Controller
+                      name="iLevel"
                       control={control}
                       render={({ field }) => <Input label="gold" {...field} />}
                     />

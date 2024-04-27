@@ -89,7 +89,7 @@ export default function CollectionPage() {
                             (monster.weight / selectedMap.totalWeight) *
                             100
                           ).toFixed(2)}
-                          %
+                          %({monster.weight})
                         </div>
                         <div className="text-[10px] text-green-400">
                           +{monster.experience.toLocaleString()}exp, +
@@ -191,6 +191,10 @@ export function BaseWeaponBoxTooltipComponent({
             {selectedItem.criticalMultiplier[0]} ~{' '}
             {selectedItem.criticalMultiplier[1]}
           </div>
+        </div>
+        <div className="flex justify-between">
+          <div>판매 금액</div>
+          <div>{selectedItem.gold.toLocaleString()}</div>
         </div>
       </div>
     </div>

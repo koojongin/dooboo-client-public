@@ -13,6 +13,9 @@ module.exports = withMT({
     './src/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    screens: {
+      wide:'1000px'
+    },
     extend: {
       colors: {
         'dark-blue': '#43466a'

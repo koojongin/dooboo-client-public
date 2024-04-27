@@ -13,6 +13,8 @@ import { fetchEquipItem, fetchGetMyInventory } from '@/services/api-fetch'
 import { InnItem, InventoryRef, Weapon } from '@/interfaces/item.interface'
 import toAPIHostURL from '@/services/image-name-parser'
 import { toMMDDHHMM } from '@/services/util'
+import { socket } from '@/services/socket'
+import { EMIT_SHARE_ITEM_EVENT } from '@/interfaces/chat.interface'
 
 export function WeaponBoxDetailComponent({
   item,
@@ -31,6 +33,10 @@ export function WeaponBoxDetailComponent({
     if (equippedCallback) equippedCallback()
   }
 
+  const shareItem = async (eItem: Weapon | any) => {
+    socket.emit(EMIT_SHARE_ITEM_EVENT, { itemId: eItem._id })
+  }
+
   const sellItem = async (eItem: Weapon | any) => {
     await Swal.fire({
       title: '미지원',
@@ -41,7 +47,18 @@ export function WeaponBoxDetailComponent({
   }
 
   return (
-    <div className="flex flex-col gap-1 min-w-[200px] p-[4px] text-white bg-[#555d62ed] rounded">
+    <div className="flex flex-col gap-1 min-w-[200px] p-[4px] text-white bg-[#555d62ed] rounded shadow-gray-400 shadow-xl">
+      <div className="flex items-center justify-center">
+        {[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1].map((v) => {
+          return (
+            <img
+              className="w-[16px] h-[16px]"
+              key={createKey()}
+              src={`/images/star_${v ? 'on' : 'off'}.png`}
+            />
+          )
+        })}
+      </div>
       <div className="text-center text-2xl bg-[#9bb5c44f]">
         {selectedItem.name}
       </div>
@@ -50,7 +67,11 @@ export function WeaponBoxDetailComponent({
         <div>{selectedItem.iType}</div>
       </div>
       <div className="flex justify-between">
-        <div className="">요구 레벨</div>
+        <div className="">아이템 레벨</div>
+        <div>{selectedItem.iLevel}</div>
+      </div>
+      <div className="flex justify-between">
+        <div className="">착용 레벨</div>
         <div>{selectedItem.requiredEquipmentLevel}</div>
       </div>
       <div className="border-b border-b-white" />
@@ -119,6 +140,12 @@ export function WeaponBoxDetailComponent({
               >
                 착용
               </div>
+              <div
+                className="flex items-center justify-center border border-white min-w-[40px] bg-green-400 rounded text-white px-[2px] cursor-pointer"
+                onClick={() => shareItem(item)}
+              >
+                공유
+              </div>
               {/*     <div
                 className="flex items-center justify-center border border-white min-w-[40px] bg-green-400 rounded text-white px-[2px] cursor-pointer"
                 onClick={() => sellItem(item)}
@@ -150,10 +177,10 @@ export function ItemBoxComponent({
 }) {
   const selectedItem = item.weapon
   const totalFlatDamage =
-    selectedItem.damageOfPhysical +
-    selectedItem.damageOfLightning +
-    selectedItem.damageOfCold +
-    selectedItem.damageOfFire
+    (selectedItem?.damageOfPhysical || 0) +
+    (selectedItem?.damageOfLightning || 0) +
+    (selectedItem?.damageOfCold || 0) +
+    (selectedItem?.damageOfFire || 0)
 
   const onClickItem = () => {
     onSelect(item)
@@ -178,7 +205,9 @@ export function ItemBoxComponent({
             }
           >
             <div className="relative max-w-full max-h-full w-[40px] h-[40px]">
-              <div className="absolute text-[12px]">{totalFlatDamage}</div>
+              <div className="absolute text-[12px] border rounded px-[2px] ff-ba ff-skew bg-[#424242a6] text-white">
+                {totalFlatDamage}
+              </div>
               <img
                 className="max-w-full max-h-full w-[40px] h-[40px]"
                 src={`${toAPIHostURL(selectedItem.thumbnail)}`}

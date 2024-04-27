@@ -35,7 +35,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.className} bg-[url('/images/bg001.jpg')] bg-contain min-h-[500px] min-w-[900px]`}
+        className={`${inter.className} bg-[url('/images/bg001.jpg')] bg-contain min-h-[500px] min-w-[900px] wide:w-full`}
       >
         <div className="flex justify-start bg-gray-100 bg-opacity-65 w-full text-[14px] py-1">
           <div className="min-w-[900px] px-3">

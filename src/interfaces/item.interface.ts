@@ -25,6 +25,7 @@ export interface BaseWeapon extends MongooseDocument {
   name: string // '목도'
   requiredEquipmentLevel: string // 1
   thumbnail: string // 'public/upload/items/08521e812a40a8af.png'
+  iLevel: number
 
   /// //
   weight: number

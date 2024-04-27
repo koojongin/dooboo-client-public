@@ -24,7 +24,7 @@ export default function CommunityPage() {
     loadRanks()
   }, [])
   return (
-    <div>
+    <div className="min-w-[900px] wide:w-full">
       <div className="flex gap-1 px-[1px] py-[1px] bg-blue-gray-200 bg-dark-blue text-white">
         <div className={tableClass[0]}>랭크</div>
         <div className={tableClass[1]}>레벨</div>

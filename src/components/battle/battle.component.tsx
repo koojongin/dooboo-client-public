@@ -26,6 +26,7 @@ export default (function Battle({
   const [battleLogs, setBattleLogs]: any = useState([])
   const [isAutoRunning, setIsAutoRunning] = useState<boolean>(false)
   const timerRef = useRef<NodeJS.Timeout>()
+  const battleScrollDivRef = useRef<HTMLDivElement>(null)
 
   const onChangeMap = (mapName: string | undefined) => {
     if (!mapName) return
@@ -72,6 +73,10 @@ export default (function Battle({
   const stopBattleInterval = () => {
     setIsAutoRunning(false)
     if (timerRef.current) {
+      if (selectedMap && timerRef?.current) {
+        audioEndOfBattle.volume = 0.5
+        audioEndOfBattle.play()
+      }
       clearInterval(timerRef.current)
       timerRef.current = undefined
     }
@@ -96,9 +101,15 @@ export default (function Battle({
   }
 
   const audio = new Audio('/audio/item_drop.mp3')
+  const audioEndOfBattle = new Audio('/audio/end_of_battle.mp3')
   const playDropSound = () => {
     audio.volume = 0.1
     audio.play()
+  }
+
+  const onAnimationEnd = () => {
+    console.log('onAnimationEnd')
+    battleScrollDivRef.current?.scrollTo(0, 9999999999999)
   }
 
   useEffect(() => {
@@ -107,7 +118,6 @@ export default (function Battle({
       stopBattleInterval()
     }
   }, [])
-
   return (
     <Card className={headCss}>
       <div className="flex mb-5 px-[24px] pt-[20px]">
@@ -141,7 +151,10 @@ export default (function Battle({
         </Button>
       </div>
       {/* 전투로그 */}
-      <div className="px-[24px] overflow-y-scroll max-h-[400px] h-[400px]">
+      <div
+        className="px-[24px] overflow-y-scroll max-h-[350px] h-[350px]"
+        ref={battleScrollDivRef}
+      >
         {battleResult && battleResult.monster && (
           <div>
             <div className="flex gap-1 text-sm">
@@ -155,25 +168,26 @@ export default (function Battle({
               <div>
                 <img
                   src={toAPIHostURL(battleResult.monster.thumbnail)}
-                  className="max-w-28 rounded-lg"
+                  className="max-w-[100px] rounded-lg"
                 />
               </div>
               <div>
-                <div className="flex items-center text-[24px] leading-[24px] ff-ba gap-1">
-                  <div className="ff-ba rounded-lg bg-indigo-400 text-white px-4 py-0.5">
+                <div className="flex items-center text-[14px] gap-1">
+                  <div className="rounded bg-indigo-400 text-white px-4 py-0.5">
                     {battleResult.monster.name}
                   </div>
-                  <div className="ff-ba">을/를 만났습니다.</div>
+                  <div className="">을/를 만났습니다.</div>
                 </div>
-                <div>HP:{battleResult.monster.hp}</div>
+                <div className="text-[12px]">HP:{battleResult.monster.hp}</div>
               </div>
             </div>
-            <div className="text-white text-[16px]">
+            <div className="text-white text-[12px]">
               {battleLogs.map((battleLog: any, index: any) => {
                 return (
                   <div
                     key={`battlelog-${index}`}
                     className="animate-slideIn flex items-center mb-1 gap-1 transition text-black opacity-0"
+                    onAnimationEnd={onAnimationEnd}
                     style={
                       { '--delay': `${index * 0.25}s` } as React.CSSProperties
                     }
@@ -181,6 +195,7 @@ export default (function Battle({
                     <Chip
                       variant="gradient"
                       size="sm"
+                      className="text-[14px] rounded px-[4px] min-w-[70px] flex items-center justify-center py-[2px]"
                       color={battleLog.isCriticalHit ? 'red' : 'indigo'}
                       value={`${index + 1}Turn`}
                     />
@@ -188,7 +203,7 @@ export default (function Battle({
                       {battleLog.isCriticalHit && (
                         <Chip size="sm" color="yellow" value="치명타!" />
                       )}
-                      <div className="bg-light-blue-300 ff-ba text-[20px] leading-[20px] px-2 py-0.5 text-white rounded-lg">
+                      <div className="bg-light-blue-300 ff-ba text-[20px] leading-[20px] px-[2px] py-[1px] text-white rounded">
                         {battleLog.damage}
                       </div>
                       <div>의 피해를 입혔습니다.</div>
@@ -208,10 +223,10 @@ export default (function Battle({
                 } as React.CSSProperties
               }
             >
-              <div className="flex items-end">
+              <div className="flex items-end mt-[10px]">
                 전투에서
                 <span
-                  className={`pl-1 font-bold text-3xl ${battleResult.isWin ? 'text-green-900' : 'text-red-800'}`}
+                  className={`pl-1 font-bold text-[20px] ${battleResult.isWin ? 'text-green-900' : 'text-red-800'}`}
                 >
                   {battleResult.isWin ? '승리' : '패배'}
                 </span>

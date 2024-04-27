@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import MainHeader from '@/app/main/header.component'
 import { ChatComponent } from '@/app/main/chat.component'
 
@@ -20,17 +21,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const currentPath = ''
   return (
     <div className="flex justify-center mt-2">
       {/* 컨텐츠 */}
-      <div className="min-w-[900px] flex items-center justify-between flex-col">
+      <div className="min-w-[960px] flex items-center justify-between flex-col">
         {/* 헤더 */}
         <MainHeader />
-
         {/* 내용 */}
-        <div className="relative w-full flex justify-between">{children}</div>
-        <div className="mt-[10px] w-full">
-          <ChatComponent />
+        <div className="flex flex-col gap-[6px]  wide:flex-row">
+          <div className="relative w-full flex justify-between wide:w-[1000px]">
+            {children}
+          </div>
+          <div className="w-full wide:w-[300px]">
+            <ChatComponent />
+          </div>
         </div>
       </div>
     </div>
