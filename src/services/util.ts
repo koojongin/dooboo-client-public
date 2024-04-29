@@ -32,3 +32,7 @@ export const getItemByType = (item: Item) => {
 export const getTokenByLocalStorage = () => {
   return localStorage.getItem('token') || ''
 }
+
+export const toEmojiPath = (path: string) => {
+  return `/images/emoji/${path}`
+}

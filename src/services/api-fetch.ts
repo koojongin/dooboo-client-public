@@ -6,6 +6,7 @@ import {
   BaseWeapon,
   BaseWeaponListResponseDto,
   BaseWeaponResponseDto,
+  EnhancedResult,
   Weapon,
 } from '@/interfaces/item.interface'
 import {
@@ -137,6 +138,7 @@ export async function fetchGetMyInventory(): Promise<{
   items: Array<Weapon | any>
   slots: number
   isFulled: boolean
+  gold: number
 }> {
   const { data: response } = await api.get(`/character/inventory`)
   return response
@@ -215,5 +217,20 @@ export async function fetchSellItems(
   itemIds: string[],
 ): Promise<DropTableResponseDto> {
   const { data: response } = await api.post(`/item/sell`, { itemIds })
+  return response
+}
+
+export async function fetchGetEnhancePrice(
+  id: string,
+): Promise<{ price: number } & any> {
+  const { data: response } = await api.get(`/item/enhance-price/${id}`)
+  return response
+}
+
+export async function fetchEnhanceWeapon(
+  id: string,
+  data: { itemIds: string[] },
+): Promise<EnhancedResult> {
+  const { data: response } = await api.post(`/item/enhance/${id}`, data)
   return response
 }

@@ -33,6 +33,7 @@ const TABLE_HEAD = [
   '치명타피해',
   '획득골드',
   '템렙',
+  '최대스타포스',
   '-',
 ]
 export default function ItemWeaponPage() {
@@ -153,6 +154,9 @@ export default function ItemWeaponPage() {
                       </td>{' '}
                       <td className={classes}>
                         <div>{weapon.iLevel}</div>
+                      </td>
+                      <td className={classes}>
+                        <div>{weapon.maxStarForce}</div>
                       </td>
                       <td className={`${classes}`}>
                         <div className="flex justify-start gap-1">

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
-import { headers } from 'next/headers'
 import MainHeader from '@/app/main/header.component'
 import { ChatComponent } from '@/app/main/chat.component'
+import AudioPlayBar from './audio-play-bar'
 
 export const metadata: Metadata = {
   title: '두부 온라인',
@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <div className="flex justify-center mt-2">
       {/* 컨텐츠 */}
-      <div className="min-w-[960px] flex items-center justify-between flex-col">
+      <div className="min-w-[960px] flex items-center justify-between flex-col mb-[50px]">
         {/* 헤더 */}
         <MainHeader />
         {/* 내용 */}
@@ -37,6 +37,9 @@ export default function RootLayout({
             <ChatComponent />
           </div>
         </div>
+      </div>
+      <div className="fixed bottom-0 left-0 w-full">
+        <AudioPlayBar />
       </div>
     </div>
   )

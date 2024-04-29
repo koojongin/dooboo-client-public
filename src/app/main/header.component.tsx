@@ -35,7 +35,10 @@ export default function MainHeader() {
       <Link href="/main/rank" className="  duration-300 cursor-pointer">
         <img src="/images/icon_006_rank.png" />
       </Link>
-      <Link href="/main/collection" className="  duration-300 cursor-pointer">
+      <Link
+        href="/main/collection/maps"
+        className="  duration-300 cursor-pointer"
+      >
         <img src="/images/icon_008_collection.png" />
       </Link>
       {/* <Link */}

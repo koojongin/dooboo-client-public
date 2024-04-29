@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import CollectionHeader from '@/app/main/collection/collection-header'
 
 export const metadata: Metadata = {
   title: '두부 온라인',
@@ -18,5 +19,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return <>{children}</>
+  return (
+    <div className="flex flex-col gap-[4px] text-[20px] ff-ba ff-skew w-full">
+      <CollectionHeader />
+      <div>{children}</div>
+    </div>
+  )
 }

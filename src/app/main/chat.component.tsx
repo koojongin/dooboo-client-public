@@ -1,22 +1,30 @@
 'use client'
 
-import { Card, Tooltip } from '@material-tailwind/react'
+import {
+  Card,
+  Popover,
+  PopoverContent,
+  PopoverHandler,
+  Tooltip,
+} from '@material-tailwind/react'
 import { KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { socket } from '@/services/socket'
 import { fetchGetJwtToken } from '@/services/api-fetch'
 import {
+  EMIT_CHAT_EMOJI_EVENT,
   EMIT_CHAT_MESSAGE_EVENT,
   EMIT_GET_CHARACTERS_EVENT,
   MESSAGE_EVENT,
   MESSAGE_TYPE,
+  ON_CHAT_EMOJI_EVENT,
   ON_CHAT_JOIN_EVENT,
   ON_CHAT_MESSAGE_EVENT,
   ON_GET_CHARACTERS_EVENT,
   ON_SHARE_ITEM_EVENT,
 } from '@/interfaces/chat.interface'
 import createKey from '@/services/key-generator'
-import { toHHMM } from '@/services/util'
+import { toEmojiPath, toHHMM } from '@/services/util'
 import toAPIHostURL from '@/services/image-name-parser'
 import { WeaponBoxDetailComponent } from '@/app/main/inventory.component'
 
@@ -39,6 +47,12 @@ export function ChatComponent() {
   const [connectedCharacters, setConnectedCharacters] =
     useState<ConnectedCharacterWrapper>({})
 
+  const [openPopover, setOpenPopover] = useState<boolean>(false)
+  const triggers = {
+    onMouseEnter: () => setOpenPopover(true),
+    onMouseLeave: () => setOpenPopover(false),
+  }
+
   // const audioNotification = new Audio('/audio/notification.mp3')
   const sendMessage = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== 'Enter') return
@@ -49,6 +63,11 @@ export function ChatComponent() {
   }
   const onChangeMessage = (message: string) => {
     setEnteredMessage(message)
+  }
+
+  const selectEmoji = (emojiNumber: number) => {
+    triggers.onMouseLeave()
+    socket.emit(EMIT_CHAT_EMOJI_EVENT, { name: emojiNumber })
   }
 
   const setupSocket = async () => {
@@ -80,6 +99,12 @@ export function ChatComponent() {
           break
 
         case ON_SHARE_ITEM_EVENT:
+          setChatMessages((before) => {
+            return [...before, data]
+          })
+          break
+
+        case ON_CHAT_EMOJI_EVENT:
           setChatMessages((before) => {
             return [...before, data]
           })
@@ -131,7 +156,7 @@ export function ChatComponent() {
             })}
           </div>
           <div
-            className="overflow-y-scroll w-full text-[14px] wide:h-full wide:max-h-[inherit]"
+            className="overflow-y-scroll w-full text-[14px] wide:h-full wide:max-h-[inherit] flex flex-col gap-[4px] wide:border-l"
             ref={chatElementRef}
           >
             {chatMessages.map((chatMessage) => {
@@ -148,6 +173,10 @@ export function ChatComponent() {
                 }
               }
 
+              if (chatMessage.type) {
+                messageType = chatMessage.type
+              }
+
               return (
                 <div key={createKey()} className="flex flex-wrap">
                   {messageType === MESSAGE_TYPE.ITEM_SHARE && (
@@ -160,7 +189,6 @@ export function ChatComponent() {
                         content={
                           <WeaponBoxDetailComponent
                             item={chatMessage.item}
-                            onShowActions={false}
                           />
                         }
                       >
@@ -176,7 +204,11 @@ export function ChatComponent() {
                               className="w-[40px] h-[40px] border rounded p-[1px] bg-white"
                             />
                           </div>
-                          [{chatMessage.item.weapon.name}]
+                          [{chatMessage.item.weapon.name}
+                          {chatMessage.item.weapon.starForce > 0
+                            ? `+${chatMessage.item.weapon.starForce}`
+                            : ''}
+                          ]
                         </div>
                       </Tooltip>
                     </div>
@@ -186,6 +218,20 @@ export function ChatComponent() {
                     <div className="break-all pl-[5px]">
                       {`[${toHHMM(new Date(chatMessage.timestamp))}] `}
                       {chatMessage.nickname}: {chatMessage.message}
+                    </div>
+                  )}
+
+                  {messageType === MESSAGE_TYPE.EMOJI && (
+                    <div className="break-all pl-[5px] flex flex-col wide:w-full">
+                      <div>
+                        {`[${toHHMM(new Date(chatMessage.timestamp))}] `}{' '}
+                        {chatMessage.nickname}:{' '}
+                      </div>
+                      <div className="wide:w-full wide:flex wide:justify-center">
+                        <div className="w-[120px] h-[120px]">
+                          <img src={toEmojiPath(chatMessage.emoji)} />
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -200,7 +246,29 @@ export function ChatComponent() {
             })}
           </div>
         </div>
-        <div>
+        <div className="flex items-stretch">
+          <Popover handler={setOpenPopover} open={openPopover}>
+            <PopoverHandler>
+              <div className="w-[32px] h-[32px] border border-r-0 flex items-center justify-center cursor-pointer">
+                <img src="/images/emoji/icon_emoji_select.png" />
+              </div>
+            </PopoverHandler>
+            <PopoverContent className="rounded p-0 m-0 p-[10px]">
+              <div className="flex flex-wrap gap-[1px] w-[404px]">
+                {new Array(19).fill(1).map((v, index) => {
+                  const src = `/images/emoji/ClanChat_Emoji_${`${index + 1}`.padStart(2, '0')}_kr.png`
+                  return (
+                    <img
+                      key={createKey()}
+                      src={src}
+                      onClick={() => selectEmoji(index + 1)}
+                      className="w-[80px] h-[80px] cursor-pointer"
+                    />
+                  )
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
           <input
             className="border p-[4px] w-full text-[14px]"
             placeholder="채팅 내용을 입력하세요. 입력 후 엔터"

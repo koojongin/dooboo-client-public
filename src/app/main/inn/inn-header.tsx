@@ -29,14 +29,15 @@ export default function InnHeader() {
       url: '/main/inn/quest',
       thumbnail: '/images/icon_quest.webp',
     },
+    {
+      name: '거래소',
+      url: '/main/inn/trade',
+      thumbnail: '/images/icon_trade.webp',
+    },
   ]
   const goToRoute = (path: string) => {
     router.push(path)
   }
-
-  useEffect(() => {
-    console.log(pathname)
-  }, [pathname])
 
   return (
     <div>
@@ -49,7 +50,7 @@ export default function InnHeader() {
               onClick={() => goToRoute(menu.url)}
             >
               <img className="w-full h-full" src={menu.thumbnail} />
-              <div className="absolute rounded bg-gradient-to-b from-yellow-900 w-full text-white bottom-0 py-[3px] flex justify-center items-center">
+              <div className="absolute bg-gradient-to-b from-yellow-900 w-full text-white bottom-0 py-[3px] flex justify-center items-center">
                 {menu.name}
               </div>
             </div>

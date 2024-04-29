@@ -4,7 +4,10 @@ import { Card, CardBody, Tooltip } from '@material-tailwind/react'
 import { MeResponse } from '@/interfaces/user.interface'
 import { Item } from '@/interfaces/item.interface'
 import toAPIHostURL from '@/services/image-name-parser'
-import { WeaponBoxDetailComponent } from '@/app/main/inventory.component'
+import {
+  InventoryActionKind,
+  WeaponBoxDetailComponent,
+} from '@/app/main/inventory.component'
 import { fetchUnequipItem } from '@/services/api-fetch'
 
 export default (function CharacterStatusComponent({
@@ -132,7 +135,7 @@ export default (function CharacterStatusComponent({
                         content={
                           <WeaponBoxDetailComponent
                             item={item}
-                            onShowActions={false}
+                            actions={[InventoryActionKind.Share]}
                           />
                         }
                       >

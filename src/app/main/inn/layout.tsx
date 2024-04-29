@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <div className="flex flex-col gap-[4px] text-[20px] ff-ba ff-skew">
+    <div className="flex flex-col gap-[4px] text-[20px] ff-ba ff-skew w-full">
       <InnHeader />
       <div>{children}</div>
     </div>

@@ -54,19 +54,16 @@ export default function CommunityPage() {
               <div className={tableClass[1]}>{character.level}</div>
               <div className={tableClass[2]}>{user.nickname}</div>
               {character.equip && (
-                <div>
+                <div className="flex items-center gap-[2px]">
                   <Tooltip
                     className="rounded-none bg-transparent"
                     interactive
                     content={
-                      <WeaponBoxDetailComponent
-                        item={character.equip}
-                        onShowActions={false}
-                      />
+                      <WeaponBoxDetailComponent item={character.equip} />
                     }
                   >
                     <div>
-                      <div className="absolute text-[12px] p-[2px]">
+                      <div className="absolute m-[1px] px-[2px] text-[12px] border rounded px-[2px] bg-[#424242a6] text-white ff-ba ff-skew">
                         {totalFlatDamage}
                       </div>
                       <img
@@ -75,6 +72,13 @@ export default function CommunityPage() {
                       />
                     </div>
                   </Tooltip>
+                  <div>
+                    [{character.equip.weapon.name}
+                    {character.equip.weapon.starForce > 0
+                      ? `+${character.equip.weapon.starForce}`
+                      : ''}
+                    ]
+                  </div>
                 </div>
               )}
             </div>

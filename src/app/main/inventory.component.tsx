@@ -16,14 +16,18 @@ import { toMMDDHHMM } from '@/services/util'
 import { socket } from '@/services/socket'
 import { EMIT_SHARE_ITEM_EVENT } from '@/interfaces/chat.interface'
 
+export const InventoryActionKind = {
+  Share: 'share',
+  Equip: 'equip',
+}
 export function WeaponBoxDetailComponent({
   item,
-  onShowActions,
   equippedCallback,
   onShowTotalDamage = false,
+  actions,
 }: {
   item: Weapon | any
-  onShowActions: boolean
+  actions?: string[]
   onShowTotalDamage?: boolean
   equippedCallback?: () => void
 }) {
@@ -49,12 +53,13 @@ export function WeaponBoxDetailComponent({
   return (
     <div className="flex flex-col gap-1 min-w-[200px] p-[4px] text-white bg-[#555d62ed] rounded shadow-gray-400 shadow-xl">
       <div className="flex items-center justify-center">
-        {[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1].map((v) => {
+        {new Array(selectedItem?.maxStarForce).fill(1).map((v, index) => {
+          const isOnStarForce = index < selectedItem.starForce
           return (
             <img
               className="w-[16px] h-[16px]"
               key={createKey()}
-              src={`/images/star_${v ? 'on' : 'off'}.png`}
+              src={`/images/star_${isOnStarForce ? 'on' : 'off'}.png`}
             />
           )
         })}
@@ -128,24 +133,26 @@ export function WeaponBoxDetailComponent({
         </div>
       </div>
 
-      {onShowActions && (
+      {
         <>
-          <div className="border-b border-b-dark-blue" />
-
           <div>
             <div className="flex items-center gap-1">
-              <div
-                className="flex items-center justify-center border border-white min-w-[40px] bg-green-400 rounded text-white px-[2px] cursor-pointer"
-                onClick={() => equipItem(item)}
-              >
-                착용
-              </div>
-              <div
-                className="flex items-center justify-center border border-white min-w-[40px] bg-green-400 rounded text-white px-[2px] cursor-pointer"
-                onClick={() => shareItem(item)}
-              >
-                공유
-              </div>
+              {actions && actions.includes(InventoryActionKind.Equip) && (
+                <div
+                  className="flex items-center justify-center border border-white min-w-[40px] bg-green-400 rounded text-white px-[2px] cursor-pointer"
+                  onClick={() => equipItem(item)}
+                >
+                  착용
+                </div>
+              )}
+              {actions && actions.includes(InventoryActionKind.Share) && (
+                <div
+                  className="flex items-center justify-center border border-white min-w-[40px] bg-green-400 rounded text-white px-[2px] cursor-pointer"
+                  onClick={() => shareItem(item)}
+                >
+                  공유
+                </div>
+              )}
               {/*     <div
                 className="flex items-center justify-center border border-white min-w-[40px] bg-green-400 rounded text-white px-[2px] cursor-pointer"
                 onClick={() => sellItem(item)}
@@ -155,7 +162,7 @@ export function WeaponBoxDetailComponent({
             </div>
           </div>
         </>
-      )}
+      }
     </div>
   )
 }
@@ -163,14 +170,14 @@ export function WeaponBoxDetailComponent({
 export function ItemBoxComponent({
   className = '',
   item,
-  onShowActions = false,
+  actions,
   onShowTotalDamage = false,
   equippedCallback = () => {},
   onSelect = () => {},
 }: {
   item: Weapon | any
   className: string
-  onShowActions?: boolean
+  actions?: string[]
   onShowTotalDamage?: boolean
   equippedCallback?: () => void
   onSelect?: (param: InnItem) => void
@@ -199,7 +206,7 @@ export function ItemBoxComponent({
               <WeaponBoxDetailComponent
                 item={item}
                 onShowTotalDamage={onShowTotalDamage}
-                onShowActions={onShowActions}
+                actions={actions}
                 equippedCallback={equippedCallback}
               />
             }
@@ -210,7 +217,7 @@ export function ItemBoxComponent({
               </div>
               <img
                 className="max-w-full max-h-full w-[40px] h-[40px]"
-                src={`${toAPIHostURL(selectedItem.thumbnail)}`}
+                src={`${toAPIHostURL(selectedItem?.thumbnail)}`}
               />
             </div>
           </Tooltip>
@@ -288,7 +295,10 @@ function InventoryComponent(
                   <ItemBoxComponent
                     className="p-[2px]"
                     item={item}
-                    onShowActions
+                    actions={[
+                      InventoryActionKind.Share,
+                      InventoryActionKind.Equip,
+                    ]}
                     onShowTotalDamage
                     equippedCallback={equippedCallback}
                   />

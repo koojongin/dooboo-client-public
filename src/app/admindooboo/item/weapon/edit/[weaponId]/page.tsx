@@ -49,6 +49,7 @@ export default function Page({
       criticalRateMin: 0,
       criticalRateMax: 0,
       gold: 0,
+      maxStarForce: 5,
       iLevel: 1,
     },
   })
@@ -95,6 +96,7 @@ export default function Page({
 
     setValue('gold', rWeapon.gold)
     setValue('iLevel', rWeapon.iLevel)
+    setValue('maxStarForce', rWeapon.maxStarForce)
   }
 
   const checkValidation = (formData: any) => {
@@ -195,6 +197,7 @@ export default function Page({
       gold: getValues('gold'),
       name: getValues('name'),
       iLevel: getValues('iLevel'),
+      maxStarForce: getValues('maxStarForce'),
       damageOfPhysical: [
         getValues('damageOfPhysicalMin'),
         getValues('damageOfPhysicalMax'),
@@ -500,7 +503,23 @@ export default function Page({
                     <Controller
                       name="iLevel"
                       control={control}
-                      render={({ field }) => <Input label="gold" {...field} />}
+                      render={({ field }) => (
+                        <Input label="iLevel" {...field} />
+                      )}
+                    />
+                  </div>
+                </div>
+                {/* ================================================================= */}
+
+                <div>
+                  <div>최대 강화</div>
+                  <div className="flex">
+                    <Controller
+                      name="maxStarForce"
+                      control={control}
+                      render={({ field }) => (
+                        <Input label="maxStarForce" {...field} />
+                      )}
                     />
                   </div>
                 </div>

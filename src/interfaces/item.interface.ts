@@ -12,6 +12,8 @@ export interface Weapon extends MongooseDocument {
   name: string // '목도'
   requiredEquipmentLevel: string // 1
   thumbnail: string // 'public/upload/items/08521e812a40a8af.png'
+  starForce: number
+  maxStarForce: number
 }
 export interface BaseWeapon extends MongooseDocument {
   criticalMultiplier: number[] // [0, 0]
@@ -26,6 +28,8 @@ export interface BaseWeapon extends MongooseDocument {
   requiredEquipmentLevel: string // 1
   thumbnail: string // 'public/upload/items/08521e812a40a8af.png'
   iLevel: number
+  starForce: number
+  maxStarForce: number
 
   /// //
   weight: number
@@ -48,6 +52,10 @@ export interface SelectItemDialogRef {
   openDialog: (index: number) => void
 }
 
+export interface EnhancedResultDialogRef {
+  open: () => void
+}
+
 export interface InventoryRef {
   refresh: () => void
 }
@@ -68,4 +76,12 @@ export interface Item extends MongooseDocument {
 
 export interface InnItem extends Item {
   isSelected: boolean
+}
+
+export interface EnhancedResult {
+  updatedWeapon: Weapon
+  enhancedLog: {
+    snapshot: Weapon
+  }
+  isSuccess: boolean
 }

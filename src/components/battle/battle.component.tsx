@@ -172,7 +172,7 @@ export default (function Battle({
                 />
               </div>
               <div>
-                <div className="flex items-center text-[14px] gap-1">
+                <div className="flex items-center text-[20px] gap-1">
                   <div className="rounded bg-indigo-400 text-white px-4 py-0.5">
                     {battleResult.monster.name}
                   </div>
@@ -181,7 +181,7 @@ export default (function Battle({
                 <div className="text-[12px]">HP:{battleResult.monster.hp}</div>
               </div>
             </div>
-            <div className="text-white text-[12px]">
+            <div className="text-white text-[16px]">
               {battleLogs.map((battleLog: any, index: any) => {
                 return (
                   <div
@@ -203,8 +203,8 @@ export default (function Battle({
                       {battleLog.isCriticalHit && (
                         <Chip size="sm" color="yellow" value="치명타!" />
                       )}
-                      <div className="bg-light-blue-300 ff-ba text-[20px] leading-[20px] px-[2px] py-[1px] text-white rounded">
-                        {battleLog.damage}
+                      <div className="bg-light-blue-300 ff-ba text-[20px] px-[6px] py-[1px] text-white rounded">
+                        {battleLog.damage.toLocaleString()}
                       </div>
                       <div>의 피해를 입혔습니다.</div>
                     </div>
@@ -216,7 +216,7 @@ export default (function Battle({
               })}
             </div>
             <div
-              className="animate-slideIn transition flex flex-col opacity-0"
+              className="animate-slideIn transition flex flex-col opacity-0 text-[18px]"
               style={
                 {
                   '--delay': `${battleResult.battleLogs.length * 0.25}s`,

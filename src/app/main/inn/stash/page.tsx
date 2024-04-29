@@ -46,21 +46,19 @@ export default function StashPage() {
 
   return (
     <div className="rounded w-full min-h-[500px]">
-      <Card className="rounded border">
-        <CardBody className="flex flex-col gap-1">
-          <Card className="rounded shadow-none">
-            {!!characterData?.character && (
-              <div>{characterData.character.gold.toLocaleString()} Gold</div>
-            )}
-          </Card>
-          <InnInventory
-            items={items}
-            setItems={setItems}
-            syncData={syncData}
-            maxItemSlots={maxItemSlots}
-            isFulledInventory={isFulledInventory}
-          />
-        </CardBody>
+      <Card className="rounded border p-[8px]">
+        <Card className="rounded shadow-none">
+          {!!characterData?.character && (
+            <div>{characterData.character.gold.toLocaleString()} Gold</div>
+          )}
+        </Card>
+        <InnInventory
+          items={items}
+          setItems={setItems}
+          syncData={syncData}
+          maxItemSlots={maxItemSlots}
+          isFulledInventory={isFulledInventory}
+        />
       </Card>
     </div>
   )
@@ -139,13 +137,13 @@ function InnInventory({
     <div className="">
       <div className="flex">
         <div
-          className="border px-[5px] text-[16px] rounded text-white bg-green-400 cursor-pointer hover:bg-green-300"
+          className="border py-[2px] px-[5px] text-[16px] rounded text-white bg-green-400 cursor-pointer hover:bg-green-300"
           onClick={() => selectAll()}
         >
           전체 선택
         </div>
         <div
-          className="border px-[5px] text-[16px] rounded text-white bg-red-400 cursor-pointer"
+          className="border py-[2px]  px-[5px] text-[16px] rounded text-white bg-red-400 cursor-pointer"
           onClick={() => sellSelectedItems()}
         >
           선택된 아이템 판매
@@ -156,7 +154,15 @@ function InnInventory({
       <div className="flex gap-[10px]">
         {/* Left Inventory */}
         <div>
-          <div>인벤토리</div>
+          <div className="flex justify-between">
+            <div>인벤토리</div>
+            <div className="flex">
+              <input className="border border-dark-blue rounded rounded-r-none focus-visible:outline-0 ff-wavve text-[16px] p-[2px]" />
+              <div className="border-dark-blue border border-l-0 rounded rounded-l-none ff-wavve text-[16px] flex items-center justify-center p-[2px]">
+                선택
+              </div>
+            </div>
+          </div>
           <div>
             <div>
               <div className="flex flex-wrap max-w-[414px] bg-gray-100 p-[2px] rounded shadow-md gap-[1px]">
@@ -176,7 +182,6 @@ function InnInventory({
                         <ItemBoxComponent
                           className="p-[2px]"
                           item={item}
-                          onShowActions={false}
                           onShowTotalDamage
                           equippedCallback={() => {}}
                           onSelect={onSelectItem}
@@ -221,7 +226,6 @@ function InnInventory({
                         <ItemBoxComponent
                           className="p-[2px]"
                           item={item}
-                          onShowActions={false}
                           onShowTotalDamage
                           equippedCallback={() => {}}
                           onSelect={onSelectItem}

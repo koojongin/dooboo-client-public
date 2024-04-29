@@ -12,14 +12,44 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'Wavve';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/WavvePADO-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'S-CoreDream';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 * {
-    font-family: 'GmarketSansMedium', 'BlueArchive';
+    font-family: 'GmarketSansMedium', 'BlueArchive', 'Wavve','S-CoreDream';
     line-height: normal;
     scrollbar-width: thin;
 }
 
+.ff-gs {
+    font-family: 'GmarketSansMedium'!important;
+}
+
+.ff-score {
+    font-family: 'S-CoreDream'!important;
+}
+
+.ff-gs * {
+    font-family: 'GmarketSansMedium';
+}
+
+.ff-wavve {
+    font-family: 'Wavve'!important;
+}
+
 .ff-ba {
-    font-family: 'BlueArchive';
+    font-family: 'BlueArchive'!important;
 }
 
 .ff-skew {
@@ -73,137 +103,6 @@ code {
 div[data-floating-ui-portal] div[role='tooltip'] {
     z-index: 99999
 }
-
-
-
-
-
-
-
-
-
-
-
-.layoutRoot {
-    display: flex;
-    background: #eee;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-.absoluteLayout {
-    height: 600px;
-    position: relative;
-    justify-content: center;
-    align-items: center;
-}
-.scaledLayout {
-    width: 125%;
-    left: -12.5vw;
-    transform: scale(0.75);
-    margin-top: -7.5vh;
-}
-
-.box {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    background: #ccc;
-    border: 1px solid black;
-    text-align: center;
-    padding: 10px;
-    box-sizing: border-box;
-    margin-bottom: 10px;
-    overflow: hidden;
-    position: relative;
-    margin: 20px;
-}
-.box .text {
-    text-align: center;
-}
-
-.hover-handles .react-resizable-handle {
-    display: none;
-}
-.hover-handles:hover .react-resizable-handle {
-    display: block;
-}
-.absolutely-positioned {
-    position: absolute !important;
-}
-.left-aligned {
-    left: 0;
-}
-.right-aligned {
-    right: 0;
-}
-.top-aligned {
-    top: 0;
-}
-.bottom-aligned {
-    bottom: 0;
-}
-
-.custom-box {
-    overflow: visible;
-}
-.custom-handle {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background-color: #1153aa;
-    opacity: 0.75;
-    border-radius: 4px;
-}
-.custom-handle-sw {
-    bottom: -4px;
-    left: -4px;
-    cursor: sw-resize;
-}
-.custom-handle-se {
-    bottom: -4px;
-    right: -4px;
-    cursor: se-resize;
-}
-.custom-handle-nw {
-    top: -4px;
-    left: -4px;
-    cursor: nw-resize;
-}
-.custom-handle-ne {
-    top: -4px;
-    right: -4px;
-    cursor: ne-resize;
-}
-.custom-handle-w,
-.custom-handle-e {
-    top: 50%;
-    margin-top: -4px;
-    cursor: ew-resize;
-}
-.custom-handle-w {
-    left: -4px;
-}
-.custom-handle-e {
-    right: -4px;
-}
-.custom-handle-n,
-.custom-handle-s {
-    left: 50%;
-    margin-left: -4px;
-    cursor: ns-resize;
-}
-.custom-handle-n {
-    top: -4px;
-}
-.custom-handle-s {
-    bottom: -4px;
-}
-.custom-resize-handle-component {
-    background-color: red;
-}
-
-
 
 
 @tailwind base;
