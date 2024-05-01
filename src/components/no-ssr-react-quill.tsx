@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic'
 
 export const QuillNoSSRWrapper =
-  typeof window !== 'object'
+  typeof window === 'undefined'
     ? () => null
     : dynamic(
         async () => {

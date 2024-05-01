@@ -78,7 +78,7 @@ export default function CommunityWritePage() {
         matchVisual: false,
         matchers: [
           [
-            Node.ELEMENT_NODE,
+            1,
             (node: Node, delta: any) => {
               const fixedOps = delta?.ops.map((op: any) => {
                 const isImage = op?.insert?.image
