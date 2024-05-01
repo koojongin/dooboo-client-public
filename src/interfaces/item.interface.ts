@@ -1,5 +1,14 @@
 import { MongooseDocument, Pagination } from './common.interface'
 
+export const WeaponType = {
+  Axe: 'axe',
+  Sword: 'sword',
+  Dagger: 'dagger',
+  Bow: 'bow',
+  Blunt: 'blunt',
+  Spear: 'spear',
+}
+
 export interface Weapon extends MongooseDocument {
   criticalMultiplier: number //
   criticalRate: number //
@@ -8,12 +17,18 @@ export interface Weapon extends MongooseDocument {
   damageOfLightning: number //
   damageOfPhysical: number //
   iType: string // 'weapon'
+  iLevel: number
   gold: number
+  iGrade: string
   name: string // '목도'
   requiredEquipmentLevel: string // 1
   thumbnail: string // 'public/upload/items/08521e812a40a8af.png'
   starForce: number
   maxStarForce: number
+  weaponType: string
+  additionalAttributes?: {
+    [key: string]: number
+  }
 }
 export interface BaseWeapon extends MongooseDocument {
   criticalMultiplier: number[] // [0, 0]
@@ -30,6 +45,7 @@ export interface BaseWeapon extends MongooseDocument {
   iLevel: number
   starForce: number
   maxStarForce: number
+  weaponType: string
 
   /// //
   weight: number

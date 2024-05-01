@@ -88,6 +88,7 @@ export default function Main() {
               ref={inventoryRef}
               refreshInventory={refreshInventory}
               refreshMe={refreshMe}
+              equippedItems={equippedItems}
             />
           )}
         </div>

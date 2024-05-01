@@ -26,39 +26,92 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'NanumBarunGothic';
+    font-style: normal;
+    font-weight: 400;
+    src: url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.eot');
+    src: url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.eot?#iefix') format('embedded-opentype'), url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.woff') format('woff'), url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.ttf') format('truetype');
+}
+
 * {
-    font-family: 'GmarketSansMedium', 'BlueArchive', 'Wavve','S-CoreDream';
+    font-family: 'GmarketSansMedium', 'BlueArchive', 'Wavve', 'S-CoreDream', 'NanumBarunGothic';
     line-height: normal;
     scrollbar-width: thin;
 }
 
 .ff-gs {
-    font-family: 'GmarketSansMedium'!important;
+    font-family: 'GmarketSansMedium';
+}
+
+.ff-dodoom {
+    font-family: '돋움';
+}
+
+.ff-dodoom-all {
+    font-family: '돋움';
+}
+
+.ff-dodoom-all * {
+    font-family: '돋움';
+}
+
+.ff-nbg {
+    font-family: 'NanumBarunGothic';
+}
+
+.ff-nbg-all {
+    font-family: 'NanumBarunGothic';
+}
+
+.ff-nbg-all * {
+    font-family: 'NanumBarunGothic';
 }
 
 .ff-score {
-    font-family: 'S-CoreDream'!important;
+    font-family: 'S-CoreDream';
 }
 
-.ff-gs * {
+.ff-score-all {
+    font-family: 'S-CoreDream';
+}
+
+.ff-score-all * {
+    font-family: 'S-CoreDream';
+}
+
+.ff-gs {
+    font-family: 'GmarketSansMedium';
+}
+
+.ff-gs-all * {
+    font-family: 'GmarketSansMedium';
+}
+
+.ff-gs-all {
     font-family: 'GmarketSansMedium';
 }
 
 .ff-wavve {
-    font-family: 'Wavve'!important;
+    font-family: 'Wavve';
 }
 
 .ff-ba {
-    font-family: 'BlueArchive'!important;
+    font-family: 'BlueArchive';
+}
+
+.ff-ba-all * {
+    font-family: 'BlueArchive';
+}
+
+.ff-ba-all {
+    font-family: 'BlueArchive';
 }
 
 .ff-skew {
     transform: skew(-0.1deg);
 }
 
-.ff-ba * {
-    font-family: 'BlueArchive';
-}
 
 body {
     margin: 0;
@@ -70,12 +123,8 @@ body {
     /*cursor:url('/images/cursor-normal.png'), auto;*/
 }
 
-@media (max-width: 1000px){
+@media (max-width: 1000px) {
     body {
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
-        align-items: center;
     }
 }
 

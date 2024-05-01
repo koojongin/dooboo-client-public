@@ -26,7 +26,7 @@ import {
   UpdateMonsterDialogRef,
 } from '@/interfaces/monster.interface'
 import UpdateMonsterDialog from './update-monster-dialog'
-import {API_SERVER_URL} from "@/constants/constant";
+import { API_SERVER_URL } from '@/constants/constant'
 
 const TABLE_HEAD = ['이미지', 'name', 'experience', 'hp', 'gold', 'weight', '']
 

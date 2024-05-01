@@ -1,7 +1,7 @@
 'use client'
 
 import Swal from 'sweetalert2'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Button, Card, CardBody, Chip, Input } from '@material-tailwind/react'
 import { useRouter } from 'next/navigation'
@@ -11,10 +11,10 @@ import {
   fetchPutBaseWeapon,
   fetchUploadItemFile,
 } from '@/services/api-fetch'
-import { BaseWeapon } from '@/interfaces/item.interface'
+import { BaseWeapon, WeaponType } from '@/interfaces/item.interface'
 import createKey from '@/services/key-generator'
 import toAPIHostURL from '@/services/image-name-parser'
-import { MonsterListRef } from '@/interfaces/monster.interface'
+import { translate } from '@/services/util'
 
 export default function Page({
   params,
@@ -27,6 +27,7 @@ export default function Page({
   const imageUploadRef = useRef<any>(null)
   const isCreateMode = params?.weaponId === 'create'
   const [weapon, setWeapon] = useState<BaseWeapon | any>()
+  const weaponTypeOptions = Object.values(WeaponType)
   const {
     handleSubmit,
     formState: { errors },
@@ -51,6 +52,7 @@ export default function Page({
       gold: 0,
       maxStarForce: 5,
       iLevel: 1,
+      weaponType: 'axe',
     },
   })
 
@@ -66,38 +68,42 @@ export default function Page({
     setWeapon({ ...weapon, thumbnail: path })
   }
 
-  const loadWeapon = async (weaponId: string) => {
-    const { weapon: rWeapon } = await fetchGetBaseWeapon(weaponId)
-    if (!rWeapon) {
-      return Swal.fire({
-        title: '아이템을 찾을 수 없습니다.',
-        text: '문제가 계속되면 관리자에게 문의해주세요',
-        icon: 'error',
-        confirmButtonText: '확인',
-      })
-    }
+  const loadWeapon = useCallback(
+    async (weaponId: string) => {
+      const { weapon: rWeapon } = await fetchGetBaseWeapon(weaponId)
+      if (!rWeapon) {
+        return Swal.fire({
+          title: '아이템을 찾을 수 없습니다.',
+          text: '문제가 계속되면 관리자에게 문의해주세요',
+          icon: 'error',
+          confirmButtonText: '확인',
+        })
+      }
 
-    setWeapon(rWeapon)
-    setValue('name', rWeapon.name)
-    setValue('damageOfPhysicalMin', rWeapon.damageOfPhysical[0])
-    setValue('damageOfPhysicalMax', rWeapon.damageOfPhysical[1])
-    setValue('damageOfFireMin', rWeapon.damageOfFire[0])
-    setValue('damageOfFireMax', rWeapon.damageOfFire[1])
-    setValue('damageOfColdMin', rWeapon.damageOfCold[0])
-    setValue('damageOfColdMax', rWeapon.damageOfCold[1])
-    setValue('damageOfLightningMin', rWeapon.damageOfLightning[0])
-    setValue('damageOfLightningMax', rWeapon.damageOfLightning[1])
+      setWeapon(rWeapon)
+      setValue('name', rWeapon.name)
+      setValue('damageOfPhysicalMin', rWeapon.damageOfPhysical[0])
+      setValue('damageOfPhysicalMax', rWeapon.damageOfPhysical[1])
+      setValue('damageOfFireMin', rWeapon.damageOfFire[0])
+      setValue('damageOfFireMax', rWeapon.damageOfFire[1])
+      setValue('damageOfColdMin', rWeapon.damageOfCold[0])
+      setValue('damageOfColdMax', rWeapon.damageOfCold[1])
+      setValue('damageOfLightningMin', rWeapon.damageOfLightning[0])
+      setValue('damageOfLightningMax', rWeapon.damageOfLightning[1])
 
-    setValue('criticalRateMin', rWeapon.criticalRate[0])
-    setValue('criticalRateMax', rWeapon.criticalRate[1])
+      setValue('criticalRateMin', rWeapon.criticalRate[0])
+      setValue('criticalRateMax', rWeapon.criticalRate[1])
 
-    setValue('criticalMultiplierMin', rWeapon.criticalMultiplier[0])
-    setValue('criticalMultiplierMax', rWeapon.criticalMultiplier[1])
+      setValue('criticalMultiplierMin', rWeapon.criticalMultiplier[0])
+      setValue('criticalMultiplierMax', rWeapon.criticalMultiplier[1])
 
-    setValue('gold', rWeapon.gold)
-    setValue('iLevel', rWeapon.iLevel)
-    setValue('maxStarForce', rWeapon.maxStarForce)
-  }
+      setValue('gold', rWeapon.gold)
+      setValue('iLevel', rWeapon.iLevel)
+      setValue('maxStarForce', rWeapon.maxStarForce)
+      setValue('weaponType', rWeapon.weaponType)
+    },
+    [setValue],
+  )
 
   const checkValidation = (formData: any) => {
     const error = {
@@ -198,6 +204,7 @@ export default function Page({
       name: getValues('name'),
       iLevel: getValues('iLevel'),
       maxStarForce: getValues('maxStarForce'),
+      weaponType: getValues('weaponType'),
       damageOfPhysical: [
         getValues('damageOfPhysicalMin'),
         getValues('damageOfPhysicalMax'),
@@ -226,9 +233,9 @@ export default function Page({
     setWeapon(newWeapon)
 
     if (isCreateMode) {
-      const result = await fetchPostBaseWeapon(newWeapon)
+      await fetchPostBaseWeapon(newWeapon)
     } else {
-      const result = await fetchPutBaseWeapon(newWeapon)
+      await fetchPutBaseWeapon(newWeapon)
     }
 
     await Swal.fire({
@@ -262,14 +269,13 @@ export default function Page({
         icon: 'error',
         confirmButtonText: '확인',
       })
-      return
     }
 
     if (isCreateMode) {
       return
     }
     loadWeapon(params.weaponId)
-  }, [])
+  }, [isCreateMode, loadWeapon, params.weaponId])
 
   return (
     <div>
@@ -519,6 +525,28 @@ export default function Page({
                       control={control}
                       render={({ field }) => (
                         <Input label="maxStarForce" {...field} />
+                      )}
+                    />
+                  </div>
+                </div>
+                {/* ================================================================= */}
+
+                <div>
+                  <div>종류</div>
+                  <div className="flex">
+                    <Controller
+                      name="weaponType"
+                      control={control}
+                      render={({ field }) => (
+                        <select defaultValue="axe" {...field}>
+                          {weaponTypeOptions.map((weaponType) => {
+                            return (
+                              <option key={createKey()} value={weaponType}>
+                                {translate(weaponType)}
+                              </option>
+                            )
+                          })}
+                        </select>
                       )}
                     />
                   </div>

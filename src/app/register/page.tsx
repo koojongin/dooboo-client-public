@@ -24,6 +24,19 @@ export default function Register() {
     },
     [nickname],
   )
+
+  const checkNickName = useCallback(async () => {
+    const { data } = await axios.post(`${API_SERVER_URL}/auth/check-nickname`, {
+      nickname,
+    })
+
+    const { isAvailable, message } = data
+    if (!isAvailable) setSearchValidMessage(message)
+    else setSearchValidMessage('사용 가능한 닉네임입니다.')
+
+    setIsAvailableNickname(isAvailable)
+  }, [])
+
   useEffect(() => {
     const ac = params.get('accessToken')
     setAccessToken(ac || '')
@@ -31,23 +44,8 @@ export default function Register() {
   }, [])
 
   useEffect(() => {
-    async function get() {
-      const { data } = await axios.post(
-        `${API_SERVER_URL}/auth/check-nickname`,
-        {
-          nickname,
-        },
-      )
-
-      const { isAvailable, message } = data
-      if (!isAvailable) setSearchValidMessage(message)
-      else setSearchValidMessage('사용 가능한 닉네임입니다.')
-
-      setIsAvailableNickname(isAvailable)
-    }
-
-    get()
-  }, [nickname])
+    checkNickName()
+  }, [checkNickName, nickname])
 
   useEffect(() => {
     if (!searchValidMessage) {

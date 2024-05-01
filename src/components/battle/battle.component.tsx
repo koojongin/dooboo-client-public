@@ -204,12 +204,12 @@ export default (function Battle({
                         <Chip size="sm" color="yellow" value="치명타!" />
                       )}
                       <div className="bg-light-blue-300 ff-ba text-[20px] px-[6px] py-[1px] text-white rounded">
-                        {battleLog.damage.toLocaleString()}
+                        {battleLog.damage.toFixed(2).toLocaleString()}
                       </div>
                       <div>의 피해를 입혔습니다.</div>
                     </div>
                     <div className="ml-auto">
-                      남은 체력:{battleLog.currentHp}
+                      남은 체력:{battleLog.currentHp.toFixed(2)}
                     </div>
                   </div>
                 )

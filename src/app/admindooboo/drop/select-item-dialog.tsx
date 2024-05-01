@@ -44,8 +44,11 @@ function SelectItemDialog(
                 onClick={() => selectItem(baseWeapon)}
               >
                 <Tooltip interactive content={<div>{baseWeapon.name}</div>}>
-                  <div className="max-w-[50px]">
-                    <img src={toAPIHostURL(baseWeapon.thumbnail)} />
+                  <div className="max-w-[36px] w-[36px] h-[36px] p-[2px] border border-dark-blue">
+                    <img
+                      className="w-full h-full"
+                      src={toAPIHostURL(baseWeapon.thumbnail)}
+                    />
                   </div>
                 </Tooltip>
               </div>

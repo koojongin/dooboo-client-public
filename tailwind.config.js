@@ -14,11 +14,12 @@ module.exports = withMT({
   ],
   theme: {
     screens: {
-      wide:'1000px'
+      wide: '1000px',
     },
     extend: {
       colors: {
-        'dark-blue': '#43466a'
+        'dark-blue': '#43466a',
+        ruliweb: '#1a70dc',
       },
       textShadow: {
         sm: '0 1px 2px var(--tw-shadow-color)',

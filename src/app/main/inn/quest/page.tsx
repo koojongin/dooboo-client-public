@@ -26,6 +26,7 @@ export default function QuestPage() {
   return (
     <div>
       <Card className="rounded p-[8px] w-full">
+        거래소 개발중........
         <div className="flex flex-col gap-[2px]">
           {quests.map((quest) => {
             return (

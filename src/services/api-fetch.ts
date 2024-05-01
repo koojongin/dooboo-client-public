@@ -14,6 +14,9 @@ import {
   DropTableListResponseDto,
   DropTableResponseDto,
 } from '@/interfaces/drop-table.interface'
+import { Board, BoardListResponse } from '@/interfaces/board.interface'
+import { Pagination } from '@/interfaces/common.interface'
+import { AuctionListResponse } from '@/interfaces/auction.interface'
 
 interface CreateMonsterResponse {
   monster: {
@@ -199,16 +202,12 @@ export async function fetchUploadItemFile(
   return response
 }
 
-export async function fetchEquipItem(
-  id: string,
-): Promise<DropTableResponseDto> {
+export async function fetchEquipItem(id: string) {
   const { data: response } = await api.post(`/item/equip/${id}`)
   return response
 }
 
-export async function fetchUnequipItem(
-  id: string,
-): Promise<DropTableResponseDto> {
+export async function fetchUnequipItem(id: string) {
   const { data: response } = await api.post(`/item/unequip/${id}`)
   return response
 }
@@ -232,5 +231,67 @@ export async function fetchEnhanceWeapon(
   data: { itemIds: string[] },
 ): Promise<EnhancedResult> {
   const { data: response } = await api.post(`/item/enhance/${id}`, data)
+  return response
+}
+
+export async function fetchPostBoard(data: any): Promise<any> {
+  const { data: response } = await api.post(`/board/create`, data)
+  return response
+}
+
+export async function fetchGetBoardList(
+  data: object,
+  opts = { page: 1 },
+): Promise<BoardListResponse> {
+  const { data: response } = await api.post(`/board/list`, {
+    condition: data,
+    opts,
+  })
+  return response
+}
+
+export async function fetchGetBoardOne(id: string): Promise<{ board: Board }> {
+  const { data: response } = await api.post(`/board/${id}`)
+  return response
+}
+
+export async function fetchPostBoardComment(
+  id: string,
+  data: { content: string } & any,
+): Promise<{ board: Board }> {
+  const { data: response } = await api.post(`/board/comment/create/${id}`, data)
+  return response
+}
+
+export async function fetchDeleteBoardOne(
+  id: string,
+): Promise<{ board: Board }> {
+  const { data: response } = await api.delete(`/board/delete/${id}`)
+  return response
+}
+
+export async function fetchPostAddToAuction(
+  id: string,
+  data: { gold: number },
+) {
+  const { data: response } = await api.post(`/item/auction/add/${id}`, data)
+  return response
+}
+
+export async function fetchGetAuctions(
+  condition = {},
+  opts?: { page: number },
+): Promise<AuctionListResponse> {
+  const { data: response } = await api.post(`/item/auction/list`, {
+    condition,
+    opts,
+  })
+  return response
+}
+
+export async function fetchPurchaseAuctionItem(
+  id: string,
+): Promise<AuctionListResponse> {
+  const { data: response } = await api.post(`/item/auction/purchase/${id}`)
   return response
 }

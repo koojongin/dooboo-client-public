@@ -3,7 +3,6 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import { Button, Card, CardBody, Tooltip } from '@material-tailwind/react'
 import Swal from 'sweetalert2'
-import moment from 'moment'
 import { useRouter } from 'next/navigation'
 import {
   BaseWeapon,
@@ -202,13 +201,7 @@ function DropTableMonsterComponent({
   )
 }
 
-export default function Page({
-  params,
-  searchParams,
-}: {
-  params: { dropTableId: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}) {
+export default function Page({ params }: { params: { dropTableId: string } }) {
   const router = useRouter()
   const { dropTableId } = params
 
@@ -255,9 +248,9 @@ export default function Page({
       })
 
     if (dropTable?._id && dropTable?._id.length === 24) {
-      const result = await fetchPutDropTable(dropTable!)
+      await fetchPutDropTable(dropTable!)
     } else {
-      const result = await fetchCreateDropTable(dropTable!)
+      await fetchCreateDropTable(dropTable!)
     }
     await Swal.fire({
       title: '성공',
@@ -278,7 +271,7 @@ export default function Page({
     } else {
       loadDropTable(dropTableId)
     }
-  }, [])
+  }, [dropTableId])
 
   return (
     <Card>

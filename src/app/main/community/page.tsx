@@ -1,122 +1,114 @@
 'use client'
 
-import _ from 'lodash'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { fetchGetBoardList } from '@/services/api-fetch'
+import { Board } from '@/interfaces/board.interface'
 import createKey from '@/services/key-generator'
+import { ago } from '@/services/util'
 
 export default function CommunityPage() {
-  const route = useRouter()
-  const posts: any = [
-    { title: '드레이크도 잡아봤어요' },
-    { title: '허심의 극치얻는 교란마을 퀘 꼬인건지 봐주세요' },
-    { title: '용만 잡고싶다고....용만...' },
-    { title: '다회차 이부분은 대실망!' },
-    { title: '드레이크도 잡아봤어요' },
-    { title: '드레이크도 잡아봤어요' },
-    {
-      title:
-        '허심의 극치얻는 교란마을 퀘 꼬인건지 봐주세요 이름이긴제목1ㅣㅏ머ㅣㅏ;ㅅㅁㅈ더;시ㅏㅁㅈ더ㅏㅣ;섬ㅈ;디ㅏ서ㅏㅣ;ㅁㅈㄷ서;ㅣㅏㅁㅈ덧;ㅏㅣㅁㅈㄷㅅ',
-    },
-    { title: '용만 잡고싶다고....용만...' },
-    // { title: '다회차 이부분은 대실망!' },
-    // { title: '드레이크도 잡아봤어요' },
-    // { title: '드레이크도 잡아봤어요' },
-    // { title: '허심의 극치얻는 교란마을 퀘 꼬인건지 봐주세요' },
-    // { title: '용만 잡고싶다고....용만...' },
-    // { title: '다회차 이부분은 대실망!' },
-    // { title: '드레이크도 잡아봤어요' },
-    // { title: '드레이크도 잡아봤어요' },
-    // { title: '허심의 극치얻는 교란마을 퀘 꼬인건지 봐주세요' },
-    // { title: '용만 잡고싶다고....용만...' },
-    // { title: '다회차 이부분은 대실망!' },
-    // { title: '드레이크도 잡아봤어요' },
-    // { title: '허심의 극치얻는 교란마을 퀘 꼬인건지 봐주세요' },
-    // { title: '용만 잡고싶다고....용만...' },
-    // { title: '다회차 이부분은 대실망!' },
-    // { title: '드레이크도 잡아봤어요' },
-    // { title: '허심의 극치얻는 교란마을 퀘 꼬인건지 봐주세요' },
-    // { title: '용만 잡고싶다고....용만...' },
-    // { title: '다회차 이부분은 대실망!' },
-    // { title: '드레이크도 잡아봤어요' },
-    // { title: '허심의 극치얻는 교란마을 퀘 꼬인건지 봐주세요' },
-    // { title: '용만 잡고싶다고....용만...' },
-    // { title: '다회차 이부분은 대실망!' },
-    // { title: '드레이크도 잡아봤어요' },
-    // { title: '허심의 극치얻는 교란마을 퀘 꼬인건지 봐주세요' },
-    // { title: '용만 잡고싶다고....용만...' },
-    // { title: '다회차 이부분은 대실망!' },
-    // { title: '드레이크도 잡아봤어요' },
-    // { title: '허심의 극치얻는 교란마을 퀘 꼬인건지 봐주세요' },
-    // { title: '용만 잡고싶다고....용만...' },
-    // { title: '다회차 이부분은 대실망!' },
-    // { title: '드레이크도 잡아봤어요' },
-    // { title: '허심의 극치얻는 교란마을 퀘 꼬인건지 봐주세요' },
-    // { title: '용만 잡고싶다고....용만...' },
-    // { title: '다회차 이부분은 대실망!' },
-    // { title: '드레이크도 잡아봤어요' },
-    // { title: '허심의 극치얻는 교란마을 퀘 꼬인건지 봐주세요' },
-    // { title: '용만 잡고싶다고....용만...' },
-    // { title: '다회차 이부분은 대실망!' },
-    // { title: '드레이크도 잡아봤어요' },
-    // { title: '허심의 극치얻는 교란마을 퀘 꼬인건지 봐주세요' },
-    // { title: '용만 잡고싶다고....용만...' },
-    // { title: '다회차 이부분은 대실망!' },
-    // { title: '드레이크도 잡아봤어요' },
-  ]
+  const [notices, setNotices] = useState<Board[]>([])
+  const [freeBoards, setFreeBoards] = useState<Board[]>([])
+  const [boards, setBoards] = useState<
+    { path: string; name: string; boards: Board[] }[]
+  >([])
+  const loadBoards = async () => {
+    const [result, freeResult] = await Promise.all([
+      fetchGetBoardList(
+        { category: { $in: ['공지', '패치노트'] } },
+        { page: 1 },
+      ),
+      fetchGetBoardList({ category: { $in: [null] } }, { page: 1 }),
+    ])
 
-  const onClickWriteButton = () => {
-    route.push('/main/community/write')
+    setNotices(result.boards)
+    setFreeBoards(freeResult.boards)
+
+    setBoards([
+      {
+        path: '/main/community/board?board=1&page=1',
+        name: '공지 사항 및 패치 노트',
+        boards: result.boards.splice(0, 10),
+      },
+      {
+        path: '/main/community/board?board=2&page=1',
+        name: '자유 게시판',
+        boards: freeResult.boards.splice(0, 10),
+      },
+    ])
   }
 
-  useEffect(() => {}, [])
+  useEffect(() => {
+    loadBoards()
+  }, [])
+
   return (
-    <div className="">
-      <div onClick={() => onClickWriteButton()}>글쓰기</div>
-      <div className="text-[14px] flex flex-col ">
-        <div className="bg-blue-gray-500 text-white py-1.5 border-b border-gray-300 flex gap-[1px]">
-          <div className="pl-2 min-w-[100px]">구분</div>
-          <div className="w-full flex gap-1">제목</div>
-          <div className="min-w-[150px] max-w-[150px] ">글쓴이</div>
-          <div className="min-w-[50px] text-center">추천</div>
-          <div className="min-w-[50px] text-center">조회</div>
-          <div className="min-w-[120px] text-center">날짜</div>
+    <div className="flex flex-wrap gap-[10px]">
+      {/* BOARD ITEMS */}
+      {boards.map((board) => {
+        return (
+          <BoardBox
+            path={board.path}
+            key={createKey()}
+            boards={board.boards}
+            name={board.name}
+          />
+        )
+      })}
+
+      {/* BOARD ITEMS END */}
+    </div>
+  )
+}
+
+function BoardBox({
+  path,
+  boards,
+  name,
+}: {
+  path: string
+  boards: Board[]
+  name: string
+}) {
+  const router = useRouter()
+  const goToRoute = (pathName: string) => {
+    router.push(pathName)
+  }
+  return (
+    <div className="max-w-[400px] min-w-[400px] p-[10px] border-r border-gray-300">
+      <div className="flex items-center mb-[10px]">
+        <div
+          className="ff-nbg text-[20px] border-b-ruliweb border-b-2 pb-[2px] cursor-pointer"
+          onClick={() => goToRoute(path)}
+        >
+          {name}
         </div>
-        {posts.map((post: any) => {
+      </div>
+      <div className="flex flex-col gap-[10px]">
+        {boards.map((post) => {
           return (
-            <div
-              key={createKey()}
-              className="bg-blue-50 py-1.5 border-b border-gray-300 flex gap-[1px] [&>*]:flex [&>*]:items-center"
-            >
-              <div className="pl-2 min-w-[100px]">잡담</div>
-              <div className="w-full flex gap-1">
-                <div className="max-w-[600px] truncate">{post.title}</div>
-                <div className="font-bold">[3]</div>
-              </div>
-              <div className="min-w-[150px] max-w-[150px] gap-1">
-                <div className="w-full max-w-[22px] rounded-full border border-white">
-                  <img src="/images/profile_test.png" />
-                </div>
-                <div
-                  className="min-w-[100px] max-w-[100px] truncate"
-                  suppressHydrationWarning
-                >
-                  {_.shuffle(['영구', '귀차나', '긴닉네임1234ㅎㅎㅎㅎㅎ'])[0]}
-                </div>
-              </div>
-              <div className="min-w-[50px] justify-center">1</div>
-              <div className="min-w-[50px] justify-center">1</div>
+            <div key={createKey()} className="flex items-start justify-between">
               <div
-                className="min-w-[120px] justify-center"
-                suppressHydrationWarning
+                className="text-[12px] break-all w-full cursor-pointer hover:underline"
+                onClick={() => goToRoute(`/main/community/detail/${post._id}`)}
               >
-                {_.shuffle(['2024/01/01', '01:05', '12:38'])[0]}
+                {post.title}
+                <span className="font-bold">
+                  {post.comments!.length > 0
+                    ? ` [${post.comments?.length}]`
+                    : ''}
+                </span>
+              </div>
+              <div className="flex text-[12px] min-w-[80px] justify-end">
+                <div className="bg-gray-800 text-white px-[4px] py-[1px] rounded">
+                  {ago(post.createdAt!)}
+                </div>
               </div>
             </div>
           )
         })}
       </div>
-      <div className="mt-3 flex justify-center">페이지네이션처리..</div>
     </div>
   )
 }

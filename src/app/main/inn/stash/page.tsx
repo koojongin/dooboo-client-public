@@ -173,8 +173,14 @@ function InnInventory({
                   return (
                     <div
                       key={createKey()}
-                      className={`bg-white relative flex border-[1px] border-r rounded-md w-[40px] h-[40px] ${isOveredSlot ? disableSlotClass : ''} ${item?.isSelected ? 'border-red-300' : ''}`}
+                      className={`relative bg-white relative flex border-[1px] border-r rounded-md w-[40px] h-[40px] ${isOveredSlot ? disableSlotClass : ''}`}
+                      style={{
+                        borderColor: `${item?.isSelected ? 'transparent' : ''}`,
+                      }}
                     >
+                      {item?.isSelected && (
+                        <div className="w-full h-full absolute left-0 top-0 bg-red-500" />
+                      )}
                       {isOveredSlot && (
                         <div className="absolute z-10 bg-gray-800 bg-opacity-60 w-[40px] h-[40px] rounded" />
                       )}
@@ -208,16 +214,16 @@ function InnInventory({
           <div>창고(는 개발중..)</div>
           <div>
             <div>
-              <div className="flex flex-wrap max-w-[404px] bg-gray-100 p-[2px] rounded shadow-md">
+              <div className="flex flex-wrap max-w-[414px] bg-gray-100 p-[2px] rounded shadow-md gap-[1px]">
                 {new Array(100).fill(1).map((value, index) => {
                   const item = { isSelected: false } // items[index]
                   const disableSlotClass = 'bg-gray-800'
                   // const isOveredSlot = maxItemSlots <= index
-                  const isOveredSlot = false
+                  const isOveredSlot = true
                   return (
                     <div
                       key={createKey()}
-                      className={`bg-white relative flex border-[1px] border-r rounded-md w-[40px] h-[40px] ${isOveredSlot ? disableSlotClass : ''} ${item?.isSelected ? 'border-red-300' : ''}`}
+                      className={`relative bg-white flex border-[1px] border-r rounded-md w-[40px] h-[40px] ${isOveredSlot ? disableSlotClass : ''} ${item?.isSelected ? 'border-red-300' : ''}`}
                     >
                       {isOveredSlot && (
                         <div className="absolute z-10 bg-gray-800 bg-opacity-60 w-[40px] h-[40px] rounded" />

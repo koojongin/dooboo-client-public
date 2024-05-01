@@ -1,4 +1,4 @@
-import { Item } from '@/interfaces/item.interface'
+import { Item } from './item.interface'
 
 export interface CharacterStat {
   criticalMultiplier: number // 10
@@ -27,4 +27,7 @@ export interface Character {
   _id: string // '6603b3d5b7868c3b327f4c53'
   user?: User
   equip?: Item
+  lastBattledAt: string
+  thumbnail?: string
+  nickname: string
 }

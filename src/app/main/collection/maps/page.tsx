@@ -140,11 +140,7 @@ export default function CollectionMapsPage() {
     </div>
   )
 }
-export function BaseWeaponBoxTooltipComponent({
-  item,
-}: {
-  item: DropTableItem
-}) {
+function BaseWeaponBoxTooltipComponent({ item }: { item: DropTableItem }) {
   const selectedItem = item.item
   return (
     <div className="bg-white rounded p-[12px] border border-gray-300 text-[#34343a] min-w-[300px] shadow-md drop-shadow-lg">

@@ -16,7 +16,7 @@ export default function Home() {
 
     const token = localStorage.getItem('token')
     if (token) {
-      router.push('/main')
+      router.push('/main/community')
     }
   }, [])
 

@@ -1,6 +1,5 @@
 import { MongooseDocument, Pagination } from '@/interfaces/common.interface'
 import { BaseWeapon } from '@/interfaces/item.interface'
-import { Monster } from '@/interfaces/monster.interface'
 
 export interface DropTableItem extends MongooseDocument {
   itemId?: string
@@ -11,7 +10,7 @@ export interface DropTableItem extends MongooseDocument {
 export interface DropTable extends MongooseDocument {
   items: DropTableItem[]
   monsterId: string
-  monster?: Monster
+  monster?: any
 }
 export interface DropTableListResponseDto extends Pagination {
   dropTables: DropTable[]

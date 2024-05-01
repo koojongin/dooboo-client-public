@@ -9,6 +9,7 @@ import {
   WeaponBoxDetailComponent,
 } from '@/app/main/inventory.component'
 import { fetchUnequipItem } from '@/services/api-fetch'
+import { DEFAULT_THUMBNAIL_URL } from '@/constants/constant'
 
 export default (function CharacterStatusComponent({
   user,
@@ -37,7 +38,7 @@ export default (function CharacterStatusComponent({
           <div className="flex gap-1">
             <div className="w-[80px] h-[80px] min-w-[80px] min-h-[80px] border border-gray-600 rounded p-[1px] flex items-center justify-center">
               {/* <img className="w-full" src="/images/ako.webp" /> */}
-              <img className="w-full" src="/images/question_mark.webp" />
+              <img className="w-full" src={DEFAULT_THUMBNAIL_URL} />
             </div>
             <div className="w-full flex flex-col gap-[2px]">
               <div className="flex w-full justify-between">

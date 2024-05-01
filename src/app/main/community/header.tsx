@@ -8,12 +8,23 @@ export default function CommunityHeader({ children }: any) {
   const goToIndex = () => {
     router.push('/main/community')
   }
+
+  const goToRoute = (path: string) => {
+    router.push(path)
+  }
   return (
-    <div className="rounded w-full flex flex-row justify-between gap-1">
+    <div className="rounded w-full flex flex-row justify-between gap-1 ff-dodoom-all mb-[800px]">
       <div className="w-full">
         <Card className="p-2 rounded leading-none">
-          <div className="text-[32px] my-1.5 cursor-pointer">
-            <div onClick={() => goToIndex()}>전체 게시판(준비중)</div>
+          <div className="text-[16px] flex flex-col gap-[4px]">
+            <div className="flex gap-[4px]">
+              <div
+                className="flex items-center justify-center bg-ruliweb px-[9px] py-[4px] text-white font-bold cursor-pointer"
+                onClick={() => goToIndex()}
+              >
+                메인으로
+              </div>
+            </div>
             <div>{children}</div>
           </div>
         </Card>

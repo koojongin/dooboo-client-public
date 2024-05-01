@@ -4,8 +4,14 @@ import { useEffect, useState } from 'react'
 import { Tooltip } from '@material-tailwind/react'
 import { fetchGetRankList } from '@/services/api-fetch'
 import toAPIHostURL from '@/services/image-name-parser'
-import { getItemByType } from '@/services/util'
+import {
+  getItemByType,
+  toColorByGrade,
+  toMMDDHHMM,
+  toMMDDHHMMSS,
+} from '@/services/util'
 import { WeaponBoxDetailComponent } from '@/app/main/inventory.component'
+import createKey from '@/services/key-generator'
 
 export default function CommunityPage() {
   const [characters, setCharacters] = useState<any[]>([])
@@ -47,7 +53,7 @@ export default function CommunityPage() {
 
           return (
             <div
-              key={character._id}
+              key={createKey()}
               className="flex gap-1 px-[1px] py-[1px] items-center min-h-[30px] border-blue-gray-50 border-b"
             >
               <div className={tableClass[0]}>{index + 1}</div>
@@ -62,7 +68,14 @@ export default function CommunityPage() {
                       <WeaponBoxDetailComponent item={character.equip} />
                     }
                   >
-                    <div>
+                    <div
+                      className="border-2 rounded border-gray-800"
+                      style={{
+                        borderColor: toColorByGrade(
+                          character.equip.weapon.iGrade,
+                        ),
+                      }}
+                    >
                       <div className="absolute m-[1px] px-[2px] text-[12px] border rounded px-[2px] bg-[#424242a6] text-white ff-ba ff-skew">
                         {totalFlatDamage}
                       </div>
@@ -81,6 +94,11 @@ export default function CommunityPage() {
                   </div>
                 </div>
               )}
+              <div className="ml-auto">
+                {character.lastBattledAt
+                  ? toMMDDHHMMSS(new Date(character.lastBattledAt))
+                  : ''}
+              </div>
             </div>
           )
         })}
