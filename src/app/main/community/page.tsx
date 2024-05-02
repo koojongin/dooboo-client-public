@@ -7,6 +7,7 @@ import { Board } from '@/interfaces/board.interface'
 import createKey from '@/services/key-generator'
 import { ago } from '@/services/util'
 
+const { env } = process
 export default function CommunityPage() {
   const [notices, setNotices] = useState<Board[]>([])
   const [freeBoards, setFreeBoards] = useState<Board[]>([])

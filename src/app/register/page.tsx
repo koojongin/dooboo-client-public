@@ -15,7 +15,7 @@ export default function Register() {
   const [searchValidMessage, setSearchValidMessage] = useState('')
   const [isAvailableNickname, setIsAvailableNickname] = useState(false)
   const [accessToken, setAccessToken] = useState('')
-  const isDev = false
+  const isDev = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
   const addHookString = '+webhook.incoming'
   const loginUrl = `https://discord.com/oauth2/authorize?client_id=1219938115016458331&response_type=code&redirect_uri=https%3A%2F%2Fdooboo.online%3A3001%2Foauth2&scope=email+identify+guilds${isDev ? addHookString : ''}&&prompt=none`
 
