@@ -17,12 +17,7 @@ import {
 } from '@/services/api-fetch'
 import { InnItem, InventoryRef, Weapon } from '@/interfaces/item.interface'
 import toAPIHostURL from '@/services/image-name-parser'
-import {
-  toColorByGrade,
-  toMMDDHHMM,
-  toMMDDHHMMSS,
-  translate,
-} from '@/services/util'
+import { toColorByGrade, toMMDDHHMMSS, translate } from '@/services/util'
 import { socket } from '@/services/socket'
 import { EMIT_SHARE_ITEM_EVENT } from '@/interfaces/chat.interface'
 
@@ -100,8 +95,7 @@ export function WeaponBoxDetailComponent({
           )
         }
         try {
-          const response = await fetchPostAddToAuction(item._id, { gold })
-          return response
+          return await fetchPostAddToAuction(item._id, { gold })
         } catch (error) {
           Swal.showValidationMessage(`
         Request failed: ${error}
@@ -223,7 +217,7 @@ export function WeaponBoxDetailComponent({
           {_.sortBy(
             Object.keys(selectedItem.additionalAttributes || {}),
             (k) => k,
-          ).map((key: string, index: number) => {
+          ).map((key: string) => {
             const attributeValue = selectedItem.additionalAttributes[key]
             return (
               <div key={createKey()}>

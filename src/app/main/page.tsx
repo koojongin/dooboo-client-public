@@ -30,6 +30,8 @@ export default function Main() {
         stat: rStat,
         equippedItems: rEquippedItems,
       } = await fetchMe()
+
+      localStorage.setItem('characterId', dCharacter._id!)
       setUser(dUser)
       setCharacter(dCharacter)
       setNextExp(rNextExp)

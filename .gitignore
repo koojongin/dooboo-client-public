@@ -38,3 +38,5 @@ next-env.d.ts
 /public/bgm/*
 
 /prod/*
+/.prod/*
+/prod /*

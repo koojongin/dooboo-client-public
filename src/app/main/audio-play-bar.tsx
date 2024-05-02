@@ -62,6 +62,7 @@ export default function AudioPlayBar() {
   const replaceOnlyFileName = (path: string) => {
     return decodeURIComponent(path)
       .replace('http://dooboo.online:3002/bgm/', '')
+      .replace('http://dooboo.online:3003/bgm/', '')
       .replace('.flac', '')
       .replace('.mp3', '')
   }

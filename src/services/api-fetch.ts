@@ -239,6 +239,11 @@ export async function fetchPostBoard(data: any): Promise<any> {
   return response
 }
 
+export async function fetchPutBoard(id: string, data: any): Promise<any> {
+  const { data: response } = await api.put(`/board/edit/${id}`, data)
+  return response
+}
+
 export async function fetchGetBoardList(
   data: object,
   opts = { page: 1 },

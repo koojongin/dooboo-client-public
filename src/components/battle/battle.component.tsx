@@ -1,12 +1,5 @@
-import {
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Option,
-  Select,
-} from '@material-tailwind/react'
-import { ForwardedRef, forwardRef, useEffect, useRef, useState } from 'react'
+import { Button, Card, Chip, Option, Select } from '@material-tailwind/react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Swal from 'sweetalert2'
 import createKey from '@/services/key-generator'
 import { fetchBattle, fetchGetMapsName } from '@/services/api-fetch'
@@ -54,7 +47,7 @@ export default (function Battle({
     setBattleLogs(result.battleLogs)
 
     if (result.isWin) {
-      battleHandler.refreshCharacterComponent()
+      await battleHandler.refreshCharacterComponent()
     }
   }
 
@@ -70,7 +63,10 @@ export default (function Battle({
     }
   }
 
-  const stopBattleInterval = () => {
+  const audio = new Audio('/audio/item_drop.mp3')
+  const audioEndOfBattle = new Audio('/audio/end_of_battle.mp3')
+
+  const stopBattleInterval = useCallback(() => {
     setIsAutoRunning(false)
     if (timerRef.current) {
       if (selectedMap && timerRef?.current) {
@@ -80,7 +76,7 @@ export default (function Battle({
       clearInterval(timerRef.current)
       timerRef.current = undefined
     }
-  }
+  }, [selectedMap])
 
   const battle = (mapName: string) => {
     if (!isAutoRunning) {
@@ -95,13 +91,11 @@ export default (function Battle({
     }
   }
 
-  const refreshMaps = async () => {
+  const refreshMaps = useCallback(async () => {
     const { maps: rMaps } = await fetchGetMapsName()
     setMaps(rMaps)
-  }
+  }, [])
 
-  const audio = new Audio('/audio/item_drop.mp3')
-  const audioEndOfBattle = new Audio('/audio/end_of_battle.mp3')
   const playDropSound = () => {
     audio.volume = 0.1
     audio.play()
@@ -117,7 +111,7 @@ export default (function Battle({
     return () => {
       stopBattleInterval()
     }
-  }, [])
+  }, [refreshMaps, stopBattleInterval])
   return (
     <Card className={headCss}>
       <div className="flex mb-5 px-[24px] pt-[20px]">

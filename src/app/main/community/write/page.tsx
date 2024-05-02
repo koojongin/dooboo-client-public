@@ -1,15 +1,15 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useCallback, useMemo, useRef, useState } from 'react'
-import ReactQuill from 'react-quill'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import ReactQuill, { Quill } from 'react-quill'
 import Swal from 'sweetalert2'
 import { Cloudinary } from '@cloudinary/url-gen'
 import Delta from 'quill-delta'
 import { fetchPostBoard } from '@/services/api-fetch'
-import { QuillNoSSRWrapper } from '@/components/no-ssr-react-quill'
 import { dataURLtoFile } from '@/services/util'
 import createKey from '@/services/key-generator'
+import 'react-quill/dist/quill.snow.css'
 
 export default function CommunityWritePage() {
   const reactQuillRef = useRef<ReactQuill>(null)
@@ -21,7 +21,7 @@ export default function CommunityWritePage() {
   const imageHandler = useCallback(() => {
     const quill = reactQuillRef.current?.getEditor()
     if (!quill) return
-    const input = document.createElement('input')
+    const input = document?.createElement('input')
     input.setAttribute('type', 'file')
     input.setAttribute('accept', 'image/*')
     input.click()
@@ -74,6 +74,9 @@ export default function CommunityWritePage() {
           image: imageHandler,
         },
       },
+      // ImageResize: {
+      //   parchment: Quill.import('parchment'),
+      // },
       clipboard: {
         matchVisual: false,
         matchers: [
@@ -168,13 +171,14 @@ export default function CommunityWritePage() {
 
     await Swal.fire({
       title: '등록되었습니다.',
-      text: `${result}`,
       icon: 'success',
       confirmButtonText: '확인',
     })
 
     router.back()
   }
+
+  useEffect(() => {}, [])
   return (
     <div className="ff-dodoom-all">
       <div className="mb-[4px]">
@@ -186,7 +190,7 @@ export default function CommunityWritePage() {
         />
       </div>
 
-      <QuillNoSSRWrapper
+      {/* <QuillNoSSRWrapper
         forwardedRef={reactQuillRef}
         // ref={reactQuillRef}
         theme="snow"
@@ -195,7 +199,7 @@ export default function CommunityWritePage() {
         onChange={setContent}
         modules={modules}
         className="mb-[4px]"
-      />
+      /> */}
       <div className="flex justify-end">
         <div
           className="flex justify-center items-center border border-gray-600 h-[40px] w-[100px] border-r-0 shadow-md shadow-gray-400 rounded-l cursor-pointer"

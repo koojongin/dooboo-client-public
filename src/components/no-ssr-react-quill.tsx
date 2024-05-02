@@ -7,7 +7,6 @@ export const QuillNoSSRWrapper =
         async () => {
           'use client'
 
-          console.log(typeof Node, '1111')
           const { default: RQ } = await import('react-quill')
 
           return function nameless({ forwardedRef, ...props }: any) {

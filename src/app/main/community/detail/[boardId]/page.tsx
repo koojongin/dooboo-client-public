@@ -93,11 +93,8 @@ export default function BoardDetail({
   }
 
   const editPost = async () => {
-    await Swal.fire({
-      title: '미지원',
-      icon: 'info',
-      denyButtonText: `닫기`,
-    })
+    console.log(localStorage.getItem('token'))
+    router.push(`/main/community/edit/${board?._id}`)
   }
   const deletePost = async () => {
     const { isConfirmed } = await Swal.fire({
@@ -114,6 +111,9 @@ export default function BoardDetail({
       router.back()
     }
   }
+  const onClickWriteButton = () => {
+    router.push('/main/community/write')
+  }
 
   useEffect(() => {
     loadBoard()
@@ -128,14 +128,20 @@ export default function BoardDetail({
           목록으로
         </div>
         <div
+          className="bg-blue-300 text-white py-[4px] px-[6px] font-bold text-[14px] cursor-pointer"
+          onClick={() => onClickWriteButton()}
+        >
+          글쓰기
+        </div>
+        <div
           onClick={() => editPost()}
-          className="bg-ruliweb text-white py-[4px] px-[6px] font-bold text-[14px] cursor-pointer"
+          className="bg-white border-ruliweb border text-ruliweb py-[4px] px-[6px] font-bold text-[14px] cursor-pointer"
         >
           수정
         </div>
         <div
           onClick={() => deletePost()}
-          className="bg-ruliweb text-white py-[4px] px-[6px] font-bold text-[14px] cursor-pointer"
+          className="bg-white border-ruliweb border text-ruliweb py-[4px] px-[6px] font-bold text-[14px] cursor-pointer"
         >
           삭제
         </div>
@@ -143,7 +149,7 @@ export default function BoardDetail({
       {board && (
         <div className="border border-gray-400">
           <div className="border-b border-b-gray-400 p-[10px] font-bold bg-gray-100">
-            {board.title}
+            {board.title}a
           </div>
           <div className="flex p-[10px] border-b border-b-gray-400 gap-[4px]">
             <div className="w-[100px] h-[100px] border-b-gray-400 border p-[2px]">
@@ -168,7 +174,7 @@ export default function BoardDetail({
             </div>
           </div>
           <div
-            className="p-[10px] text-[14px]"
+            className="p-[10px] text-[14px] ql-editor"
             dangerouslySetInnerHTML={{
               __html: board.content,
             }}
