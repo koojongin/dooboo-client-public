@@ -1,24 +1,20 @@
 'use client'
 
+import { Cloudinary } from '@cloudinary/url-gen/index'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+
 import ReactQuill, { Quill } from 'react-quill'
 import Swal from 'sweetalert2'
-import { Cloudinary } from '@cloudinary/url-gen'
 import Delta from 'quill-delta'
-import ImageResize from 'quill-image-resize'
-import {
-  fetchGetBoardOne,
-  fetchPostBoard,
-  fetchPutBoard,
-} from '@/services/api-fetch'
-import { QuillNoSSRWrapper } from '@/components/no-ssr-react-quill'
+import { ImageResize } from 'quill-image-resize-module-ts'
+import { fetchGetBoardOne, fetchPutBoard } from '@/services/api-fetch'
 import { dataURLtoFile } from '@/services/util'
 import createKey from '@/services/key-generator'
 import 'react-quill/dist/quill.snow.css'
+import { QuillNoSSRWrapper } from '@/components/no-ssr-react-quill'
 
 Quill.register('modules/ImageResize', ImageResize as any)
-
 export default function CommunityBoardEditPage({
   params,
 }: {
@@ -67,6 +63,7 @@ export default function CommunityBoardEditPage({
         alert('Upload failed')
       })
   }
+
   const modules = useMemo(() => {
     return {
       toolbar: {
@@ -87,7 +84,7 @@ export default function CommunityBoardEditPage({
         },
       },
       ImageResize: {
-        parchment: Quill.import('parchment'),
+        modules: ['Resize', 'DisplaySize'],
       },
       clipboard: {
         matchVisual: false,
@@ -97,7 +94,6 @@ export default function CommunityBoardEditPage({
             (node: Node, delta: any) => {
               const fixedOps = delta?.ops.map((op: any) => {
                 const isImage = op?.insert?.image
-
                 if (!isImage) {
                   return op
                 }
@@ -188,7 +184,6 @@ export default function CommunityBoardEditPage({
 
     await Swal.fire({
       title: '수정 되었습니다.',
-      text: `${result}`,
       icon: 'success',
       confirmButtonText: '확인',
     })

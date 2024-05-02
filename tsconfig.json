@@ -35,15 +35,12 @@
     }
   },
   "include": [
-    "./@types",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".aa/types/**/*.ts",
-    "prod/types/**/*.ts",
-    "test/types/**/*.ts",
-    "prod /types/**/*.ts",
+    "build/types/**/*.ts",
+    ".prodbuild/types/**/*.ts",
     ".prod/types/**/*.ts"
   ],
   "exclude": [

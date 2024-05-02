@@ -5,8 +5,6 @@ export const QuillNoSSRWrapper =
     ? () => null
     : dynamic(
         async () => {
-          'use client'
-
           const { default: RQ } = await import('react-quill')
 
           return function nameless({ forwardedRef, ...props }: any) {

@@ -1,133 +1,16 @@
 'use client'
 
+import { Cloudinary } from '@cloudinary/url-gen/index'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import ReactQuill, { Quill } from 'react-quill'
+import { useRef, useState } from 'react'
+import ReactQuill from 'react-quill'
 import Swal from 'sweetalert2'
-import { Cloudinary } from '@cloudinary/url-gen'
-import Delta from 'quill-delta'
+import { QuillEditor } from './quill-loader'
 import { fetchPostBoard } from '@/services/api-fetch'
-import { dataURLtoFile } from '@/services/util'
-import createKey from '@/services/key-generator'
-import 'react-quill/dist/quill.snow.css'
 
-export default function CommunityWritePage() {
-  const reactQuillRef = useRef<ReactQuill>(null)
-  const cld = new Cloudinary({ cloud: { cloudName: 'dqihpypxi' } })
-  const [imageUrl, setImageUrl] = useState()
+export default function WriteBoardPage() {
   const [content, setContent] = useState('')
   const [title, setTitle] = useState('')
-
-  const imageHandler = useCallback(() => {
-    const quill = reactQuillRef.current?.getEditor()
-    if (!quill) return
-    const input = document?.createElement('input')
-    input.setAttribute('type', 'file')
-    input.setAttribute('accept', 'image/*')
-    input.click()
-    input.onchange = async () => {
-      if (input !== null && input.files !== null) {
-        const file = input.files[0]
-        const { secure_url } = await uploadUploadToCloudinaryFromFile(file)
-        const range = quill.getSelection()
-        quill.insertEmbed(range!.index, 'image', secure_url)
-      }
-    }
-  }, [])
-
-  const uploadUploadToCloudinaryFromFile = async (file: any) => {
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('upload_preset', 'broyhm4t')
-    return fetch(
-      `https://api.cloudinary.com/v1_1/${cld.getConfig().cloud!.cloudName}/image/upload`,
-      {
-        method: 'POST',
-        body: formData,
-      },
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        return data
-      })
-      .catch((err) => {
-        console.error('Error:', err)
-        alert('Upload failed')
-      })
-  }
-  const modules = useMemo(() => {
-    return {
-      toolbar: {
-        container: [
-          [{ header: [1, 2, false] }],
-          ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-          [
-            { list: 'ordered' },
-            { list: 'bullet' },
-            { indent: '-1' },
-            { indent: '+1' },
-          ],
-          ['link', 'image'],
-          ['clean'],
-        ],
-        handlers: {
-          image: imageHandler,
-        },
-      },
-      // ImageResize: {
-      //   parchment: Quill.import('parchment'),
-      // },
-      clipboard: {
-        matchVisual: false,
-        matchers: [
-          [
-            1,
-            (node: Node, delta: any) => {
-              const fixedOps = delta?.ops.map((op: any) => {
-                const isImage = op?.insert?.image
-                if (!isImage) {
-                  return op
-                }
-
-                const filename = createKey()
-                const file = dataURLtoFile((node as any).src, `${filename}.png`)
-                const imageAttributes = {
-                  ...op.attributes,
-                  alt: `${filename}`,
-                }
-                // eslint-disable-next-line no-param-reassign
-                op.insert.image = '/images/uploading.gif'
-                setTimeout(async () => {
-                  const editor = reactQuillRef.current?.getEditor()
-                  if (!editor) return
-                  console.log(editor.getSelection())
-                  const data = await uploadUploadToCloudinaryFromFile(file)
-                  const targetElement = editor.root.querySelector(
-                    `img[alt='${filename}']`,
-                  )
-                  if (!targetElement) return
-                  targetElement.setAttribute('src', data?.secure_url)
-                }, 1)
-
-                return {
-                  ...op,
-                  attributes: imageAttributes,
-                }
-              })
-
-              // eslint-disable-next-line no-param-reassign
-              delta.ops = fixedOps
-              const newDelta = new Delta().retain(delta.length(), {
-                header: 3,
-              })
-              return delta.compose(newDelta)
-            },
-          ],
-        ],
-      },
-    }
-  }, [])
-
   const router = useRouter()
   const writePost = async () => {
     const FIVE_MEGA_BYTE = 1000 * 1000 * 5
@@ -177,8 +60,6 @@ export default function CommunityWritePage() {
 
     router.back()
   }
-
-  useEffect(() => {}, [])
   return (
     <div className="ff-dodoom-all">
       <div className="mb-[4px]">
@@ -190,16 +71,7 @@ export default function CommunityWritePage() {
         />
       </div>
 
-      {/* <QuillNoSSRWrapper
-        forwardedRef={reactQuillRef}
-        // ref={reactQuillRef}
-        theme="snow"
-        value={content}
-        placeholder="이곳에 글 내용을 작성하세요"
-        onChange={setContent}
-        modules={modules}
-        className="mb-[4px]"
-      /> */}
+      <QuillEditor value={content} onChange={setContent} />
       <div className="flex justify-end">
         <div
           className="flex justify-center items-center border border-gray-600 h-[40px] w-[100px] border-r-0 shadow-md shadow-gray-400 rounded-l cursor-pointer"

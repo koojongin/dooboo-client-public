@@ -18,6 +18,7 @@ export default function CommunityBoardPage() {
   const [totalPages, setTotalPages] = useState<number>(0)
   const onClickWriteButton = () => {
     router.push('/main/community/write')
+    // router.push('/main/community')
   }
 
   const loadBoards = async (pageNumber: number) => {

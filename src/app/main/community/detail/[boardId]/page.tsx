@@ -113,6 +113,7 @@ export default function BoardDetail({
   }
   const onClickWriteButton = () => {
     router.push('/main/community/write')
+    // router.push('/main/community')
   }
 
   useEffect(() => {
