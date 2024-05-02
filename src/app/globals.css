@@ -1,27 +1,27 @@
 @font-face {
     font-family: 'GmarketSansMedium';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+    src: url('/font/GmarketSansMedium.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'BlueArchive';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/GyeonggiTitleM.woff') format('woff');
+    src: url('/font/GyeonggiTitleM.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Wavve';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/WavvePADO-Regular.woff2') format('woff2');
+    src: url('/font/WavvePADO-Regular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'S-CoreDream';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+    src: url('/font/S-CoreDream-3Light.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
@@ -30,8 +30,8 @@
     font-family: 'NanumBarunGothic';
     font-style: normal;
     font-weight: 400;
-    src: url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.eot');
-    src: url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.eot?#iefix') format('embedded-opentype'), url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.woff') format('woff'), url('//cdn.jsdelivr.net/font-nanumlight/1.0/NanumBarunGothicWeb.ttf') format('truetype');
+    src: url('/font/NanumBarunGothicWeb.eot');
+    src: url('/font/NanumBarunGothicWeb.eot?#iefix') format('embedded-opentype'), url('/font/NanumBarunGothicWeb.woff') format('woff'), url('/font/NanumBarunGothicWeb.ttf') format('truetype');
 }
 
 * {

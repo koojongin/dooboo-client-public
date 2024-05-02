@@ -271,7 +271,7 @@ export function ChatComponent() {
               <PopoverContent className="rounded p-0 m-0 p-[10px]">
                 <div className="flex flex-wrap gap-[1px] w-[604px] overflow-y-scroll max-h-[300px]">
                   {new Array(21).fill(1).map((v, index) => {
-                    const src = `/images/emoji/ClanChat_Emoji_${`${index + 1}`.padStart(2, '0')}_kr.png`
+                    const src = `/images/emoji/ClanChat_Emoji_${`${index + 1}`.padStart(2, '0')}_Kr.png`
                     return (
                       <img
                         key={createKey()}
