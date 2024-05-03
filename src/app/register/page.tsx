@@ -19,14 +19,11 @@ export default function Register() {
   const addHookString = '+webhook.incoming'
   const loginUrl = `https://discord.com/oauth2/authorize?client_id=1219938115016458331&response_type=code&redirect_uri=https%3A%2F%2Fdooboo.online%3A3001%2Foauth2&scope=email+identify+guilds${isDev ? addHookString : ''}&&prompt=none`
 
-  const handleChange = useCallback(
-    (element: React.ChangeEvent<HTMLInputElement>) => {
-      setNickname(element.target.value)
-    },
-    [nickname],
-  )
+  const handleChange = (element: React.ChangeEvent<HTMLInputElement>) => {
+    setNickname(element.target.value)
+  }
 
-  const checkNickName = useCallback(async () => {
+  const checkNickName = async () => {
     const { data } = await axios.post(`${API_SERVER_URL}/auth/check-nickname`, {
       nickname,
     })
@@ -36,7 +33,7 @@ export default function Register() {
     else setSearchValidMessage('사용 가능한 닉네임입니다.')
 
     setIsAvailableNickname(isAvailable)
-  }, [])
+  }
 
   useEffect(() => {
     const ac = params.get('accessToken')
@@ -46,7 +43,7 @@ export default function Register() {
 
   useEffect(() => {
     checkNickName()
-  }, [checkNickName, nickname])
+  }, [nickname])
 
   useEffect(() => {
     if (!searchValidMessage) {

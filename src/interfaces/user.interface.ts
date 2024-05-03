@@ -1,4 +1,5 @@
 import { Item } from './item.interface'
+import { MongooseDocument } from '@/interfaces/common.interface'
 
 export interface CharacterStat {
   criticalMultiplier: number // 10
@@ -30,4 +31,14 @@ export interface Character {
   lastBattledAt: string
   thumbnail?: string
   nickname: string
+}
+
+export interface RankLog extends MongooseDocument {
+  owner: any
+  snapshot: {
+    battleLogs: any[]
+    totalDamage: number
+    averageDamage: number
+    weapon?: any
+  }
 }

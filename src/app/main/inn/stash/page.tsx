@@ -6,7 +6,15 @@ import {
   CardHeader,
   Typography,
 } from '@material-tailwind/react'
-import { SetStateAction, Dispatch, useEffect, useState } from 'react'
+import React, {
+  SetStateAction,
+  Dispatch,
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+} from 'react'
 import Swal from 'sweetalert2'
 import {
   fetchGetMyInventory,
@@ -15,34 +23,41 @@ import {
 } from '@/services/api-fetch'
 import { InnItem, Item } from '@/interfaces/item.interface'
 import createKey from '@/services/key-generator'
-import { ItemBoxComponent } from '@/app/main/inventory.component'
+import {
+  InventoryActionKind,
+  ItemBoxComponent,
+} from '@/app/main/inventory.component'
 import { getItemByType } from '@/services/util'
 import { MeResponse } from '@/interfaces/user.interface'
 
+// eslint-disable-next-line react/display-name
 export default function StashPage() {
   const [items, setItems] = useState<InnItem[]>([])
   const [characterData, setCharacterData] = useState<MeResponse>()
   const [maxItemSlots, setMaxItemSlots] = useState<number>(0)
   const [isFulledInventory, setIsFulledInventory] = useState<boolean>()
-  const refreshInventory = async () => {
+  const refreshInventory = useCallback(async () => {
     const { items: rItems, slots, isFulled } = await fetchGetMyInventory()
     setItems(rItems)
     setMaxItemSlots(slots)
     setIsFulledInventory(isFulled)
-  }
+  }, [items])
 
-  const refreshCharacterData = async () => {
+  const refreshCharacterData = useCallback(async () => {
     const result = await fetchMe()
     setCharacterData(result)
-  }
+  }, [])
 
-  const syncData = async () => {
+  const syncData = useCallback(async () => {
+    console.log('syncdata')
     refreshInventory()
     refreshCharacterData()
-  }
-  useEffect(() => {
-    syncData()
   }, [])
+
+  useEffect(() => {
+    console.log('useeffec syncd', syncData)
+    syncData()
+  }, [syncData])
 
   return (
     <div className="rounded w-full min-h-[500px]">
@@ -78,7 +93,11 @@ function InnInventory({
   isFulledInventory?: boolean
 }) {
   const sellItem = (item: InnItem) => {}
+  const leftInventoryRef = useRef<any>()
 
+  useEffect(() => {
+    console.log('???????여기스 싱데콜')
+  }, [items])
   const sellSelectedItems = async () => {
     const selectedItems = items.filter((item) => item.isSelected)
     const totalPrice = selectedItems.reduce((prev, next) => {
@@ -100,16 +119,24 @@ function InnInventory({
       await syncData()
     }
   }
+
+  const onChangeLatestItem = (originItem: any, index: any) => {
+    console.log(originItem, index)
+  }
   const onSelectItem = (item: InnItem) => {
     const selectedItemIndex = items.findIndex((i) => i._id === item._id)
     if (selectedItemIndex < 0) return
     const newItems = items.map((originItem, index) => {
+      const newItem = originItem
+      newItem.open = false
+      newItem.isLatest = false
       if (selectedItemIndex === index) {
-        const newItem = { ...originItem }
         newItem.isSelected = !newItem.isSelected
+        newItem.open = true
+        newItem.isLatest = true
         return newItem
       }
-      return originItem
+      return newItem
     })
     setItems(newItems)
   }
@@ -126,7 +153,7 @@ function InnInventory({
     }
 
     setItems(
-      items.map((item) => {
+      items.map((item, index) => {
         const newItem = item
         newItem.isSelected = true
         return newItem
@@ -163,7 +190,7 @@ function InnInventory({
               </div>
             </div>
           </div>
-          <div>
+          <div ref={leftInventoryRef}>
             <div>
               <div className="flex flex-wrap max-w-[414px] bg-gray-100 p-[2px] rounded shadow-md gap-[1px]">
                 {new Array(100).fill(1).map((value, index) => {
@@ -188,6 +215,12 @@ function InnInventory({
                         <ItemBoxComponent
                           className="p-[2px]"
                           item={item}
+                          actions={
+                            [
+                              // InventoryActionKind.Share,
+                              // InventoryActionKind.AddToAuction,
+                            ]
+                          }
                           onShowTotalDamage
                           equippedCallback={() => {}}
                           onSelect={onSelectItem}

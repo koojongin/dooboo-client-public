@@ -1,7 +1,7 @@
 import api from '@/services/api'
 import { GetMapResponse, GetMapsResponse } from '@/interfaces/map.interface'
 import { BattleResponseDto } from '@/interfaces/battle.interface'
-import { Character, MeResponse } from '@/interfaces/user.interface'
+import { Character, MeResponse, RankLog } from '@/interfaces/user.interface'
 import {
   BaseWeapon,
   BaseWeaponListResponseDto,
@@ -15,7 +15,7 @@ import {
   DropTableResponseDto,
 } from '@/interfaces/drop-table.interface'
 import { Board, BoardListResponse } from '@/interfaces/board.interface'
-import { Pagination } from '@/interfaces/common.interface'
+import { MongooseDocument, Pagination } from '@/interfaces/common.interface'
 import { AuctionListResponse } from '@/interfaces/auction.interface'
 
 interface CreateMonsterResponse {
@@ -24,7 +24,10 @@ interface CreateMonsterResponse {
   }
 }
 
-export async function fetchGetJwtToken(): Promise<any> {
+export async function fetchGetJwtToken(): Promise<{
+  token: string
+  character: Character
+}> {
   const { data } = await api.get('/auth/jwt')
   return data
 }
@@ -97,8 +100,14 @@ export async function fetchDeleteMap(id: string) {
   return response
 }
 
-export async function fetchGetBaseWeaponList(): Promise<BaseWeaponListResponseDto> {
-  const { data: response } = await api.get('/item/base-weapon/list')
+export async function fetchGetBaseWeaponList(
+  condition = {},
+  opts = { page: 1 },
+): Promise<BaseWeaponListResponseDto> {
+  const { data: response } = await api.post('/item/base-weapon/list', {
+    condition,
+    opts,
+  })
   return response
 }
 
@@ -134,6 +143,13 @@ export async function fetchDeleteBaseWeapon(
 
 export async function fetchGetRankList(): Promise<{ characters: Character[] }> {
   const { data: response } = await api.get(`/character/rank`)
+  return response
+}
+
+export async function fetchGetRankByDamageList(): Promise<{
+  ranks: RankLog[]
+}> {
+  const { data: response } = await api.get(`/character/rank-by-damage`)
   return response
 }
 

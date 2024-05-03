@@ -9,6 +9,8 @@ export default function MainHeader() {
   const logout = () => {
     if (typeof window === 'undefined') return
     localStorage.removeItem('token')
+    localStorage.removeItem('characterId')
+    localStorage.removeItem('nickname')
     window.location.href = '/'
   }
 

@@ -16,16 +16,18 @@ import {
   EMIT_CHAT_EMOJI_EVENT,
   EMIT_CHAT_MESSAGE_EVENT,
   EMIT_GET_CHARACTERS_EVENT,
+  EMIT_NOTICE_MESSAGE_EVENT,
   MESSAGE_EVENT,
   MESSAGE_TYPE,
   ON_CHAT_EMOJI_EVENT,
   ON_CHAT_JOIN_EVENT,
   ON_CHAT_MESSAGE_EVENT,
   ON_GET_CHARACTERS_EVENT,
+  ON_NOTICE_MESSAGE_EVENT,
   ON_SHARE_ITEM_EVENT,
 } from '@/interfaces/chat.interface'
 import createKey from '@/services/key-generator'
-import { toColorByGrade, toEmojiPath, toHHMM } from '@/services/util'
+import { parseHtml, toColorByGrade, toEmojiPath, toHHMM } from '@/services/util'
 import toAPIHostURL from '@/services/image-name-parser'
 import { WeaponBoxDetailComponent } from '@/app/main/inventory.component'
 
@@ -49,9 +51,20 @@ export function ChatComponent() {
     useState<ConnectedCharacterWrapper>({})
   // const { width, height, ref } = useResizeDetector()
   const [openPopover, setOpenPopover] = useState<boolean>(false)
+  const [openPopoverUserAction, setOpenPopoverUserAction] =
+    useState<boolean>(false)
+
+  const audioBellRef = useRef<HTMLAudioElement>()
+  const audioWhisperRef = useRef<HTMLAudioElement>()
+
   const triggers = {
     onMouseEnter: () => setOpenPopover(true),
     onMouseLeave: () => setOpenPopover(false),
+  }
+
+  const triggersOfUserAction = {
+    onMouseEnter: () => setOpenPopoverUserAction(true),
+    onMouseLeave: () => setOpenPopoverUserAction(false),
   }
 
   const [isFoldedBox, setIsFoldedBox] = useState<boolean>(false)
@@ -61,8 +74,18 @@ export function ChatComponent() {
     if (event.key !== 'Enter') return
     if (!enteredMessage) return
     // chatSocket.emit(EMIT_GET_CHARACTERS_EVENT, {})
-    socket.emit(EMIT_CHAT_MESSAGE_EVENT, { message: enteredMessage })
+    if (enteredMessage.indexOf('/공지 ') >= 0) {
+      const [, ...messages] = enteredMessage.split('/공지 ')
+      socket.emit(EMIT_NOTICE_MESSAGE_EVENT, { message: messages.join('') })
+    } else {
+      socket.emit(EMIT_CHAT_MESSAGE_EVENT, { message: enteredMessage })
+    }
     setEnteredMessage('')
+  }
+
+  const onClickCharacter = (data: any) => {
+    console.log(data, openPopoverUserAction)
+    setOpenPopoverUserAction(!openPopoverUserAction)
   }
   const onChangeMessage = (message: string) => {
     setEnteredMessage(message)
@@ -83,7 +106,9 @@ export function ChatComponent() {
   }
 
   const setupSocket = async () => {
-    const { token: jwtToken } = await fetchGetJwtToken()
+    const { token: jwtToken, character } = await fetchGetJwtToken()
+    localStorage.setItem('characterId', character._id)
+    localStorage.setItem('nickname', character.nickname)
     socket.io.opts.extraHeaders!.Authorization = `Bearer ${jwtToken}`
     socket.connect()
     socket.on('connect', () => {
@@ -93,8 +118,20 @@ export function ChatComponent() {
     socket.on(MESSAGE_EVENT, (eventName, data) => {
       switch (eventName) {
         case ON_CHAT_MESSAGE_EVENT:
-          // audioNotification.volume = 0.5
-          // audioNotification.play()
+          // eslint-disable-next-line no-case-declarations
+          const localNickName = localStorage.getItem('nickname')
+          if (data.message.indexOf(`@${localNickName}`) >= 0) {
+            if (audioWhisperRef.current) {
+              audioWhisperRef.current.volume = 0.3
+              audioWhisperRef.current.play()
+            }
+            const nickReplacer = new RegExp(`\\@{1}(${localNickName})`, 'g')
+            // eslint-disable-next-line no-param-reassign
+            data.message = data.message.replace(
+              nickReplacer,
+              '<span class="bg-red-300 text-white">$1</span>',
+            )
+          }
           setChatMessages((before) => {
             return [...before, data]
           })
@@ -115,8 +152,16 @@ export function ChatComponent() {
             return [...before, data]
           })
           break
-
         case ON_CHAT_EMOJI_EVENT:
+          setChatMessages((before) => {
+            return [...before, data]
+          })
+          break
+        case ON_NOTICE_MESSAGE_EVENT:
+          if (audioBellRef.current) {
+            audioBellRef.current.volume = 0.5
+            audioBellRef.current.play()
+          }
           setChatMessages((before) => {
             return [...before, data]
           })
@@ -128,7 +173,6 @@ export function ChatComponent() {
   }
 
   useEffect(() => {
-    // chatSocket?.emit(EMIT_CHAT_MESSAGE_EVENT, { message: enteredMessage })
     if (chatElementRef?.current) {
       chatElementRef?.current.scrollTo(0, 99999999999)
     }
@@ -136,6 +180,8 @@ export function ChatComponent() {
 
   useEffect(() => {
     setupSocket()
+    audioBellRef.current = new Audio('/audio/bell.flac')
+    audioWhisperRef.current = new Audio('/audio/whisper.mp3')
     return () => {
       socket?.removeAllListeners()
       socket?.disconnect()
@@ -178,7 +224,11 @@ export function ChatComponent() {
               >
                 접기
               </div>
-              <div>현재 접속자 {Object.keys(connectedCharacters).length}명</div>
+              <div>
+                <div>
+                  현재 접속자 {Object.keys(connectedCharacters).length}명
+                </div>
+              </div>
             </div>
             <div
               className={`flex justify-between text-[14px] ${pathname.indexOf('main/community') >= 0 ? 'wide:flex-row h-[220px]' : 'wide:h-full wide:flex-col max-h-[200px] min-h-[150px] wide:max-h-full'}`}
@@ -186,10 +236,20 @@ export function ChatComponent() {
               <div
                 className={`min-w-[200px] overflow-y-scroll border border-r-0 ${pathname.indexOf('main/community') >= 0 ? '' : 'wide:min-h-[80px] wide:min-w-full wide:max-h-[80px] wide:text-start'} `}
               >
-                {Object.entries(connectedCharacters).map((data) => {
+                {Object.entries(connectedCharacters).map((data, index) => {
                   const [cId, connectedCharacter] = data
                   const { nickname } = connectedCharacter
-                  return <div key={createKey()}>{nickname}</div>
+                  return (
+                    <div key={createKey()}>
+                      <div
+                        onClick={() => {
+                          onClickCharacter(connectedCharacter)
+                        }}
+                      >
+                        {nickname}
+                      </div>
+                    </div>
+                  )
                 })}
               </div>
               <div
@@ -262,8 +322,11 @@ export function ChatComponent() {
 
                       {messageType === MESSAGE_TYPE.NORMAL && (
                         <div className="break-all pl-[5px]">
-                          {`[${toHHMM(new Date(chatMessage.timestamp))}] `}
-                          {chatMessage.nickname}: {chatMessage.message}
+                          {parseHtml(
+                            `[${toHHMM(new Date(chatMessage.timestamp))}] ${chatMessage.nickname}: ${chatMessage.message}`,
+                          )}
+                          {/* {`[${toHHMM(new Date(chatMessage.timestamp))}] `} */}
+                          {/* {chatMessage.nickname}: {chatMessage.message} */}
                         </div>
                       )}
 
@@ -287,12 +350,23 @@ export function ChatComponent() {
                           {chatMessage.message}
                         </div>
                       )}
+
+                      {messageType === MESSAGE_TYPE.NOTICE && (
+                        <div className="break-all pl-[5px] bg-blue-gray-500 text-white py-[2px] text-[16px] w-full ff-ba ff-skew">
+                          {chatMessage.message}
+                        </div>
+                      )}
                     </div>
                   )
                 })}
               </div>
             </div>
             <div className="flex items-stretch">
+              <Popover open={openPopoverUserAction}>
+                <PopoverContent className="relative">
+                  sdf asd fsad fas df
+                </PopoverContent>
+              </Popover>
               <Popover handler={setOpenPopover} open={openPopover}>
                 <PopoverHandler>
                   <div className="w-[32px] h-[32px] border border-r-0 flex items-center justify-center cursor-pointer">

@@ -32,6 +32,7 @@ export default function Main() {
       } = await fetchMe()
 
       localStorage.setItem('characterId', dCharacter._id!)
+      localStorage.setItem('nickname', dCharacter.nickname!)
       setUser(dUser)
       setCharacter(dCharacter)
       setNextExp(rNextExp)

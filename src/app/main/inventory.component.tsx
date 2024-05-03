@@ -303,7 +303,7 @@ export function ItemBoxComponent({
   equippedCallback = () => {},
   onSelect = () => {},
 }: {
-  item: Weapon | any
+  item: InnItem | any
   className: string
   equippedItems?: any[]
   actions?: string[]
@@ -315,6 +315,18 @@ export function ItemBoxComponent({
     (i) => i.iType === 'weapon',
   )
 
+  const dismiss = (event: any) => {
+    console.log(event)
+  }
+
+  const handler = (event: any, sItem: any) => {
+    console.log('?')
+    if (sItem?.onChangeLatestItem) sItem.onChangeLatestItem()
+    if (!sItem.isLatest) {
+      return
+    }
+    console.log(event, sItem)
+  }
   const selectedItem = item.weapon
   const totalFlatDamage =
     (selectedItem?.damageOfPhysical || 0) +
@@ -340,6 +352,8 @@ export function ItemBoxComponent({
           <Tooltip
             className="rounded-none bg-transparent"
             interactive
+            // handler={(e: any) => handler(e, item)}
+            // open={item.open}
             content={
               <div className="flex gap-[4px] items-start">
                 {equippedWeapon && (

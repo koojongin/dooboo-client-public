@@ -12,6 +12,7 @@ import createKey from '@/services/key-generator'
 import toAPIHostURL from '@/services/image-name-parser'
 import { ago, toColorByGrade, toMMDDHHMMSS, translate } from '@/services/util'
 import { Auction } from '@/interfaces/auction.interface'
+import { WeaponType } from '@/interfaces/item.interface'
 
 export default function TradePage() {
   const [auctions, setAuctions] = useState<Auction[]>([])
@@ -19,7 +20,7 @@ export default function TradePage() {
   const [selectedWeapons, setSelectedWeapons] = useState<
     { name: string; isSelected: boolean }[]
   >(
-    ['axe', 'sword', 'dagger', 'bow', 'blunt', 'spear'].map((w) => ({
+    Object.values(WeaponType).map((w) => ({
       name: w,
       isSelected: true,
     })),
@@ -27,8 +28,6 @@ export default function TradePage() {
   const [pagenation, setPagenation] = useState<any>()
   const [lastSearchOptions, setLastSearchOptions] = useState<any>()
   const router = useRouter()
-
-  const onClickWeaponType = (weaponType: string) => {}
 
   const loadWeapons = async (_condition?: object, _opts?: any) => {
     // const result = await fetchGetMyInventory()
@@ -147,7 +146,6 @@ export default function TradePage() {
                   <label
                     className="flex items-center cursor-pointer"
                     key={createKey()}
-                    onClick={() => onClickWeaponType(weaponType.name)}
                   >
                     <input
                       type="checkbox"

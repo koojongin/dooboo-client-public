@@ -68,6 +68,15 @@ export const translate = (text: string) => {
     case 'spear':
       parsedText = '창'
       break
+
+    case 'gun':
+      parsedText = '권총'
+      break
+
+    case 'cannon':
+      parsedText = '대포'
+      break
+
     case 'normal':
       parsedText = '일반'
       break
@@ -127,6 +136,12 @@ export const translate = (text: string) => {
     case 'ADDED_DAMAGE_WITH_SPEAR':
       parsedText = '창 피해 추가(+)'
       break
+    case 'ADDED_DAMAGE_WITH_GUN':
+      parsedText = '권총 피해 추가(+)'
+      break
+    case 'ADDED_DAMAGE_WITH_CANNON':
+      parsedText = '대포 피해 추가(+)'
+      break
     case 'INCREASED_DAMAGE_WITH_AXE':
       parsedText = '도끼 피해 증가(%)'
       break
@@ -144,6 +159,12 @@ export const translate = (text: string) => {
       break
     case 'INCREASED_DAMAGE_WITH_SPEAR':
       parsedText = '창 피해 증가(%)'
+      break
+    case 'INCREASED_DAMAGE_WITH_GUN':
+      parsedText = '권총 피해 증가(%)'
+      break
+    case 'INCREASED_DAMAGE_WITH_CANNON':
+      parsedText = '대포 피해 증가(%)'
       break
     default:
       break

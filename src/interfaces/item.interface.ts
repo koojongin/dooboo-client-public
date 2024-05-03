@@ -7,6 +7,8 @@ export const WeaponType = {
   Bow: 'bow',
   Blunt: 'blunt',
   Spear: 'spear',
+  Gun: 'gun',
+  Cannon: 'cannon',
 }
 
 export interface Weapon extends MongooseDocument {
@@ -92,6 +94,9 @@ export interface Item extends MongooseDocument {
 
 export interface InnItem extends Item {
   isSelected: boolean
+  open?: boolean
+  isLatest?: boolean
+  onChangeLatestItem?: (item: any, index: number) => void
 }
 
 export interface EnhancedResult {

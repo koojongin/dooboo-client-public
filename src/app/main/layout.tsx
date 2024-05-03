@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     images: [
       {
-        url: 'https://s3.orbi.kr/data/file/united2/dd35986eea024b719c37cd597d39ee74.gif',
+        url: 'http://dooboo.online:3002/images/tofu.webp',
       },
       // {url: 'http://dooboo.online:3002/images/tofu.webp'}
     ],

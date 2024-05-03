@@ -150,7 +150,7 @@ export default function BoardDetail({
       {board && (
         <div className="border border-gray-400">
           <div className="border-b border-b-gray-400 p-[10px] font-bold bg-gray-100">
-            {board.title}a
+            {board.title}
           </div>
           <div className="flex p-[10px] border-b border-b-gray-400 gap-[4px]">
             <div className="w-[100px] h-[100px] border-b-gray-400 border p-[2px]">

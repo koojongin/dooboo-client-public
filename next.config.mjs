@@ -5,6 +5,7 @@ export default (phase, { defaultConfig }) => {
     const nextConfig = {
         /* config options here */
         distDir: process.env.BUILD_DIR || '.next',
+        reactStrictMode: false,
     }
     return nextConfig
 }
