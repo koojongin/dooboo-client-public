@@ -9,6 +9,7 @@ export const WeaponType = {
   Spear: 'spear',
   Gun: 'gun',
   Cannon: 'cannon',
+  Claw: 'claw',
 }
 
 export interface Weapon extends MongooseDocument {
@@ -23,7 +24,7 @@ export interface Weapon extends MongooseDocument {
   gold: number
   iGrade: string
   name: string // '목도'
-  requiredEquipmentLevel: string // 1
+  requiredEquipmentLevel: number // 1
   thumbnail: string // 'public/upload/items/08521e812a40a8af.png'
   starForce: number
   maxStarForce: number
@@ -42,7 +43,7 @@ export interface BaseWeapon extends MongooseDocument {
   iType: string // 'weapon'
   gold: number
   name: string // '목도'
-  requiredEquipmentLevel: string // 1
+  requiredEquipmentLevel: number // 1
   thumbnail: string // 'public/upload/items/08521e812a40a8af.png'
   iLevel: number
   starForce: number
@@ -90,6 +91,8 @@ export interface Item extends MongooseDocument {
 
   item?: BaseWeapon | any
   roll?: number
+
+  owner?: any
 }
 
 export interface InnItem extends Item {

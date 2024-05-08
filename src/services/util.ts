@@ -2,6 +2,7 @@ import moment from 'moment'
 import 'moment/locale/ko'
 import parse from 'html-react-parser'
 import { Item } from '@/interfaces/item.interface'
+import { JobKind } from '@/interfaces/job.interface'
 
 export const toRangeString = (range: number[]) => {
   const [start, end] = range
@@ -50,6 +51,90 @@ export const toEmojiPath = (path: string) => {
 export const translate = (text: string) => {
   let parsedText = text
   switch (text) {
+    case 'menu:All':
+      parsedText = '전체'
+      break
+    case 'menu:Running':
+      parsedText = '진행중'
+      break
+    case 'menu:Completed':
+      parsedText = '완료'
+      break
+
+    case 'job:warrior':
+      parsedText = '전사'
+      break
+    case 'job:bowman':
+      parsedText = '궁수'
+      break
+    case 'job:rogue':
+      parsedText = '도적'
+      break
+    case 'job:novice':
+      parsedText = '초보자'
+      break
+
+    case 'dagger-mastery':
+      parsedText = '단검 마스터리'
+      break
+    case 'sword-mastery':
+      parsedText = '검 마스터리'
+      break
+    case 'claw-mastery':
+      parsedText = '아대 마스터리'
+      break
+    case 'spear-mastery':
+      parsedText = '창 마스터리'
+      break
+    case 'axe-mastery':
+      parsedText = '도끼 마스터리'
+      break
+    case 'blunt-mastery':
+      parsedText = '둔기 마스터리'
+      break
+    case 'bow-mastery':
+      parsedText = '활 마스터리'
+      break
+    case 'gun-mastery':
+      parsedText = '권총 마스터리'
+      break
+    case 'cannon-mastery':
+      parsedText = '대포 마스터리'
+      break
+
+    case 'add-str':
+      parsedText = '추가 힘'
+      break
+    case 'add-dex':
+      parsedText = '추가 민첩'
+      break
+    case 'add-luk':
+      parsedText = '추가 행운'
+      break
+    case 'add-critical-rate':
+      parsedText = '치명타 확률 증가'
+      break
+    case 'add-critical-multiplier':
+      parsedText = '치명타 배율 증가'
+      break
+    case 'power-strike':
+      parsedText = '파워 스트라이크'
+      break
+
+    /// //////////////
+    case 'trade-sort:created':
+      parsedText = '등록순'
+      break
+    case 'trade-sort:price':
+      parsedText = '가격순'
+      break
+    case 'trade-sort:grade':
+      parsedText = '등급순'
+      break
+    case 'trade-sort:item-level':
+      parsedText = '아이템 레벨순'
+      break
+    /// ///////////////////////////
     case 'axe':
       parsedText = '도끼'
       break
@@ -68,13 +153,14 @@ export const translate = (text: string) => {
     case 'spear':
       parsedText = '창'
       break
-
     case 'gun':
       parsedText = '권총'
       break
-
     case 'cannon':
       parsedText = '대포'
+      break
+    case 'claw':
+      parsedText = '아대'
       break
 
     case 'normal':
@@ -142,6 +228,9 @@ export const translate = (text: string) => {
     case 'ADDED_DAMAGE_WITH_CANNON':
       parsedText = '대포 피해 추가(+)'
       break
+    case 'ADDED_DAMAGE_WITH_CLAW':
+      parsedText = '아대 피해 추가(+)'
+      break
     case 'INCREASED_DAMAGE_WITH_AXE':
       parsedText = '도끼 피해 증가(%)'
       break
@@ -165,6 +254,9 @@ export const translate = (text: string) => {
       break
     case 'INCREASED_DAMAGE_WITH_CANNON':
       parsedText = '대포 피해 증가(%)'
+      break
+    case 'INCREASED_DAMAGE_WITH_CLAW':
+      parsedText = '아대 피해 증가(%)'
       break
     default:
       break
@@ -213,4 +305,40 @@ export function dataURLtoFile(dataurl: string, filename: string) {
   }
 
   return new File([u8arr], filename, { type: mime })
+}
+
+export function toFixedWithFloat(value: number, fixedValue = 2) {
+  if (!value) return value
+  return parseFloat(value.toFixed(fixedValue))
+}
+
+export function formatNumber(number: number) {
+  if (!number) return number
+  // Use the toLocaleString method to add suffixes to the number
+  return number.toLocaleString('ko-KR', {
+    // add suffixes for thousands, millions, and billions
+    // the maximum number of decimal places to use
+    maximumFractionDigits: 2,
+    // specify the abbreviations to use for the suffixes
+    notation: 'compact',
+    compactDisplay: 'short',
+  })
+}
+
+export function getJobIconUrl(job: string) {
+  if (job === JobKind.Bowman) return '/images/job/icon_job_bowman.webp'
+  if (job === JobKind.Warrior) return '/images/job/icon_job_warrior.webp'
+  if (job === JobKind.Rogue) return '/images/job/icon_job_rogue.webp'
+  return '/images/job/icon_job_novice.png'
+}
+export function getJobIconBgColor(job: string) {
+  if (job === JobKind.Bowman) return '#3b8839'
+  if (job === JobKind.Warrior) return '#e84b4b'
+  if (job === JobKind.Rogue) return '#525bee'
+  return '#444040'
+}
+
+export function isExistLoginToken() {
+  if (typeof window === 'undefined') return false
+  return !!localStorage.getItem('token')
 }

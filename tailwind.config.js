@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
 const withMT = require('@material-tailwind/react/utils/withMT')
-
+const colors = require('tailwindcss/colors')
 const plugin = require('tailwindcss/plugin')
 module.exports = withMT({
   content: [
@@ -18,6 +18,7 @@ module.exports = withMT({
     },
     extend: {
       colors: {
+        ...colors,
         'dark-blue': '#43466a',
         ruliweb: '#1a70dc',
       },

@@ -10,8 +10,8 @@ import {
 } from '@/services/api-fetch'
 import { EnhancedResultDialogRef, InnItem } from '@/interfaces/item.interface'
 import createKey from '@/services/key-generator'
-import { ItemBoxComponent } from '@/app/main/inventory.component'
 import EnhancedResultDialog from './enhanced-result-dialog'
+import ItemBoxComponent from '@/components/item/item-box'
 
 const dummy = {
   updatedWeapon: {
@@ -222,7 +222,7 @@ export default function BlackSmithPage() {
                     className="p-[2px]"
                     item={selectedWeapons[0]}
                     onShowTotalDamage
-                    equippedCallback={() => {}}
+                    actionCallback={() => {}}
                     // onSelect={onSelectItem}
                   />
                 )}
@@ -236,7 +236,7 @@ export default function BlackSmithPage() {
                     className="p-[2px]"
                     item={selectedWeapons[1]}
                     onShowTotalDamage
-                    equippedCallback={() => {}}
+                    actionCallback={() => {}}
                     // onSelect={onSelectItem}
                   />
                 )}
@@ -247,7 +247,7 @@ export default function BlackSmithPage() {
                     className="p-[2px]"
                     item={selectedWeapons[2]}
                     onShowTotalDamage
-                    equippedCallback={() => {}}
+                    actionCallback={() => {}}
                     // onSelect={onSelectItem}
                   />
                 )}
@@ -258,7 +258,7 @@ export default function BlackSmithPage() {
                     className="p-[2px]"
                     item={selectedWeapons[3]}
                     onShowTotalDamage
-                    equippedCallback={() => {}}
+                    actionCallback={() => {}}
                     // onSelect={onSelectItem}
                   />
                 )}
@@ -331,7 +331,7 @@ export default function BlackSmithPage() {
                               className="p-[2px]"
                               item={item}
                               onShowTotalDamage
-                              equippedCallback={() => {}}
+                              actionCallback={() => {}}
                               onSelect={onSelectItem}
                             />
                           )}

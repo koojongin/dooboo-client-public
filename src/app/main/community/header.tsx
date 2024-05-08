@@ -2,6 +2,8 @@
 
 import { Card } from '@material-tailwind/react'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import GoogleAd from '@/components/ads/ads'
 
 export default function CommunityHeader({ children }: any) {
   const router = useRouter()
@@ -12,6 +14,8 @@ export default function CommunityHeader({ children }: any) {
   const goToRoute = (path: string) => {
     router.push(path)
   }
+
+  useEffect(() => {}, [])
   return (
     <div className="rounded w-full flex flex-row justify-between gap-1 ff-dodoom-all mb-[800px]">
       <div className="w-full">
@@ -28,6 +32,9 @@ export default function CommunityHeader({ children }: any) {
             <div>{children}</div>
           </div>
         </Card>
+        <div className="w-full">
+          <GoogleAd />
+        </div>
       </div>
       <div className="flex flex-col gap-2">
         <Card className="p-2 rounded min-w-40">

@@ -4,6 +4,7 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import { Button, Card, CardBody, Tooltip } from '@material-tailwind/react'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/navigation'
+import _ from 'lodash'
 import {
   BaseWeapon,
   SelectItemDialogRef,
@@ -56,8 +57,11 @@ function DropTableMonsterComponent({
     selectMonsterDialogRef?.current?.openDialog()
   }
   const removeItem = (index: number) => {
-    const newDropTable = { ...dropTable }
-    newDropTable.items = newDropTable.items.splice(0, index)
+    const newDropTable: any = { ...dropTable }
+    if (!newDropTable?.items) return
+    newDropTable.items = _.cloneDeep(newDropTable.items)
+    newDropTable.items[index] = undefined
+    newDropTable.items = newDropTable.items.filter((d: any) => !!d)
     setDropTable({ ...newDropTable })
   }
 

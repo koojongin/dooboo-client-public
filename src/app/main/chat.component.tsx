@@ -7,9 +7,10 @@ import {
   PopoverHandler,
   Tooltip,
 } from '@material-tailwind/react'
-import { KeyboardEvent, useEffect, useRef, useState } from 'react'
+import { KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 // import { useResizeDetector } from 'react-resize-detector'
+import { Socket } from 'socket.io-client'
 import { socket } from '@/services/socket'
 import { fetchGetJwtToken } from '@/services/api-fetch'
 import {
@@ -27,9 +28,15 @@ import {
   ON_SHARE_ITEM_EVENT,
 } from '@/interfaces/chat.interface'
 import createKey from '@/services/key-generator'
-import { parseHtml, toColorByGrade, toEmojiPath, toHHMM } from '@/services/util'
+import {
+  isExistLoginToken,
+  parseHtml,
+  toColorByGrade,
+  toEmojiPath,
+  toHHMM,
+} from '@/services/util'
 import toAPIHostURL from '@/services/image-name-parser'
-import { WeaponBoxDetailComponent } from '@/app/main/inventory.component'
+import WeaponBoxDetailComponent from '@/components/item/weapon-box-detail.component'
 
 interface ConnectedCharacter {
   characterId: string
@@ -40,6 +47,13 @@ interface ConnectedCharacter {
 
 interface ConnectedCharacterWrapper {
   [id: string]: ConnectedCharacter
+}
+
+export enum EmoticonKind {
+  BlueArchive = 'BlueArchive',
+  Pepe = 'Pepe',
+  Mangu = 'Mangu',
+  Nike = 'Nike',
 }
 
 export function ChatComponent() {
@@ -54,22 +68,20 @@ export function ChatComponent() {
   const [openPopoverUserAction, setOpenPopoverUserAction] =
     useState<boolean>(false)
 
+  const [selectedEmoticonGroup, setSelectedEmoticonGroup] =
+    useState<EmoticonKind>(EmoticonKind.BlueArchive)
+
   const audioBellRef = useRef<HTMLAudioElement>()
   const audioWhisperRef = useRef<HTMLAudioElement>()
+  const audioMessageAlert = useRef<HTMLAudioElement>()
 
   const triggers = {
     onMouseEnter: () => setOpenPopover(true),
     onMouseLeave: () => setOpenPopover(false),
   }
 
-  const triggersOfUserAction = {
-    onMouseEnter: () => setOpenPopoverUserAction(true),
-    onMouseLeave: () => setOpenPopoverUserAction(false),
-  }
-
   const [isFoldedBox, setIsFoldedBox] = useState<boolean>(false)
 
-  // const audioNotification = new Audio('/audio/notification.mp3')
   const sendMessage = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== 'Enter') return
     if (!enteredMessage) return
@@ -84,8 +96,8 @@ export function ChatComponent() {
   }
 
   const onClickCharacter = (data: any) => {
-    console.log(data, openPopoverUserAction)
     setOpenPopoverUserAction(!openPopoverUserAction)
+    setEnteredMessage(`${enteredMessage}@${data?.nickname}`)
   }
   const onChangeMessage = (message: string) => {
     setEnteredMessage(message)
@@ -112,15 +124,19 @@ export function ChatComponent() {
     socket.io.opts.extraHeaders!.Authorization = `Bearer ${jwtToken}`
     socket.connect()
     socket.on('connect', () => {
-      console.log('connected')
       socket.emit(EMIT_GET_CHARACTERS_EVENT)
     })
-    socket.on(MESSAGE_EVENT, (eventName, data) => {
+
+    addMessageEvent(socket)
+  }
+
+  const addMessageEvent = (selectedSocket: Socket) => {
+    selectedSocket.on(MESSAGE_EVENT, (eventName, data) => {
+      const localNickName = localStorage.getItem('nickname')
+      const isMe = data?.message?.indexOf(`@${localNickName}`) >= 0 || false
       switch (eventName) {
         case ON_CHAT_MESSAGE_EVENT:
-          // eslint-disable-next-line no-case-declarations
-          const localNickName = localStorage.getItem('nickname')
-          if (data.message.indexOf(`@${localNickName}`) >= 0) {
+          if (isMe) {
             if (audioWhisperRef.current) {
               audioWhisperRef.current.volume = 0.3
               audioWhisperRef.current.play()
@@ -132,6 +148,7 @@ export function ChatComponent() {
               '<span class="bg-red-300 text-white">$1</span>',
             )
           }
+
           setChatMessages((before) => {
             return [...before, data]
           })
@@ -179,9 +196,11 @@ export function ChatComponent() {
   }, [chatMessages])
 
   useEffect(() => {
+    if (!isExistLoginToken()) return
     setupSocket()
     audioBellRef.current = new Audio('/audio/bell.flac')
     audioWhisperRef.current = new Audio('/audio/whisper.mp3')
+    audioMessageAlert.current = new Audio('/audio/mokoko.mp3')
     return () => {
       socket?.removeAllListeners()
       socket?.disconnect()
@@ -240,8 +259,9 @@ export function ChatComponent() {
                   const [cId, connectedCharacter] = data
                   const { nickname } = connectedCharacter
                   return (
-                    <div key={createKey()}>
+                    <div key={createKey()} className="hover:bg-gray-100">
                       <div
+                        className="cursor-pointer"
                         onClick={() => {
                           onClickCharacter(connectedCharacter)
                         }}
@@ -362,41 +382,85 @@ export function ChatComponent() {
               </div>
             </div>
             <div className="flex items-stretch">
-              <Popover open={openPopoverUserAction}>
-                <PopoverContent className="relative">
-                  sdf asd fsad fas df
-                </PopoverContent>
-              </Popover>
-              <Popover handler={setOpenPopover} open={openPopover}>
+              <Popover
+                handler={setOpenPopover}
+                open={openPopover}
+                placement="left"
+              >
                 <PopoverHandler>
                   <div className="w-[32px] h-[32px] border border-r-0 flex items-center justify-center cursor-pointer">
                     <img src="/images/emoji/icon_emoji_select.png" />
                   </div>
                 </PopoverHandler>
                 <PopoverContent className="rounded p-0 m-0 p-[10px]">
-                  <div className="flex flex-wrap gap-[1px] w-[604px] overflow-y-scroll max-h-[300px]">
-                    {new Array(21).fill(1).map((v, index) => {
-                      const src = `/images/emoji/ClanChat_Emoji_${`${index + 1}`.padStart(2, '0')}_Kr.png`
-                      return (
-                        <img
-                          key={createKey()}
-                          src={src}
-                          onClick={() => selectEmoji(src)}
-                          className="w-[80px] h-[80px] cursor-pointer"
-                        />
-                      )
-                    })}
-                    {new Array(12).fill(1).map((v, index) => {
-                      const src = `/images/emoji/pepe_${`${index + 1}`.padStart(3, '0')}.png`
-                      return (
-                        <img
-                          key={createKey()}
-                          src={src}
-                          onClick={() => selectEmoji(src)}
-                          className="w-[80px] h-[80px] cursor-pointer"
-                        />
-                      )
-                    })}
+                  <div className="flex w-full overflow-x-scroll text-[16px]">
+                    {Object.keys(EmoticonKind).map(
+                      (emoticonName, index, row) => {
+                        return (
+                          <div
+                            key={`emoji_${emoticonName}`}
+                            onClick={() =>
+                              setSelectedEmoticonGroup(
+                                emoticonName as EmoticonKind,
+                              )
+                            }
+                            className={`${emoticonName === selectedEmoticonGroup ? 'bg-dark-blue text-white' : ''} flex items-center justify-center ff-ba ff-skew border border-gray-400 min-w-[40px] min-h-[24px] px-[2px] cursor-pointer border-b-0 ${row.length === index + 1 ? '' : 'border-r-0'}`}
+                          >
+                            {emoticonName}
+                          </div>
+                        )
+                      },
+                    )}
+                  </div>
+                  <div className="flex flex-wrap content-start gap-[1px] w-[604px] overflow-y-scroll gap-y-0 h-[300px] border-gray-500 border">
+                    {selectedEmoticonGroup === EmoticonKind.BlueArchive &&
+                      new Array(28).fill(1).map((v, index) => {
+                        const src = `/images/emoji/ClanChat_Emoji_${`${index + 1}`.padStart(2, '0')}_Kr.png`
+                        return (
+                          <img
+                            key={createKey()}
+                            src={src}
+                            onClick={() => selectEmoji(src)}
+                            className="w-[80px] h-[80px] cursor-pointer"
+                          />
+                        )
+                      })}
+                    {selectedEmoticonGroup === EmoticonKind.Pepe &&
+                      new Array(15).fill(1).map((v, index) => {
+                        const src = `/images/emoji/pepe_${`${index + 1}`.padStart(3, '0')}.png`
+                        return (
+                          <img
+                            key={createKey()}
+                            src={src}
+                            onClick={() => selectEmoji(src)}
+                            className="w-[80px] h-[80px] cursor-pointer"
+                          />
+                        )
+                      })}
+                    {selectedEmoticonGroup === EmoticonKind.Mangu &&
+                      new Array(10).fill(1).map((v, index) => {
+                        const src = `/images/emoji/mangu_${`${index + 1}`.padStart(3, '0')}.png`
+                        return (
+                          <img
+                            key={createKey()}
+                            src={src}
+                            onClick={() => selectEmoji(src)}
+                            className="w-[80px] h-[80px] cursor-pointer"
+                          />
+                        )
+                      })}
+                    {selectedEmoticonGroup === EmoticonKind.Nike &&
+                      new Array(24).fill(1).map((v, index) => {
+                        const src = `/images/emoji/nike_${`${index + 1}`.padStart(3, '0')}.png`
+                        return (
+                          <img
+                            key={createKey()}
+                            src={src}
+                            onClick={() => selectEmoji(src)}
+                            className="w-[80px] h-[80px] cursor-pointer"
+                          />
+                        )
+                      })}
                   </div>
                 </PopoverContent>
               </Popover>

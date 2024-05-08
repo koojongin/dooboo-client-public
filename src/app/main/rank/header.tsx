@@ -9,7 +9,7 @@ export default function RankHeader({ children }: any) {
     router.push('/main/community')
   }
   return (
-    <Card className="w-full rounded p-[10px]">
+    <Card className="w-full rounded p-[10px] min-w-[1130px]">
       <div className="w-full flex flex-col justify-between gap-1">
         {children}
       </div>

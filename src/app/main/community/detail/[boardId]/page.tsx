@@ -93,7 +93,6 @@ export default function BoardDetail({
   }
 
   const editPost = async () => {
-    console.log(localStorage.getItem('token'))
     router.push(`/main/community/edit/${board?._id}`)
   }
   const deletePost = async () => {

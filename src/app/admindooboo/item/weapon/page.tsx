@@ -9,7 +9,7 @@ import {
   IconButton,
   Input,
 } from '@material-tailwind/react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import createKey from '@/services/key-generator'
@@ -21,6 +21,7 @@ import { Pagination } from '@/interfaces/common.interface'
 import { BaseWeapon } from '@/interfaces/item.interface'
 import toAPIHostURL from '@/services/image-name-parser'
 import { toRangeString } from '@/services/util'
+import useDebounce from '@/components/hooks/debounce'
 
 const TABLE_HEAD = [
   '-',
@@ -33,6 +34,7 @@ const TABLE_HEAD = [
   '치명타피해',
   '획득골드',
   '템렙',
+  '착용렙',
   '최대스타포스',
   '-',
 ]
@@ -42,6 +44,9 @@ export default function ItemWeaponPage() {
   const result = null
   const [pagination, setPagination] = useState<Pagination>()
   const [weapons, setWeapons] = useState<BaseWeapon[]>()
+
+  const [searchKeyword, setSearchKeyword] = useState<string>('')
+  const debouncedKeyword = useDebounce<string>(searchKeyword, 500)
 
   const editItem = (weapon: BaseWeapon) => {
     router.push(`/admindooboo/item/weapon/edit/${weapon._id}`)
@@ -67,32 +72,51 @@ export default function ItemWeaponPage() {
     }
   }
 
-  const loadList = async () => {
-    const {
-      page,
-      total,
-      totalPages,
-      weapons: rWeapons,
-    } = await fetchGetBaseWeaponList()
+  const loadList = useCallback(
+    async (selectedPage = 1) => {
+      const condition: any = {}
 
-    setPagination({ page, total, totalPages })
-    setWeapons(rWeapons)
-  }
+      if (debouncedKeyword) {
+        condition._id = debouncedKeyword
+      }
+      const {
+        page,
+        total,
+        totalPages,
+        weapons: rWeapons,
+      } = await fetchGetBaseWeaponList(condition, {
+        page: selectedPage,
+        limit: 10,
+      })
+
+      setPagination({ page, total, totalPages })
+      setWeapons(rWeapons)
+    },
+    [debouncedKeyword],
+  )
+
   useEffect(() => {
     loadList()
-  }, [])
+  }, [loadList])
+
   return (
     <div>
       <Card className="h-full w-full">
         <CardHeader floated={false} shadow={false} className="rounded-none">
           <div className="mb-4 flex flex-col justify-between gap-8 md:flex-row md:items-center">
             <div className="text-2xl">무기목록</div>
-            <div className="flex w-full shrink-0 gap-1 md:w-max">
+          </div>
+          <div>
+            <div className="flex w-full gap-1 md:w-max">
               <div className="w-full md:w-72">
-                <Input label="Search" />
+                <Input
+                  label="Search"
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                />
               </div>
               <Button className="flex items-center gap-3" size="sm">
-                검색준비중
+                검색
               </Button>
             </div>
           </div>
@@ -116,7 +140,6 @@ export default function ItemWeaponPage() {
                 weapons.map((weapon, index) => {
                   const isLast = index === monsters.length - 1
                   const classes = `${isLast ? 'p-1' : 'p-1 border-b border-blue-gray-50'}`
-
                   return (
                     <tr
                       key={createKey()}
@@ -151,9 +174,12 @@ export default function ItemWeaponPage() {
                       </td>
                       <td className={classes}>
                         <div>{weapon.gold}</div>
-                      </td>{' '}
+                      </td>
                       <td className={classes}>
                         <div>{weapon.iLevel}</div>
+                      </td>
+                      <td className={classes}>
+                        <div>{weapon.requiredEquipmentLevel}</div>
                       </td>
                       <td className={classes}>
                         <div>{weapon.maxStarForce}</div>
@@ -183,23 +209,21 @@ export default function ItemWeaponPage() {
           </table>
         </CardBody>
         {pagination && (
-          <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-1">
-            <Button variant="outlined" size="sm">
-              Previous
-            </Button>
-            <div className="flex items-center gap-1">
+          <div className="w-full flex justify-center mt-[15px]">
+            <div className="flex gap-[4px]">
               {new Array(pagination.totalPages).fill(1).map((value, index) => {
                 return (
-                  <IconButton variant="outlined" size="sm" key={createKey()}>
+                  <div
+                    onClick={() => loadList(index + 1)}
+                    className={`cursor-pointer flex justify-center items-center w-[24px] h-[24px] text-[14px] font-bold ${index + 1 === pagination.page ? 'border text-[#5795dd]' : ''} hover:text-[#5795dd] hover:border`}
+                    key={createKey()}
+                  >
                     {index + 1}
-                  </IconButton>
+                  </div>
                 )
               })}
             </div>
-            <Button variant="outlined" size="sm">
-              Next
-            </Button>
-          </CardFooter>
+          </div>
         )}
       </Card>
     </div>

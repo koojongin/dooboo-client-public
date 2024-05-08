@@ -6,6 +6,7 @@ import { fetchGetBoardList } from '@/services/api-fetch'
 import { Board } from '@/interfaces/board.interface'
 import createKey from '@/services/key-generator'
 import { ago } from '@/services/util'
+import GoogleAd from '@/components/ads/ads'
 
 const { env } = process
 export default function CommunityPage() {
@@ -57,7 +58,6 @@ export default function CommunityPage() {
           />
         )
       })}
-
       {/* BOARD ITEMS END */}
     </div>
   )

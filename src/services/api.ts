@@ -2,7 +2,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 
 const api = axios.create({
-  baseURL: 'https://dooboo.online:3001',
+  baseURL: `https://dooboo.online:${process.env.NEXT_PUBLIC_SERVER_PORT}`,
 })
 
 // 요청 인터셉터
@@ -27,8 +27,8 @@ api.interceptors.response.use(
     const { code, message, response } = error
     const { status, data } = response || {}
     await Swal.fire({
-      title: code,
-      text: data?.message || message,
+      text: code,
+      title: data?.message || message,
       icon: 'error',
       confirmButtonText: '확인',
     })

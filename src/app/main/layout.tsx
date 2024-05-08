@@ -4,6 +4,7 @@ import path from 'path'
 import MainHeader from '@/app/main/header.component'
 import { ChatComponent } from '@/app/main/chat.component'
 import AudioPlayBar from './audio-play-bar'
+import { isExistLoginToken } from '@/services/util'
 
 export const metadata: Metadata = {
   title: '두부 온라인',

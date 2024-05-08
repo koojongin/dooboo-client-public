@@ -101,7 +101,6 @@ export default function QuillEditorBase({
                   const editorRef: any = reactQuillRef.current
                   const editor = editorRef.getEditor()
                   if (!editor) return
-                  console.log(editor.getSelection())
                   const data = await uploadToCloudinaryFromFile(file)
                   const targetElement = editor.root.querySelector(
                     `img[alt='${filename}']`,

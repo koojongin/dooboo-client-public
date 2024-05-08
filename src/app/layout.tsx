@@ -23,6 +23,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3170005754524045"
+          crossOrigin="anonymous"
+        />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -37,6 +42,7 @@ export default function RootLayout({
           name="google-site-verification"
           content="lep7juvIsq1-ds6fFdqxlUzmYC_9R-aCmTWssuX_MAk"
         />
+        <meta name="google-adsense-account" content="ca-pub-3170005754524045" />
       </head>
       <body
         className={` bg-[url('/images/bg001.jpg')] bg-contain min-h-[500px] min-w-[900px] wide:w-full`}

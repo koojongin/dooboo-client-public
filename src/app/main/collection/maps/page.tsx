@@ -9,6 +9,7 @@ import toAPIHostURL from '@/services/image-name-parser'
 import createKey from '@/services/key-generator'
 import { DropTableItem } from '@/interfaces/drop-table.interface'
 import { Monster } from '@/interfaces/monster.interface'
+import { translate } from '@/services/util'
 
 type SelectableDbMap = DbMap & { isSelected?: boolean }
 type MixedDbMap = DbMap & { monsters: Monster[]; totalWeight: number }
@@ -29,11 +30,25 @@ export default function CollectionMapsPage() {
     setMaps(newMaps)
 
     const { map: rMap, monsters: rMonsters } = await fetchGetMap(map._id!)
-    setSelectedMap({
+
+    const sorted = {
       ...rMap,
-      monsters: _.sortBy(rMonsters, 'weight').reverse(),
+      monsters: _.sortBy(
+        rMonsters.map((monster) => {
+          if (!monster.drop) return monster
+          if ((monster.drop?.items?.length || 0) > 0) {
+            const newMonster = { ...monster }
+            newMonster.drop!.items = _.sortBy(newMonster.drop!.items, 'roll')
+            return newMonster
+          }
+          return monster
+        }),
+        'weight',
+      ).reverse(),
       totalWeight: rMonsters.reduce((prev, next) => prev + next.weight, 0),
-    })
+    }
+
+    setSelectedMap(sorted)
   }
 
   useEffect(() => {
@@ -60,12 +75,16 @@ export default function CollectionMapsPage() {
           })}
         </div>
         {selectedMap && (
-          <div className="flex flex-col gap-[1px] mt-[10px]">
-            <div className="flex bg-indigo-400 text-white py-[8px]">
-              <div className="min-w-[200px] pl-[5px]">
+          <div className="flex flex-col mt-[10px]">
+            <div className="bg-gradient-to-r from-blue-gray-600/90 to-blue-gray-100/0 w-[800px] text-white px-[10px] py-[10px] text-[30px] flex items-center ff-gs-all">
+              <div className="">
+                {selectedMap.name}({selectedMap.level})
+              </div>
+            </div>
+            {/* <div className="flex bg-indigo-400 text-white py-[8px]"> */}
+            <div className="mt-[10px] flex bg-gradient-to-r from-indigo-600/90 to-blue-gray-100/0 w-[800px] text-white px-[10px] py-[0px] ff-gs-all">
+              <div className="min-w-[200px]">
                 <div>등장 몬스터</div>
-                <div className="text-[14px]">- 등장 확률</div>
-                <div className="text-[14px]">- 획득 보상</div>
               </div>
               <div>드랍 일람</div>
             </div>
@@ -112,6 +131,7 @@ export default function CollectionMapsPage() {
                           <Tooltip
                             className="rounded-none bg-transparent"
                             interactive
+                            placement="right"
                             content={
                               <BaseWeaponBoxTooltipComponent item={itemData} />
                             }
@@ -143,10 +163,24 @@ export default function CollectionMapsPage() {
 function BaseWeaponBoxTooltipComponent({ item }: { item: DropTableItem }) {
   const selectedItem = item.item
   return (
-    <div className="bg-white rounded p-[12px] border border-gray-300 text-[#34343a] min-w-[300px] shadow-md drop-shadow-lg">
-      <div className="border-b border-dashed border-dark-blue mb-[2px] text-[20px]">
-        {selectedItem?.name}
+    <div className="flex flex-col gap-[2px] bg-white rounded p-[12px] border border-gray-300 text-[#34343a] min-w-[300px] shadow-md drop-shadow-lg">
+      <div className="text-[20px]">{selectedItem?.name}</div>
+      <div className="border-b border-dashed border-dark-blue" />
+      <div className="flex justify-between items-center">
+        <div className="flex items-center">
+          {translate(selectedItem.weaponType)}(ilv:{selectedItem.iLevel})
+        </div>
+        <div className="flex items-center justify-center">
+          <img
+            className="mb-[4px] w-[16px] h-[16px]"
+            src="/images/star_on.png"
+          />
+          <div className="ff-gs flex items-center">
+            x{selectedItem.maxStarForce}
+          </div>
+        </div>
       </div>
+      <div className="border-b border-dashed border-dark-blue" />
       <div className="flex flex-col gap-[1px]">
         <div className="flex justify-between">
           <div>물리 피해</div>
@@ -187,6 +221,7 @@ function BaseWeaponBoxTooltipComponent({ item }: { item: DropTableItem }) {
             {selectedItem.criticalMultiplier[1]}
           </div>
         </div>
+        <div className="border-b border-dashed border-dark-blue" />
         <div className="flex justify-between">
           <div>판매 금액</div>
           <div>{selectedItem.gold.toLocaleString()}</div>

@@ -47,6 +47,7 @@ export default function Page({
       damageOfLightningMax: 0,
       criticalMultiplierMin: 0,
       criticalMultiplierMax: 0,
+      requiredEquipmentLevel: 1,
       criticalRateMin: 0,
       criticalRateMax: 0,
       gold: 0,
@@ -101,6 +102,7 @@ export default function Page({
       setValue('iLevel', rWeapon.iLevel)
       setValue('maxStarForce', rWeapon.maxStarForce)
       setValue('weaponType', rWeapon.weaponType)
+      setValue('requiredEquipmentLevel', rWeapon.requiredEquipmentLevel)
     },
     [setValue],
   )
@@ -204,6 +206,7 @@ export default function Page({
       name: getValues('name'),
       iLevel: getValues('iLevel'),
       maxStarForce: getValues('maxStarForce'),
+      requiredEquipmentLevel: getValues('requiredEquipmentLevel'),
       weaponType: getValues('weaponType'),
       damageOfPhysical: [
         getValues('damageOfPhysicalMin'),
@@ -525,6 +528,20 @@ export default function Page({
                       control={control}
                       render={({ field }) => (
                         <Input label="maxStarForce" {...field} />
+                      )}
+                    />
+                  </div>
+                </div>
+                {/* ================================================================= */}
+
+                <div>
+                  <div>착용 레벨</div>
+                  <div className="flex">
+                    <Controller
+                      name="requiredEquipmentLevel"
+                      control={control}
+                      render={({ field }) => (
+                        <Input label="requiredEquipmentLevel" {...field} />
                       )}
                     />
                   </div>

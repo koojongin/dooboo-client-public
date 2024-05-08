@@ -113,7 +113,6 @@ export default function CommunityBoardEditPage({
                 setTimeout(async () => {
                   const editor = reactQuillRef.current?.getEditor()
                   if (!editor) return
-                  console.log(editor.getSelection())
                   const data = await uploadUploadToCloudinaryFromFile(file)
                   const targetElement = editor.root.querySelector(
                     `img[alt='${filename}']`,

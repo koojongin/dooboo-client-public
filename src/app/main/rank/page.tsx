@@ -9,14 +9,19 @@ import {
 import toAPIHostURL from '@/services/image-name-parser'
 import {
   ago,
+  formatNumber,
   getItemByType,
+  getJobIconBgColor,
+  getJobIconUrl,
   toColorByGrade,
   toMMDDHHMM,
   toMMDDHHMMSS,
+  toYYYYMMDDHHMMSS,
+  translate,
 } from '@/services/util'
-import { WeaponBoxDetailComponent } from '@/app/main/inventory.component'
 import createKey from '@/services/key-generator'
 import { RankLog } from '@/interfaces/user.interface'
+import WeaponBoxDetailComponent from '@/components/item/weapon-box-detail.component'
 
 export default function CommunityPage() {
   const [characters, setCharacters] = useState<any[]>([])
@@ -25,7 +30,7 @@ export default function CommunityPage() {
   const tableClass = [
     'min-w-[50px] text-center',
     'min-w-[50px] text-center',
-    'min-w-[100px] ',
+    'min-w-[50px] w-[100px] truncate overflow-ellipsis cursor-pointer',
   ]
 
   const loadRanks = useCallback(async () => {
@@ -58,7 +63,7 @@ export default function CommunityPage() {
   }, [loadRanks, loadRankByDamages])
   return (
     <div className="flex flex-wrap gap-[10px]">
-      <div className="w-[600px]">
+      <div className="w-[500px]">
         <div className="bg-blue-gray-500 text-white py-[4px] px-[10px] ff-gs text-[20px]">
           레벨 랭크
         </div>
@@ -89,7 +94,30 @@ export default function CommunityPage() {
               >
                 <div className={tableClass[0]}>{index + 1}</div>
                 <div className={tableClass[1]}>{character.level}</div>
-                <div className={tableClass[2]}>{user.nickname}</div>
+                <div className={tableClass[2]}>
+                  <Tooltip
+                    content={`[${translate(`job:${character.job ? character.job : 'novice'}`)}]${
+                      character.nickname
+                    }`}
+                  >
+                    <div className="flex items-center gap-[2px]">
+                      <div
+                        className="w-[20px] h-[20px] min-w-[20px] min-h-[20px]"
+                        style={{
+                          background: getJobIconBgColor(character.job),
+                        }}
+                      >
+                        <img
+                          src={getJobIconUrl(character.job)}
+                          className="w-full h-full"
+                        />
+                      </div>
+                      <div className="ff-score font-bold leading-[100%] overflow-ellipsis truncate">
+                        {character.nickname}
+                      </div>
+                    </div>
+                  </Tooltip>
+                </div>
                 {character.equip && (
                   <div className="flex items-center gap-[2px]">
                     <Tooltip
@@ -125,11 +153,13 @@ export default function CommunityPage() {
                     </div>
                   </div>
                 )}
-                <div className="ml-auto">
-                  {character.lastBattledAt
-                    ? ago(new Date(character.lastBattledAt))
-                    : ''}
-                </div>
+                <Tooltip content={toYYYYMMDDHHMMSS(character.lastBattledAt!)}>
+                  <div className="ml-auto">
+                    {character.lastBattledAt
+                      ? ago(new Date(character.lastBattledAt))
+                      : ''}
+                  </div>
+                </Tooltip>
               </div>
             )
           })}
@@ -161,11 +191,30 @@ export default function CommunityPage() {
                   <div className="w-[40px] text-center">
                     {rankLog.owner.level}
                   </div>
-                  <div className="w-[120px] text-left">
-                    {rankLog.owner.nickname}
-                  </div>
+                  <Tooltip
+                    content={`[${translate(`job:${rankLog.owner.job ? rankLog.owner.job : 'novice'}`)}]${
+                      rankLog.owner.nickname
+                    }`}
+                  >
+                    <div className="w-[120px] text-left flex items-center gap-[2px] cursor-pointer">
+                      <div
+                        className="w-[20px] h-[20px] min-w-[20px] min-h-[20px]"
+                        style={{
+                          background: getJobIconBgColor(rankLog.owner.job),
+                        }}
+                      >
+                        <img
+                          src={getJobIconUrl(rankLog.owner.job)}
+                          className="w-full h-full"
+                        />
+                      </div>
+                      <div className="text-left ff-score font-bold leading-[100%] overflow-ellipsis truncate">
+                        {rankLog.owner.nickname}
+                      </div>
+                    </div>
+                  </Tooltip>
                   <div className="w-[100px] text-left">
-                    {rankLog.snapshot.totalDamage.toFixed(1)}
+                    {formatNumber(rankLog.snapshot.totalDamage)}
                   </div>
                   <div className="w-[100px] text-left">
                     {rankLog.snapshot.averageDamage.toFixed(1)}
@@ -202,9 +251,11 @@ export default function CommunityPage() {
                       </Tooltip>
                     )}
                   </div>
-                  <div className="w-[100px] ml-auto text-right">
-                    {ago(rankLog.updatedAt!)}
-                  </div>
+                  <Tooltip content={toYYYYMMDDHHMMSS(rankLog.updatedAt!)}>
+                    <div className="w-[100px] ml-auto text-right">
+                      {ago(rankLog.updatedAt!)}
+                    </div>
+                  </Tooltip>
                 </div>
               )
             })}

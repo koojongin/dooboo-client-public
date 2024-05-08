@@ -13,7 +13,10 @@ function SelectItemDialog(
   const [baseWeapons, setBaseWeapons] = useState<BaseWeapon[]>([])
 
   const loadBaseWeapons = async () => {
-    const { weapons } = await fetchGetBaseWeaponList()
+    const { weapons } = await fetchGetBaseWeaponList(
+      {},
+      { page: 1, limit: 100 },
+    )
     setBaseWeapons(weapons)
   }
   const handleOpen = async () => {

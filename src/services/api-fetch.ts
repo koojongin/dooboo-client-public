@@ -17,6 +17,17 @@ import {
 import { Board, BoardListResponse } from '@/interfaces/board.interface'
 import { MongooseDocument, Pagination } from '@/interfaces/common.interface'
 import { AuctionListResponse } from '@/interfaces/auction.interface'
+import { SkillMeResponse } from '@/interfaces/skill.interface'
+import {
+  BaseQuest,
+  BaseQuestListResponse,
+  Quest,
+  QuestListResponse,
+} from '@/interfaces/quest.interface'
+import {
+  MyStashListResponse,
+  MyStashResponse,
+} from '@/interfaces/stash.interface'
 
 interface CreateMonsterResponse {
   monster: {
@@ -101,9 +112,14 @@ export async function fetchDeleteMap(id: string) {
 }
 
 export async function fetchGetBaseWeaponList(
-  condition = {},
-  opts = { page: 1 },
+  _condition: any,
+  _opts: any,
 ): Promise<BaseWeaponListResponseDto> {
+  const condition = { ..._condition }
+  const opts = { ..._opts }
+  if (!opts.page) opts.page = 1
+  if (!opts.limit) opts.limit = 10
+
   const { data: response } = await api.post('/item/base-weapon/list', {
     condition,
     opts,
@@ -314,5 +330,133 @@ export async function fetchPurchaseAuctionItem(
   id: string,
 ): Promise<AuctionListResponse> {
   const { data: response } = await api.post(`/item/auction/purchase/${id}`)
+  return response
+}
+
+export async function fetchRetrieveAuctionItem(
+  id: string,
+): Promise<AuctionListResponse> {
+  const { data: response } = await api.post(`/item/auction/retrieve/${id}`)
+  return response
+}
+
+export async function fetchGetMessageLogList(
+  condition = {},
+  opts = {},
+): Promise<any> {
+  const { data: response } = await api.post(`/message-log/list`, {
+    condition,
+    opts,
+  })
+  return response
+}
+
+export async function fetchGetMySkill(): Promise<SkillMeResponse> {
+  const { data: response } = await api.get(`/skill/me`)
+  return response
+}
+
+export async function fetchLearnSkill(
+  name: string,
+  point: number,
+): Promise<SkillMeResponse> {
+  const { data: response } = await api.post(`/skill/learn`, { name, point })
+  return response
+}
+
+export async function fetchGetSkills(): Promise<any> {
+  const { data: response } = await api.get(`/skill/all`)
+  return response
+}
+
+export async function fetchAdvanceJob(job: string): Promise<any> {
+  const { data: response } = await api.post(`/character/advance-job`, { job })
+  return response
+}
+
+export async function fetchItemsAll(condition: any, opts: any): Promise<any> {
+  const { data: response } = await api.post(`/item/all`, {
+    condition,
+    opts,
+  })
+  return response
+}
+
+export async function fetchWeaponsAll(condition: any, opts: any): Promise<any> {
+  const { data: response } = await api.post(`/item/weapon/all`, {
+    condition,
+    opts,
+  })
+  return response
+}
+
+export async function fetchBaseQuestList(
+  condition: any,
+  opts: any,
+): Promise<BaseQuestListResponse> {
+  const { data: response } = await api.post(`/quest/list/base-quest`, {
+    condition,
+    opts,
+  })
+  return response
+}
+
+export async function fetchBaseQuest(
+  id: string,
+): Promise<{ baseQuest: BaseQuest; quest?: Quest }> {
+  const { data: response } = await api.get(`/quest/base-quest/${id}`)
+  return response
+}
+
+export async function fetchQuestList(
+  condition: any,
+  opts: any,
+): Promise<QuestListResponse> {
+  const { data: response } = await api.post(`/quest/list`, {
+    condition,
+    opts,
+  })
+  return response
+}
+
+export async function fetchAcceptBaseQuest(
+  id: string,
+): Promise<{ baseQuest: BaseQuest }> {
+  const { data: response } = await api.get(`/quest/base-quest/accept/${id}`)
+  return response
+}
+export async function fetchCompleteBaseQuest(
+  id: string,
+): Promise<{ baseQuest: BaseQuest }> {
+  const { data: response } = await api.get(`/quest/base-quest/complete/${id}`)
+  return response
+}
+
+export async function fetchGetMyStashes(): Promise<MyStashListResponse> {
+  const { data: response } = await api.get(`/item/stashes`)
+  return response
+}
+
+export async function fetchGetMyStash(id: string): Promise<MyStashResponse> {
+  const { data: response } = await api.get(`/item/stash/${id}`)
+  return response
+}
+
+export async function fetchItemToStash(
+  id: string,
+  itemIds: string[],
+): Promise<any> {
+  const { data: response } = await api.post(`/item/send-stash/${id}`, {
+    itemIds,
+  })
+  return response
+}
+export async function fetchItemToInventory(
+  id: string,
+  itemIds: string[],
+): Promise<any> {
+  const { data: response } = await api.post(`/item/send-inventory/${id}`, {
+    itemIds,
+  })
   return response
 }

@@ -15,22 +15,16 @@ export default function MainHeader() {
   }
 
   return (
-    <div className="flex items-center justify-start w-full mb-2 gap-1 z-10 [&>*>img]:h-[80px] [&>a]:flex">
+    <div className="flex items-center justify-start w-full mb-2 gap-1 [&>*>img]:h-[80px] [&>a]:flex">
       <Link href="/main" className=" duration-300 cursor-pointer">
         <img src="/images/icon_001_battle.png" />
       </Link>
       <Link href="/main/skill" className=" duration-300 cursor-pointer">
         <img src="/images/icon_002_skill.png" />
       </Link>
-      {/* <Link href="/main/shop" className=" duration-300 cursor-pointer"> */}
-      {/*  <img src="/images/icon_003_shop.png" /> */}
-      {/* </Link> */}
       <Link href="/main/inn/stash" className=" duration-300 cursor-pointer">
         <img src="/images/icon_007_inn.png" />
       </Link>
-      {/* <Link href="/main/gatcha" className=" duration-300 cursor-pointer"> */}
-      {/*  <img src="/images/icon_004_gatcha.png" /> */}
-      {/* </Link> */}
       <Link href="/main/community" className="  duration-300 cursor-pointer">
         <img src="/images/icon_005_community.png" />
       </Link>
@@ -39,18 +33,16 @@ export default function MainHeader() {
       </Link>
       <Link
         href="/main/collection/maps"
-        className="  duration-300 cursor-pointer"
+        className="duration-300 cursor-pointer"
       >
         <img src="/images/icon_008_collection.png" />
       </Link>
-      {/* <Link */}
-      {/*  className="w-20 ml-auto bg-white shadow-md hover:drop-shadow-lg rounded-full h-full hover:scale-125 duration-300 flex justify-center flex-col items-center" */}
-      {/*  href="/admindooboo" */}
-      {/*  target="_blank" */}
-      {/* > */}
-      {/*  <div>관리자</div> */}
-      {/*  <div>페이지</div> */}
-      {/* </Link> */}
+      <Link
+        href="/main/messages"
+        className="duration-300 cursor-pointer relative"
+      >
+        <img src="/images/icon_010_message.png" />
+      </Link>
       <button
         className="ml-auto w-20 max-h-20 bg-white shadow-md hover:drop-shadow-lg rounded-full h-full duration-300"
         onClick={() => logout()}

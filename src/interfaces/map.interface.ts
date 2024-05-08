@@ -5,6 +5,7 @@ export interface DbMap {
   name: string
   monsters?: Monster[]
   mosterIds?: Monster[] | string[]
+  level: number
 }
 export interface GetMapsResponse {
   maps: DbMap[]

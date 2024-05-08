@@ -4,12 +4,10 @@ import { Card, CardBody, Tooltip } from '@material-tailwind/react'
 import { MeResponse } from '@/interfaces/user.interface'
 import { Item } from '@/interfaces/item.interface'
 import toAPIHostURL from '@/services/image-name-parser'
-import {
-  InventoryActionKind,
-  WeaponBoxDetailComponent,
-} from '@/app/main/inventory.component'
 import { fetchUnequipItem } from '@/services/api-fetch'
 import { DEFAULT_THUMBNAIL_URL } from '@/constants/constant'
+import WeaponBoxDetailComponent from '@/components/item/weapon-box-detail.component'
+import { InventoryActionKind } from '@/components/item/item.interface'
 
 export default (function CharacterStatusComponent({
   user,
@@ -61,7 +59,7 @@ export default (function CharacterStatusComponent({
                     >
                       {/* {character.experience}/{nextExp} */}
                       <div
-                        className="absolute left-0 max-w-[300px] min-h-full opacity-80 z-20"
+                        className="absolute left-0 max-w-[300px] min-h-full opacity-80 z-[5]"
                         style={{
                           width: `${EXP_WIDTH * (character.experience / nextExp)}px`,
                           background:
@@ -73,7 +71,7 @@ export default (function CharacterStatusComponent({
                         className={`absolute min-w-[${EXP_WIDTH}px] max-w-[{EXP_WIDTH$px] min-h-full bg-blue-100`}
                       />
                       <div
-                        className={`z-20 absolute min-w-[${EXP_WIDTH}px] max-w-[{EXP_WIDTH$px] min-h-full flex items-center justify-center text-white ff-ba text-[20px] leading-[20px]`}
+                        className={`z-[5] absolute min-w-[${EXP_WIDTH}px] max-w-[{EXP_WIDTH$px] min-h-full flex items-center justify-center text-white ff-ba text-[20px] leading-[20px]`}
                       >
                         {((character.experience / nextExp) * 100).toFixed(2)}%
                       </div>

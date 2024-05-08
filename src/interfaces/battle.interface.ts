@@ -6,6 +6,11 @@ export interface BattleLog {
   isCriticalHit: boolean
   damage: number
   currentHp: number
+  skills: any[]
+  player: {
+    currentHp: number
+    currentMp: number
+  }
 }
 
 export interface BattleResponseDto {
