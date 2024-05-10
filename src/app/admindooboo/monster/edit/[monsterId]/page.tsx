@@ -115,8 +115,11 @@ export default function Page({
               몬스터 수정
               {` ${moment(monster.updatedAt).format('YYYY-MM-DD HH:mm:ss')}`}
             </Typography>
-            <div className="flex justify-center">
-              <img src={toAPIHostURL(monster.thumbnail)} />
+            <div className="flex justify-center w-[100px]">
+              <img
+                className="w-full h-full"
+                src={toAPIHostURL(monster.thumbnail)}
+              />
             </div>
             <form onSubmit={onSubmit}>
               <div className="mb-1 flex flex-col gap-3">

@@ -8,11 +8,13 @@ import {
   useState,
 } from 'react'
 import { Tooltip } from '@material-tailwind/react'
-import { InnItem } from '@/interfaces/item.interface'
+import { InnItem, ItemTypeKind } from '@/interfaces/item.interface'
 import { toColorByGrade } from '@/services/util'
 import toAPIHostURL from '@/services/image-name-parser'
 import WeaponBoxDetailComponent from './weapon-box-detail.component'
 import { InventoryActionKind } from '@/components/item/item.interface'
+import MiscBoxDetailComponent from '@/components/item/misc-box-detail.component'
+import { MiscStackChip } from '@/components/chat/share-item-box.component'
 
 export default function ItemBoxComponent({
   className = '',
@@ -40,7 +42,7 @@ export default function ItemBoxComponent({
     (i) => i.iType === 'weapon',
   )
 
-  const selectedItem = item.weapon
+  const selectedItem = item[item.iType]
   const totalFlatDamage =
     (selectedItem?.damageOfPhysical || 0) +
     (selectedItem?.damageOfLightning || 0) +
@@ -77,9 +79,9 @@ export default function ItemBoxComponent({
 
   return (
     <>
-      {item.iType === 'weapon' && (
+      {item.iType === ItemTypeKind.Weapon && (
         <div
-          className={`overflow-hidden relative cursor-pointer min-w-[40px] w-[40px] h-[40px] max-w-[40px] max-h-[40px] ${className}`}
+          className={`overflow-hidden relative cursor-pointer min-w-[50px] w-[50px] h-[50px] max-w-[50px] max-h-[50px] ${className}`}
           style={{
             borderColor: toColorByGrade(selectedItem.iGrade),
             borderWidth: '2px',
@@ -125,13 +127,51 @@ export default function ItemBoxComponent({
               </div>
             }
           >
-            <div className="relative max-w-full max-h-full w-[40px] h-[40px]">
+            <div className="relative max-w-full max-h-full w-[50px] h-[50px]">
               <div className="absolute text-[12px] border rounded px-[2px] ff-ba ff-skew bg-[#424242a6] text-white">
                 {totalFlatDamage}
               </div>
               <img
-                className="max-w-full max-h-full w-[40px] h-[40px]"
+                className="max-w-full max-h-full w-[50px] h-[50px]"
                 src={`${toAPIHostURL(selectedItem?.thumbnail)}`}
+              />
+            </div>
+          </Tooltip>
+        </div>
+      )}
+
+      {/*---------------------------------------------------------------------*/}
+      {item.iType === ItemTypeKind.Misc && (
+        <div
+          className={`overflow-hidden relative cursor-pointer min-w-[50px] w-[50px] h-[50px] max-w-[50px] max-h-[50px] ${className}`}
+          style={{
+            borderColor: toColorByGrade(selectedItem?.baseMisc.iGrade),
+            borderWidth: '2px',
+            borderRadius: '4px',
+          }}
+          onClick={(e) => onClickItem(e)}
+        >
+          <Tooltip
+            className="rounded-none bg-transparent"
+            interactive
+            handler={(e: any) => handler(e)}
+            open={open}
+            content={
+              <div>
+                <MiscBoxDetailComponent
+                  item={item}
+                  onShowTotalDamage={onShowTotalDamage}
+                  actions={actions}
+                  actionCallback={itemBoxActionCallback}
+                />
+              </div>
+            }
+          >
+            <div className="relative max-w-full max-h-full w-[50px] h-[50px]">
+              <MiscStackChip stack={selectedItem?.stack} />
+              <img
+                className="max-w-full max-h-full w-[50px] h-[50px]"
+                src={`${toAPIHostURL(selectedItem?.baseMisc?.thumbnail)}`}
               />
             </div>
           </Tooltip>

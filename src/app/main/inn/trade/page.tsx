@@ -1,11 +1,12 @@
 'use client'
 
 import { Card, Option, Select } from '@material-tailwind/react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import {
   fetchGetAuctions,
+  fetchGetMyCurrency,
   fetchPurchaseAuctionItem,
   fetchRetrieveAuctionItem,
 } from '@/services/api-fetch'
@@ -13,9 +14,14 @@ import createKey from '@/services/key-generator'
 import toAPIHostURL from '@/services/image-name-parser'
 import { ago, toColorByGrade, toMMDDHHMMSS, translate } from '@/services/util'
 import { Auction } from '@/interfaces/auction.interface'
-import { WeaponType } from '@/interfaces/item.interface'
+import {
+  SimulateBattleDialogRef,
+  WeaponType,
+} from '@/interfaces/item.interface'
 import useDebounce from '@/components/hooks/debounce'
 import { SortingType } from '@/interfaces/common.interface'
+import SelectItemDialog from '@/app/admindooboo/drop/select-item-dialog'
+import SimulateBattleDialog from './simulate-battle-dialog'
 
 const TradeSortType = {
   CREATED: 'trade-sort:created',
@@ -30,10 +36,12 @@ enum ListingType {
 }
 export default function TradePage() {
   const [characterId, setCharacterId] = useState<string>()
+  const [currency, setCurrency] = useState<{ gold: number }>()
   const [auctions, setAuctions] = useState<Auction[]>([])
   const [searchKeyword, setSearchKeyword] = useState<string>('')
   const debouncedKeyword = useDebounce<string>(searchKeyword, 500)
   const [showOnlyMyItem, setShowOnlyMyItem] = useState<boolean>(false)
+  const simulateBattleRef = useRef<SimulateBattleDialogRef>()
   const [isAllWeaponTypeChecked, setIsAllWeaponTypeChecked] =
     useState<boolean>(true)
   const [sortingType, setSortingType] = useState<
@@ -122,13 +130,18 @@ export default function TradePage() {
       setLastSearchOptions({ condition, opts })
     },
     [
-      selectedSortType,
+      showOnlyMyItem,
       selectedWeaponTypes,
       debouncedKeyword,
+      selectedSortType,
+      characterId,
       sortingType,
-      showOnlyMyItem,
     ],
   )
+
+  const simulateBattle = useCallback(async (auctionId: string) => {
+    simulateBattleRef.current?.openDialog(auctionId)
+  }, [])
 
   const onChangeAllWeaponCheck = () => {
     setSelectedWeaponTypes([
@@ -190,6 +203,11 @@ export default function TradePage() {
     }
   }
 
+  const loadCurrency = useCallback(async () => {
+    const result = await fetchGetMyCurrency()
+    setCurrency(result)
+  }, [])
+
   const goToAddItemPage = () => {
     router.push('/main/inn/trade/create')
   }
@@ -197,11 +215,26 @@ export default function TradePage() {
   useEffect(() => {
     setCharacterId(localStorage.getItem('characterId') || '')
     loadWeapons()
+    loadCurrency()
   }, [loadWeapons])
+
   return (
     <div>
+      <SimulateBattleDialog ref={simulateBattleRef} />
       <Card className="rounded p-[8px] ff-ba flex flex-col gap-[4px]">
-        <div className="flex flex-col gap-[10px] mb-[10px] ff-ba-all border-dashed border-b border-b-gray-600 pb-[10px]">
+        <div className="flex flex-col gap-[4px] mb-[10px] ff-ba-all border-dashed border-b border-b-gray-600 pb-[10px]">
+          <div>
+            {currency && (
+              <div className="flex items-center gap-[4px]">
+                <img src="/images/icon_currency.png" className="w-[30px]" />
+                <div className="ff-score text-[24px]">
+                  {currency.gold.toLocaleString()}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* SearchInputLine-----------------------------*/}
           <div className="flex items-center">
             <div className="w-[200px] flex items-stretch justify-center">
               <div className="flex items-stretch">
@@ -261,6 +294,8 @@ export default function TradePage() {
               onChange={(e) => onChangeKeyword(e.target.value)}
             />
           </div>
+
+          {/* WeaponType Group-----------------------------*/}
           <div>
             {/* Item Type CheckBox Start */}
             <div className="flex items-center gap-[8px]">
@@ -310,6 +345,7 @@ export default function TradePage() {
           </div>
         </div>
 
+        {/* Dashed Border Line---------------------------------*/}
         <div>
           {auctions.length === 0 && <div>검색결과가 없습니다</div>}
           {pagenation && (
@@ -356,6 +392,12 @@ export default function TradePage() {
                           회수하기
                         </div>
                       )}
+                      <div
+                        className="flex items-center justify-center bg-red-500 text-white cursor-pointer text-[20px] px-[12px] py-[4px] ff-wavve rounded"
+                        onClick={() => simulateBattle(auction._id!)}
+                      >
+                        시뮬레이션
+                      </div>
                     </div>
                     <div className="p-[4px] flex">
                       <div
@@ -446,6 +488,12 @@ export default function TradePage() {
                             회수하기
                           </div>
                         )}
+                        <div
+                          className="flex items-center justify-center bg-red-500 text-white cursor-pointer text-[20px] px-[12px] py-[4px] ff-wavve rounded"
+                          onClick={() => simulateBattle(auction._id!)}
+                        >
+                          시뮬레이션
+                        </div>
                       </div>
                       <div className="flex justify-between items-center">
                         <div className="flex flex-row gap-[2px] items-center">

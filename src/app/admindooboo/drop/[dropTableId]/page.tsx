@@ -6,6 +6,7 @@ import Swal from 'sweetalert2'
 import { useRouter } from 'next/navigation'
 import _ from 'lodash'
 import {
+  BaseMisc,
   BaseWeapon,
   SelectItemDialogRef,
   SelectMonsterDialogRef,
@@ -33,8 +34,16 @@ function DropTableMonsterComponent({
   const selectItemDialogRef = useRef<SelectItemDialogRef>(null)
   const selectMonsterDialogRef = useRef<SelectMonsterDialogRef>(null)
 
-  const onSelectItem = (item: BaseWeapon | any, selectedIndex: number) => {
+  const getItemType = (iType: string) => {
+    if (iType === 'weapon') return 'BaseWeapon'
+    if (iType === 'misc') return 'BaseMisc'
+    throw new Error('UnknownType')
+  }
+  const onSelectItem = (item: BaseWeapon | BaseMisc, selectedIndex: number) => {
+    // if (item.iType === 'weapon') {
+    // }
     const newDropTable = { ...dropTable }
+    newDropTable.items[selectedIndex].iType = getItemType(item.iType)
     newDropTable.items[selectedIndex].itemId = item._id
     newDropTable.items[selectedIndex].item = {
       ...newDropTable.items[selectedIndex].item,

@@ -49,12 +49,15 @@ export default function CommunityBoardPage() {
   const formatDate = (dateString: string) => {
     const targetDate = new Date(dateString)
     const now = new Date()
-
-    const ONE_DAY_MILLISECONDS = 1000 * 60 * 60 * 24
-    if (now.getTime() - targetDate.getTime() >= ONE_DAY_MILLISECONDS) {
-      return moment(targetDate).format('YYYY.MM.DD')
+    // const ONE_DAY_MILLISECONDS = 1000 * 60 * 60 * 24
+    if (
+      moment(targetDate).isSame(moment(), 'day') &&
+      moment(targetDate).isSame(moment(), 'date') &&
+      moment(targetDate).isSame(moment(), 'year')
+    ) {
+      return moment(targetDate).format('HH:mm')
     }
-    return moment(targetDate).format('HH:mm')
+    return moment(targetDate).format('YYYY.MM.DD')
   }
 
   const goToPage = (pageNumber: number | string) => {

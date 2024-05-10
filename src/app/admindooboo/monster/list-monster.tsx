@@ -119,10 +119,10 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
 
                 return (
                   <tr key={createKey()} className="hover:bg-gray-100">
-                    <td className={`${classes}`}>
+                    <td className={`${classes}`} style={{ padding: 0 }}>
                       <img
                         src={monster.thumbnail}
-                        className="w-20 h-20 border border-blue-gray-50 bg-blue-gray-50/50 object-contain"
+                        className="w-[30px] h-[30px] border border-blue-gray-50 bg-blue-gray-50/50 object-contain"
                       />
                     </td>
                     <td className={classes}>

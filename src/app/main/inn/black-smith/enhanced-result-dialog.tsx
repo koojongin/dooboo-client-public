@@ -6,6 +6,259 @@ import {
 } from '@/interfaces/item.interface'
 import toAPIHostURL from '@/services/image-name-parser'
 import createKey from '@/services/key-generator'
+import { toColorByGrade, toYYYYMMDDHHMMSS, translate } from '@/services/util'
+
+export function EnhancedSnapshotBox({ enhancedLog }: { enhancedLog: any }) {
+  const enhancedWeapon = enhancedLog.snapshot
+  const originWeapon = enhancedLog?.weapon
+  return (
+    <div className="flex flex-col rounded shadow-gray-400 shadow-md bg-gradient-to-br from-slate-500 via-gray-300 to-slate-600">
+      <div className="flex flex-row justify-stretch items-stretch p-[5px]">
+        <div className="min-w-[240px] p-[1px]">
+          <div className="flex justify-center text-[20px] h-[30px] items-center">
+            <div className="text-[20px] flex items-center ff-gs">강화 전</div>
+          </div>
+          <div className="bg-gray-800 rounded">
+            <div
+              className="pb-[8px] rounded bg-gradient-to-br from-[#5b5b5b80] to-blue-gray-100/50 h-full"
+              style={{
+                borderColor: toColorByGrade(enhancedWeapon.iGrade),
+                borderWidth: '2px',
+              }}
+            >
+              <div className="flex gap-[4px] justify-center items-center px-[6px] h-[30px]">
+                <div className="flex items-center gap-[2px]">
+                  <img
+                    className="w-[16px] h-[16px]"
+                    key={createKey()}
+                    src="/images/star_on.png"
+                  />
+                  <div className="ff-score font-bold">
+                    {enhancedWeapon.starForce}
+                  </div>
+                </div>
+                <div className="ff-score font-bold">/</div>
+                <div className="flex items-center gap-[2px]">
+                  <img
+                    className="w-[16px] h-[16px]"
+                    key={createKey()}
+                    src="/images/star_off.png"
+                  />
+                  <div className="ff-score font-bold">
+                    {enhancedWeapon.maxStarForce}
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-center items-center gap-[4px] py-[2px] mb-[4px] bg-[#9bb5c44f]">
+                <img
+                  className="w-[40px] h-[40px] bg-[#c4c4c4] border-gray-600 border p-[2px] rounded"
+                  style={{
+                    borderWidth: '2px',
+                    borderRadius: '4px',
+                  }}
+                  src={toAPIHostURL(enhancedWeapon.thumbnail)}
+                />
+                <div className="flex justify-center ff-wavve text-[20px]">
+                  {enhancedWeapon.name}+{enhancedWeapon.starForce}
+                </div>
+              </div>
+              <div className="px-[6px] mt-[10px]">
+                <div className="flex justify-between">
+                  <div>물리 피해</div>
+                  <div>{enhancedWeapon.damageOfPhysical}</div>
+                </div>
+
+                <div className="flex justify-between">
+                  <div>화염 피해</div>
+                  <div>{enhancedWeapon.damageOfFire}</div>
+                </div>
+
+                <div className="flex justify-between">
+                  <div>번개 피해</div>
+                  <div>{enhancedWeapon.damageOfLightning}</div>
+                </div>
+
+                <div className="flex justify-between">
+                  <div>냉기 피해</div>
+                  <div>{enhancedWeapon.damageOfCold}</div>
+                </div>
+
+                <div className="flex justify-between">
+                  <div>치명타 확률</div>
+                  <div>+{enhancedWeapon.criticalRate}%</div>
+                </div>
+
+                <div className="flex justify-between">
+                  <div>치명타 배율</div>
+                  <div>+{enhancedWeapon.criticalMultiplier}%</div>
+                </div>
+              </div>
+              <div className="px-[6px]">
+                {Object.keys(enhancedWeapon.additionalAttributes || {}).length >
+                  0 && (
+                  <div className="mt-[5px]">
+                    <div className="text-[#ffea00] border-b border-b-gray-200">
+                      추가 속성
+                    </div>
+                    {Object.keys(enhancedWeapon.additionalAttributes!).map(
+                      (key: string) => {
+                        if (!enhancedWeapon.additionalAttributes) return
+                        const value = enhancedWeapon.additionalAttributes[key]
+                        return (
+                          <div
+                            key={createKey()}
+                            className="flex justify-between"
+                          >
+                            <div>{translate(key)}</div>
+                            <div>{value}</div>
+                          </div>
+                        )
+                      },
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/*------------------------------------------------*/}
+
+        <div className="flex items-center px-[10px] text-[#4e4e4e] text-[20px]">
+          <i className="fa-solid fa-arrow-right" />
+        </div>
+
+        {/*------------------------------------------------*/}
+        <div className="min-w-[240px] p-[1px]">
+          <div className="flex justify-center text-[20px] h-[30px] items-center">
+            {originWeapon && (
+              <div className="text-[20px] flex items-center ff-gs">
+                현재 원본 아이템
+              </div>
+            )}
+            {!originWeapon && (
+              <div className="flex justify-center items-center text-[14px] bg-opacity-55 p-[1px] rounded ff-gs">
+                원본 아이템이 없습니다
+              </div>
+            )}
+          </div>
+          {originWeapon && (
+            <div className="bg-gray-800 rounded">
+              <div
+                className="pb-[8px] rounded bg-gradient-to-br from-[#5b5b5b80] to-blue-gray-100/50 h-full"
+                style={{
+                  borderColor: toColorByGrade(originWeapon.iGrade),
+                  borderWidth: '2px',
+                  borderRadius: '4px',
+                }}
+              >
+                <div className="flex gap-[4px] justify-center items-center px-[6px] h-[30px]">
+                  <div className="flex items-center gap-[2px]">
+                    <img
+                      className="w-[16px] h-[16px]"
+                      key={createKey()}
+                      src="/images/star_on.png"
+                    />
+                    <div className="ff-score font-bold">
+                      {originWeapon.starForce}
+                    </div>
+                  </div>
+                  <div className="ff-score font-bold">/</div>
+                  <div className="flex items-center gap-[2px]">
+                    <img
+                      className="w-[16px] h-[16px]"
+                      key={createKey()}
+                      src="/images/star_off.png"
+                    />
+                    <div className="ff-score font-bold">
+                      {originWeapon.maxStarForce}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-center items-center gap-[4px] py-[2px] mb-[4px] bg-[#9bb5c44f]">
+                  <img
+                    className="w-[40px] h-[40px] bg-[#c4c4c4] border-gray-600 border p-[2px] rounded"
+                    style={{
+                      borderWidth: '2px',
+                      borderRadius: '4px',
+                    }}
+                    src={toAPIHostURL(originWeapon.thumbnail)}
+                  />
+                  <div className="flex justify-center ff-wavve text-[20px]">
+                    {originWeapon.name}+{originWeapon.starForce}
+                  </div>
+                </div>
+                <div className="px-[6px] mt-[10px]">
+                  <div className="flex justify-between">
+                    <div>물리 피해</div>
+                    <div>{originWeapon.damageOfPhysical}</div>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <div>화염 피해</div>
+                    <div>{originWeapon.damageOfFire}</div>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <div>번개 피해</div>
+                    <div>{originWeapon.damageOfLightning}</div>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <div>냉기 피해</div>
+                    <div>{originWeapon.damageOfCold}</div>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <div>치명타 확률</div>
+                    <div>+{originWeapon.criticalRate}%</div>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <div>치명타 배율</div>
+                    <div>+{originWeapon.criticalMultiplier}%</div>
+                  </div>
+                </div>
+                <div className="px-[6px]">
+                  {Object.keys(originWeapon.additionalAttributes || {}).length >
+                    0 && (
+                    <div className="mt-[5px]">
+                      <div className="text-[#ffea00] border-b border-b-gray-200">
+                        추가 속성
+                      </div>
+                      {Object.keys(originWeapon.additionalAttributes!).map(
+                        (key: string) => {
+                          if (!originWeapon.additionalAttributes) return
+                          const value = originWeapon.additionalAttributes[key]
+                          return (
+                            <div
+                              key={createKey()}
+                              className="flex justify-between"
+                            >
+                              <div>{translate(key)}</div>
+                              <div>{value}</div>
+                            </div>
+                          )
+                        },
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+      {/*--------------------------------------*/}
+      <div className="flex bg-white overflow-hidden border-t border-dashed border-gray-800">
+        <div className="ff-gs-all text-white bg-[#182243c7] w-full flex px-[5px] py-[2px] gap-[4px]">
+          <div>강화 일시 -</div>
+          <div>{toYYYYMMDDHHMMSS(enhancedLog.createdAt)}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function EnhancedResultDialog(
   { result }: { result: EnhancedResult },
@@ -33,7 +286,7 @@ function EnhancedResultDialog(
       className="min-w-[600px!important]"
     >
       <DialogBody className="min-h-[250px] overflow-y-scroll flex justify-center items-center">
-        {!result && <div className="text-[50px] text-red-500">강화 실패!</div>}
+        {!result && <div className="text-[40px] text-red-500">강화 실패!</div>}
 
         {result && (
           <div>

@@ -17,6 +17,11 @@ export default function CollectionHeader() {
       url: '/main/collection/items',
       thumbnail: '/images/icon_items.webp',
     },
+    {
+      name: '등급 정보',
+      url: '/main/collection/grade-info',
+      thumbnail: '/images/icon_items.webp',
+    },
   ]
 
   const goToRoute = (path: string) => {

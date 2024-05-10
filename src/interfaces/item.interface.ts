@@ -1,5 +1,19 @@
 import { MongooseDocument, Pagination } from './common.interface'
 
+export enum MiscTypeCategoryKind {
+  Etc = 'etc',
+}
+
+export enum ItemGradeKind {
+  Normal = 'normal',
+  Magic = 'magic',
+  Rare = 'rare',
+  Epic = 'epic',
+  Primordial = 'primordial',
+  Unique = 'unique',
+  Legendary = 'legendary',
+}
+
 export const WeaponType = {
   Axe: 'axe',
   Sword: 'sword',
@@ -33,6 +47,16 @@ export interface Weapon extends MongooseDocument {
     [key: string]: number
   }
 }
+
+export interface BaseMisc extends MongooseDocument {
+  category: string
+  gold: number
+  name: string
+  thumbnail: string
+  iType: string
+  maxStack: number
+}
+
 export interface BaseWeapon extends MongooseDocument {
   criticalMultiplier: number[] // [0, 0]
   criticalRate: number[] // [0, 0]
@@ -58,6 +82,10 @@ export interface BaseWeaponListResponseDto extends Pagination {
   weapons: BaseWeapon[]
 }
 
+export interface BaseMiscListResponseDto extends Pagination {
+  baseMiscs: BaseMisc[]
+}
+
 export interface BaseWeaponResponseDto {
   weapon: BaseWeapon
 }
@@ -69,6 +97,11 @@ export interface WeaponListResponseDto extends Pagination {
 export interface SelectItemDialogRef {
   refresh?: () => void
   openDialog: (index: number) => void
+}
+
+export interface SimulateBattleDialogRef {
+  refresh?: () => void
+  openDialog: (auctionId: string) => void
 }
 
 export interface EnhancedResultDialogRef {
@@ -84,10 +117,21 @@ export interface SelectMonsterDialogRef {
   openDialog: () => void
 }
 
+export enum ItemTypeKind {
+  Misc = 'misc',
+  Weapon = 'weapon',
+}
+
+export enum BaseItemTypeKind {
+  BaseWeapon = 'BaseWeapon',
+  BaseMisc = 'BaseMisc',
+}
 export interface Item extends MongooseDocument {
-  iType: 'weapon' | string
+  iType: ItemTypeKind | string
   weaponId?: string
+  miscId?: string
   weapon?: any
+  misc?: any
 
   item?: BaseWeapon | any
   roll?: number

@@ -132,7 +132,7 @@ export default function ItemListPage() {
                 return (
                   <div
                     key={`main_inventory_${item?._id || createKey()}`}
-                    className="relative flex border border-r rounded-md w-[40px] h-[40px]"
+                    className="relative flex border border-r rounded-md w-[50px] h-[50px]"
                     onClick={() => setSelectedItem(item)}
                   >
                     {item && (

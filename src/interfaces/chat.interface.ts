@@ -14,6 +14,8 @@ export const ON_CHAT_EMOJI_EVENT = 'chat-emoji'
 
 export const EMIT_NOTICE_MESSAGE_EVENT = 'notice'
 export const ON_NOTICE_MESSAGE_EVENT = 'notice'
+export const EMIT_ENHANCED_LOG_MESSAGE_EVENT = 'share-enhanced-log'
+export const ON_ENHANCED_LOG_MESSAGE_EVENT = 'share-enhanced-log'
 
 export const MESSAGE_EVENT = 'message'
 
@@ -23,4 +25,5 @@ export const MESSAGE_TYPE = {
   ITEM_SHARE: 'item-share',
   EMOJI: 'emoji',
   NOTICE: 'notice',
+  ENHANCED_LOG: 'enhanced-log',
 }

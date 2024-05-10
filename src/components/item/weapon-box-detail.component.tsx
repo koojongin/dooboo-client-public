@@ -216,7 +216,6 @@ export default function WeaponBoxDetailComponent({
           })}
         </div>
       )}
-
       <div className="border-b border-b-gray-400 border-dotted" />
       <div className="px-[10px] py-[2px]">
         <div className="flex justify-between items-center">
@@ -227,16 +226,13 @@ export default function WeaponBoxDetailComponent({
           </div>
         </div>
       </div>
-
       <div className="border-b border-b-gray-400 border-dotted" />
-
       <div className="px-[10px] py-[2px]">
         <div className="flex justify-between">
           <div>획득일시</div>
           <div>{toMMDDHHMMSS(item.createdAt)}</div>
         </div>
       </div>
-
       {
         <>
           <div className="px-[10px] py-[2px] mb-[4px]">

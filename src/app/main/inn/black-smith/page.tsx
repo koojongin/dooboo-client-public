@@ -8,66 +8,14 @@ import {
   fetchGetEnhancePrice,
   fetchGetMyInventory,
 } from '@/services/api-fetch'
-import { EnhancedResultDialogRef, InnItem } from '@/interfaces/item.interface'
+import {
+  EnhancedResultDialogRef,
+  InnItem,
+  ItemTypeKind,
+} from '@/interfaces/item.interface'
 import createKey from '@/services/key-generator'
 import EnhancedResultDialog from './enhanced-result-dialog'
 import ItemBoxComponent from '@/components/item/item-box'
-
-const dummy = {
-  updatedWeapon: {
-    _id: '662de39a8cd9e2f0592a576b',
-    name: '손 도끼',
-    iLevel: 5,
-    iType: 'weapon',
-    iGrade: 'normal',
-    requiredEquipmentLevel: 1,
-    damageOfPhysical: 9,
-    damageOfCold: 14,
-    damageOfFire: 13,
-    damageOfLightning: 9,
-    criticalRate: 0,
-    criticalMultiplier: 0,
-    gold: 500,
-    starForce: 3,
-    maxStarForce: 7,
-    thumbnail: 'public/upload/items/2a2a5729-b0bd-42e6-a934-53710dd5b8e5.png',
-    owner: '6603b3d5b7868c3b327f4c53',
-    createdAt: '2024-04-28T05:50:18.336Z',
-    updatedAt: '2024-04-28T06:47:31.037Z',
-    id: '662de39a8cd9e2f0592a576b',
-  },
-  enhancedLog: {
-    originWeaponId: '662de39a8cd9e2f0592a576b',
-    snapshot: {
-      _id: '662de39a8cd9e2f0592a576b',
-      name: '손 도끼',
-      iLevel: 5,
-      iType: 'weapon',
-      iGrade: 'normal',
-      requiredEquipmentLevel: 1,
-      damageOfPhysical: 9,
-      damageOfCold: 10,
-      damageOfFire: 13,
-      damageOfLightning: 9,
-      criticalRate: 0,
-      criticalMultiplier: 0,
-      gold: 500,
-      starForce: 2,
-      maxStarForce: 7,
-      thumbnail: 'public/upload/items/2a2a5729-b0bd-42e6-a934-53710dd5b8e5.png',
-      owner: '6603b3d5b7868c3b327f4c53',
-      createdAt: '2024-04-28T05:50:18.336Z',
-      updatedAt: '2024-04-28T06:44:13.888Z',
-      id: '662de39a8cd9e2f0592a576b',
-    },
-    owner: '6603b3d5b7868c3b327f4c53',
-    _id: '662df1034f8ff9dcfa703ed7',
-    createdAt: '2024-04-28T06:47:31.037Z',
-    updatedAt: '2024-04-28T06:47:31.037Z',
-    id: '662df1034f8ff9dcfa703ed7',
-  },
-  isSuccess: true,
-}
 
 export default function BlackSmithPage() {
   const enhancedResultDialogRef = useRef<EnhancedResultDialogRef>()
@@ -216,7 +164,7 @@ export default function BlackSmithPage() {
 
             <div className="flex items-center justify-center gap-[2px]">
               <div>원본</div>
-              <div className="bg-white relative flex border-[1px] border-r rounded-md w-[40px] h-[40px] items-center justify-center flex">
+              <div className="bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] items-center justify-center flex">
                 {selectedWeapons[0] && (
                   <ItemBoxComponent
                     className="p-[2px]"
@@ -230,7 +178,7 @@ export default function BlackSmithPage() {
             </div>
             <div className="flex items-center justify-center gap-[2px]">
               <div>재료</div>
-              <div className="bg-white relative flex border-[1px] border-r rounded-md w-[40px] h-[40px] items-center justify-center flex">
+              <div className="bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] items-center justify-center flex">
                 {selectedWeapons[1] && (
                   <ItemBoxComponent
                     className="p-[2px]"
@@ -241,7 +189,7 @@ export default function BlackSmithPage() {
                   />
                 )}
               </div>
-              <div className="bg-white relative flex border-[1px] border-r rounded-md w-[40px] h-[40px] items-center justify-center flex">
+              <div className="bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] items-center justify-center flex">
                 {selectedWeapons[2] && (
                   <ItemBoxComponent
                     className="p-[2px]"
@@ -252,7 +200,7 @@ export default function BlackSmithPage() {
                   />
                 )}
               </div>
-              <div className="bg-white relative flex border-[1px] border-r rounded-md w-[40px] h-[40px] items-center justify-center flex">
+              <div className="bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] items-center justify-center flex">
                 {selectedWeapons[3] && (
                   <ItemBoxComponent
                     className="p-[2px]"
@@ -268,7 +216,7 @@ export default function BlackSmithPage() {
               <div className="text-[20px] min-h-[30px] flex justify-center items-center">
                 {enhancePrice && (
                   <div className="flex items-center gap-[2px]">
-                    <div className="text-green-400">
+                    <div className="text-green-500">
                       성공률: {enhancePrice.successRate}%
                     </div>
                     <div className="flex items-center text-amber-600">
@@ -313,18 +261,20 @@ export default function BlackSmithPage() {
               <div>인벤토리</div>
               <div className="">
                 <div>
-                  <div className="flex flex-wrap max-w-[414px] bg-gray-100 p-[2px] rounded shadow-md gap-[1px]">
+                  <div className="flex flex-wrap max-w-[514px] bg-gray-100 p-[2px] rounded shadow-md gap-[1px]">
                     {new Array(100).fill(1).map((value, index) => {
-                      const item = items[index]
+                      const item = items[index] || {}
                       const disableSlotClass = 'bg-gray-800'
-                      const isOveredSlot = index >= maxItemSlots
+                      const isOveredSlot =
+                        index >= maxItemSlots ||
+                        item?.iType === ItemTypeKind.Misc
                       return (
                         <div
-                          key={createKey()}
-                          className={`bg-white relative flex border-[1px] border-r rounded-md w-[40px] h-[40px] ${isOveredSlot ? disableSlotClass : ''} ${item?.isSelected ? 'border-red-300' : ''}`}
+                          key={`black_smith_${item?._id || createKey()}`}
+                          className={`bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] ${isOveredSlot ? disableSlotClass : ''} ${item?.isSelected ? 'border-red-300' : ''}`}
                         >
                           {isOveredSlot && (
-                            <div className="absolute z-10 bg-gray-800 bg-opacity-60 w-[40px] h-[40px] rounded" />
+                            <div className="absolute z-10 bg-gray-800 bg-opacity-60 w-[50px] h-[50px] rounded" />
                           )}
                           {item && (
                             <ItemBoxComponent

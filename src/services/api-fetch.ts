@@ -3,6 +3,8 @@ import { GetMapResponse, GetMapsResponse } from '@/interfaces/map.interface'
 import { BattleResponseDto } from '@/interfaces/battle.interface'
 import { Character, MeResponse, RankLog } from '@/interfaces/user.interface'
 import {
+  BaseMisc,
+  BaseMiscListResponseDto,
   BaseWeapon,
   BaseWeaponListResponseDto,
   BaseWeaponResponseDto,
@@ -140,6 +142,7 @@ export async function fetchPostBaseWeapon(
   const { data: response } = await api.post(`/item/base-weapon`, baseWeapon)
   return response
 }
+
 export async function fetchPutBaseWeapon(
   baseWeapon: BaseWeapon,
 ): Promise<BaseWeaponResponseDto> {
@@ -159,6 +162,11 @@ export async function fetchDeleteBaseWeapon(
 
 export async function fetchGetRankList(): Promise<{ characters: Character[] }> {
   const { data: response } = await api.get(`/character/rank`)
+  return response
+}
+
+export async function fetchGetMyCurrency(): Promise<{ gold: number }> {
+  const { data: response } = await api.get(`/character/currency`)
   return response
 }
 
@@ -307,6 +315,13 @@ export async function fetchDeleteBoardOne(
   return response
 }
 
+export async function fetchDeleteCommentOne(
+  id: string,
+): Promise<{ board: Board }> {
+  const { data: response } = await api.delete(`/board/comment/delete/${id}`)
+  return response
+}
+
 export async function fetchPostAddToAuction(
   id: string,
   data: { gold: number },
@@ -345,6 +360,17 @@ export async function fetchGetMessageLogList(
   opts = {},
 ): Promise<any> {
   const { data: response } = await api.post(`/message-log/list`, {
+    condition,
+    opts,
+  })
+  return response
+}
+
+export async function fetchGetEnhancedLogList(
+  condition = {},
+  opts = {},
+): Promise<any> {
+  const { data: response } = await api.post(`/enhanced-log/list`, {
     condition,
     opts,
   })
@@ -458,5 +484,26 @@ export async function fetchItemToInventory(
   const { data: response } = await api.post(`/item/send-inventory/${id}`, {
     itemIds,
   })
+  return response
+}
+
+export async function fetchGradeInfo(): Promise<{
+  attributes: object
+  grades: any[]
+  tierLimit: object
+}> {
+  const { data: response } = await api.get(`/item/tiers`)
+  return response
+}
+
+export async function fetchMergeStackedItemInInventory(): Promise<{
+  attributes: object
+}> {
+  const { data: response } = await api.get(`/item/merge-stackable`)
+  return response
+}
+
+export async function fetchSimulateBattle(auctionId: string): Promise<any> {
+  const { data: response } = await api.get(`/simulate/battle/${auctionId}`)
   return response
 }

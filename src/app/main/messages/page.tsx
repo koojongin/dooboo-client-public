@@ -1,18 +1,41 @@
 'use client'
 
-import { Card, CardBody } from '@material-tailwind/react'
+import { Card, CardBody, Tooltip } from '@material-tailwind/react'
 import { useCallback, useEffect, useState } from 'react'
-import { fetchGetMessageLogList } from '@/services/api-fetch'
+import {
+  fetchGetEnhancedLogList,
+  fetchGetMessageLogList,
+} from '@/services/api-fetch'
 import createKey from '@/services/key-generator'
-import { ago, isExistLoginToken } from '@/services/util'
+import {
+  ago,
+  isExistLoginToken,
+  toMMDDHHMMSS,
+  translate,
+} from '@/services/util'
 import {
   MessageLogCategoryKind,
   Pagination,
 } from '@/interfaces/common.interface'
+import { EnhancedSnapshotBox } from '@/app/main/inn/black-smith/enhanced-result-dialog'
+import toAPIHostURL from '@/services/image-name-parser'
+import {
+  EMIT_CHAT_MESSAGE_EVENT,
+  EMIT_ENHANCED_LOG_MESSAGE_EVENT,
+} from '@/interfaces/chat.interface'
+import { socket } from '@/services/socket'
 
+enum SelectMenu {
+  MessageLog,
+  EnhancedLog,
+}
 export default function MessagePage() {
   const [messageLogs, setMessageLogs] = useState<any[]>([])
+  const [enhancedLogs, setEnhancedLogs] = useState<any[]>([])
   const [pagination, setPagination] = useState<Pagination>()
+  const [selectedMenu, setSelectedMenu] = useState<SelectMenu>(
+    SelectMenu.MessageLog,
+  )
 
   const loadMessages = useCallback(async (selectedPage = 1) => {
     const result = await fetchGetMessageLogList(
@@ -28,25 +51,76 @@ export default function MessagePage() {
     })
   }, [])
 
+  const loadEnhancedLogs = useCallback(async (selectedPage = 1) => {
+    const result = await fetchGetEnhancedLogList(
+      {},
+      { limit: 10, page: selectedPage, sort: { createdAt: -1 } },
+    )
+
+    setEnhancedLogs(result.enhancedLogs)
+    setPagination({
+      page: result.page,
+      total: result.total,
+      totalPages: result.totalPages,
+      limit: result.limit,
+    })
+  }, [])
+
+  const loadPage = async (page: number) => {
+    if (selectedMenu === SelectMenu.MessageLog) {
+      loadMessages(page)
+    }
+
+    if (selectedMenu === SelectMenu.EnhancedLog) {
+      loadEnhancedLogs(page)
+    }
+  }
+
   useEffect(() => {
-    loadMessages()
-  }, [loadMessages])
+    console.log(selectedMenu)
+    if (selectedMenu === SelectMenu.MessageLog) {
+      console.log('?')
+      loadMessages()
+    }
+    if (selectedMenu === SelectMenu.EnhancedLog) {
+      loadEnhancedLogs()
+    }
+  }, [loadEnhancedLogs, loadMessages, selectedMenu])
+
   return (
     <div className="w-full">
       <Card className="rounded p-[10px]">
-        <div className="flex items-center mb-[10px]">
-          <div className="ff-nbg text-[20px] border-b-ruliweb border-b-2 pb-[2px] cursor-pointer">
-            쪽지 목록({pagination?.total.toLocaleString() || 0})
-          </div>
+        <div className="flex items-center mb-[10px] gap-[10px]">
+          {Object.keys(SelectMenu)
+            .slice(0, Object.values(SelectMenu).length / 2)
+            .map((menuKey: SelectMenu | any) => {
+              const menu = parseInt(menuKey, 10)
+              return (
+                <div
+                  key={`menu_${menuKey}`}
+                  className="ff-nbg text-[20px] border-b-ruliweb border-b-2 pb-[2px] cursor-pointer"
+                  onClick={() => {
+                    setSelectedMenu(menu)
+                  }}
+                >
+                  {translate(`menu:${SelectMenu[menuKey]}`)}
+                  {selectedMenu === menu && (
+                    <>({pagination?.total.toLocaleString() || 0})</>
+                  )}
+                </div>
+              )
+            })}
         </div>
         <div className="flex flex-col border border-dashed border-gray-600 border-b-0">
-          {messageLogs.map((messageLog) => {
-            return (
-              <div key={createKey()}>
-                <MessageLogTitleBox messageLog={messageLog} />
-              </div>
-            )
-          })}
+          {selectedMenu === SelectMenu.MessageLog && (
+            <MessageLogList messageLogs={messageLogs} />
+          )}
+          {selectedMenu === SelectMenu.EnhancedLog && (
+            <EnhancedLogList
+              pagination={pagination}
+              enhancedLogs={enhancedLogs}
+            />
+          )}
         </div>
         <div>
           {pagination && (
@@ -57,7 +131,7 @@ export default function MessagePage() {
                   .map((value, index) => {
                     return (
                       <div
-                        onClick={() => loadMessages(index + 1)}
+                        onClick={() => loadPage(index + 1)}
                         className={`cursor-pointer flex justify-center items-center w-[24px] h-[24px] text-[14px] font-bold ${index + 1 === pagination.page ? 'border text-[#5795dd]' : ''} hover:text-[#5795dd] hover:border`}
                         key={createKey()}
                       >
@@ -74,6 +148,91 @@ export default function MessagePage() {
   )
 }
 
+function EnhancedLogList({
+  enhancedLogs,
+  pagination,
+}: {
+  enhancedLogs: any[]
+  pagination: Pagination | undefined
+}) {
+  const shareLog = async (enhancedLog: any) => {
+    if (!enhancedLog) return
+    socket.emit(EMIT_ENHANCED_LOG_MESSAGE_EVENT, { id: enhancedLog._id })
+  }
+
+  useEffect(() => {}, [])
+
+  if (!pagination) return <>.</>
+  return (
+    <>
+      {enhancedLogs.map((enhancedLog, index) => {
+        const pageIndex =
+          pagination.total - (pagination.page - 1) * pagination.limit! - index
+        return (
+          <div key={`enhancedLog:${enhancedLog._id}`}>
+            <div className="flex border-b border-dashed border-b-gray-800 items-stretch">
+              <div className="w-[30px] flex items-center justify-center border-r border-r-gray-500">
+                {pageIndex}
+              </div>
+              <div className="w-[100px] flex items-center pl-[4px] border-r border-r-gray-500">
+                <Tooltip content={toMMDDHHMMSS(enhancedLog.createdAt)}>
+                  {ago(enhancedLog.createdAt)}
+                </Tooltip>
+              </div>
+              <div className="flex items-center min-h-[40px]">
+                <div className="p-[2px] flex items-center gap-[4px]">
+                  <Tooltip
+                    className="bg-transparent p-0"
+                    interactive
+                    placement="right"
+                    content={<EnhancedSnapshotBox enhancedLog={enhancedLog} />}
+                  >
+                    <div className="flex gap-[4px] cursor-pointer">
+                      <div className="w-[36px] h-[36px] border border-gray-600 p-[2px]">
+                        <img
+                          className="w-full h-full"
+                          src={toAPIHostURL(enhancedLog.snapshot.thumbnail)}
+                        />
+                      </div>
+                      <div className="flex items-center">
+                        <div>{enhancedLog.snapshot.name}</div>
+                        {enhancedLog.snapshot?.starForce > 0 && (
+                          <div>+{enhancedLog.snapshot.starForce}</div>
+                        )}
+                      </div>
+                    </div>
+                  </Tooltip>
+                </div>
+              </div>
+              <div
+                className="ml-auto mr-[5px] flex items-center"
+                onClick={() => shareLog(enhancedLog)}
+              >
+                <div className="ff-nbg text-[16px] bg-green-500 text-white flex items-center justify-center w-[50px] rounded cursor-pointer">
+                  공유
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      })}
+    </>
+  )
+}
+
+function MessageLogList({ messageLogs }: { messageLogs: any[] }) {
+  return (
+    <>
+      {messageLogs.map((messageLog) => {
+        return (
+          <div key={createKey()}>
+            <MessageLogTitleBox messageLog={messageLog} />
+          </div>
+        )
+      })}
+    </>
+  )
+}
 function MessageLogTitleBox({ messageLog }: any) {
   // MessageLogCategoryKind
   return (

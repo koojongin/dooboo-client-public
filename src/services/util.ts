@@ -34,6 +34,10 @@ export const getItemByType = (item: Item) => {
     case 'weapon':
       return item.weapon
       break
+
+    case 'misc':
+      return item.misc
+      break
     default:
       throw new Error('Unknown Item Type')
       break
@@ -51,6 +55,15 @@ export const toEmojiPath = (path: string) => {
 export const translate = (text: string) => {
   let parsedText = text
   switch (text) {
+    case 'etc':
+      parsedText = '기타'
+      break
+    case 'menu:MessageLog':
+      parsedText = '쪽지'
+      break
+    case 'menu:EnhancedLog':
+      parsedText = '강화 기록'
+      break
     case 'menu:All':
       parsedText = '전체'
       break
@@ -175,10 +188,22 @@ export const translate = (text: string) => {
     case 'epic':
       parsedText = '서사'
       break
+    case 'primordial':
+      parsedText = '태초'
+      break
 
     /// /////////////////////////////////////////////////////
     case 'INCREASED_DAMAGE':
       parsedText = '피해 증가(%)'
+      break
+    case 'INCREASED_DAMAGE_WITH_ROGUE':
+      parsedText = '도적 피해 증가(%)'
+      break
+    case 'INCREASED_DAMAGE_WITH_WARRIOR':
+      parsedText = '전사 피해 증가(%)'
+      break
+    case 'INCREASED_DAMAGE_WITH_BOWMAN':
+      parsedText = '궁수 피해 증가(%)'
       break
     case 'INCREASED_PHYSICAL_DAMAGE':
       parsedText = '물리 피해 증가(%)'
@@ -279,6 +304,9 @@ export const toColorByGrade = (grade: string) => {
       break
     case 'epic':
       color = '#6000d2'
+      break
+    case 'primordial':
+      color = '#2ebe29'
       break
     default:
       break

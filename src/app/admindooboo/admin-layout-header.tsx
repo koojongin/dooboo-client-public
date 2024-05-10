@@ -17,6 +17,10 @@ export default function AdminLayoutHeader() {
       <Button onClick={() => navigate('/admindooboo/map')}>맵</Button>
       <Button onClick={() => navigate('/admindooboo/db/weapon')}>DB</Button>
       <Button onClick={() => navigate('/admindooboo/db/chat')}>Chat</Button>
+      <Button onClick={() => navigate('/admindooboo/db/character')}>
+        캐릭
+      </Button>
+      <Button onClick={() => navigate('/admindooboo/db/stash')}>stash</Button>
     </ButtonGroup>
   )
 }

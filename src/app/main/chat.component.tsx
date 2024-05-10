@@ -1,15 +1,8 @@
 'use client'
 
-import {
-  Card,
-  Popover,
-  PopoverContent,
-  PopoverHandler,
-  Tooltip,
-} from '@material-tailwind/react'
-import { KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react'
+import { Card, Tooltip } from '@material-tailwind/react'
+import { KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
-// import { useResizeDetector } from 'react-resize-detector'
 import { Socket } from 'socket.io-client'
 import { socket } from '@/services/socket'
 import { fetchGetJwtToken } from '@/services/api-fetch'
@@ -23,20 +16,20 @@ import {
   ON_CHAT_EMOJI_EVENT,
   ON_CHAT_JOIN_EVENT,
   ON_CHAT_MESSAGE_EVENT,
+  ON_ENHANCED_LOG_MESSAGE_EVENT,
   ON_GET_CHARACTERS_EVENT,
   ON_NOTICE_MESSAGE_EVENT,
   ON_SHARE_ITEM_EVENT,
 } from '@/interfaces/chat.interface'
 import createKey from '@/services/key-generator'
-import {
-  isExistLoginToken,
-  parseHtml,
-  toColorByGrade,
-  toEmojiPath,
-  toHHMM,
-} from '@/services/util'
+import { isExistLoginToken, parseHtml, toHHMM } from '@/services/util'
 import toAPIHostURL from '@/services/image-name-parser'
 import WeaponBoxDetailComponent from '@/components/item/weapon-box-detail.component'
+import { EmojiPopOver, EmoticonKind } from '@/components/emoji/emoji-popover'
+import { ItemTypeKind } from '@/interfaces/item.interface'
+import MiscBoxDetailComponent from '@/components/item/misc-box-detail.component'
+import { EnhancedSnapshotBox } from '@/app/main/inn/black-smith/enhanced-result-dialog'
+import ShareItemBoxComponent from '@/components/chat/share-item-box.component'
 
 interface ConnectedCharacter {
   characterId: string
@@ -47,13 +40,6 @@ interface ConnectedCharacter {
 
 interface ConnectedCharacterWrapper {
   [id: string]: ConnectedCharacter
-}
-
-export enum EmoticonKind {
-  BlueArchive = 'BlueArchive',
-  Pepe = 'Pepe',
-  Mangu = 'Mangu',
-  Nike = 'Nike',
 }
 
 export function ChatComponent() {
@@ -107,16 +93,6 @@ export function ChatComponent() {
     triggers.onMouseLeave()
     socket.emit(EMIT_CHAT_EMOJI_EVENT, { src: emojiSrc })
   }
-  const getTotalFlatDamage = (weapon: any) => {
-    const selectedItem = weapon
-    const totalFlatDamage =
-      selectedItem.damageOfPhysical +
-      selectedItem.damageOfLightning +
-      selectedItem.damageOfCold +
-      selectedItem.damageOfFire
-    return totalFlatDamage
-  }
-
   const setupSocket = async () => {
     const { token: jwtToken, character } = await fetchGetJwtToken()
     localStorage.setItem('characterId', character._id)
@@ -165,6 +141,11 @@ export function ChatComponent() {
           break
 
         case ON_SHARE_ITEM_EVENT:
+          setChatMessages((before) => {
+            return [...before, data]
+          })
+          break
+        case ON_ENHANCED_LOG_MESSAGE_EVENT:
           setChatMessages((before) => {
             return [...before, data]
           })
@@ -297,44 +278,31 @@ export function ChatComponent() {
                   return (
                     <div key={createKey()} className="flex flex-wrap">
                       {messageType === MESSAGE_TYPE.ITEM_SHARE && (
-                        <div className="break-all pl-[5px] w-full border-t border-dashed border-b border-amber-800 cursor-pointer">
+                        <div className="break-all pl-[5px] w-full border-t border-dashed border-b border-amber-800 cursor-pointer py-[4px]">
                           {`[${toHHMM(new Date(chatMessage.timestamp))}] `}
                           {`${chatMessage.nickname}: `}
                           <Tooltip
                             className="rounded-none bg-transparent"
                             interactive
                             content={
-                              <WeaponBoxDetailComponent
-                                item={chatMessage.item}
-                              />
+                              <>
+                                {chatMessage.item.iType ===
+                                  ItemTypeKind.Weapon && (
+                                  <WeaponBoxDetailComponent
+                                    item={chatMessage.item}
+                                  />
+                                )}
+                                {chatMessage.item.iType ===
+                                  ItemTypeKind.Misc && (
+                                  <MiscBoxDetailComponent
+                                    item={chatMessage.item}
+                                  />
+                                )}
+                              </>
                             }
                           >
-                            <div className="flex items-center gap-[2px]">
-                              <div
-                                className="relative"
-                                style={{
-                                  borderColor: toColorByGrade(
-                                    chatMessage.item.weapon.iGrade,
-                                  ),
-                                  borderWidth: '1px',
-                                  borderRadius: '2px',
-                                }}
-                              >
-                                <div className="absolute z-10 text-[12px] border rounded px-[2px] bg-[#424242a6] text-white ff-ba ff-skew">
-                                  {getTotalFlatDamage(chatMessage.item.weapon)}
-                                </div>
-                                <img
-                                  src={toAPIHostURL(
-                                    chatMessage.item.weapon.thumbnail,
-                                  )}
-                                  className="w-[40px] h-[40px] border rounded p-[1px] bg-white"
-                                />
-                              </div>
-                              [{chatMessage.item.weapon.name}
-                              {chatMessage.item.weapon.starForce > 0
-                                ? `+${chatMessage.item.weapon.starForce}`
-                                : ''}
-                              ]
+                            <div>
+                              <ShareItemBoxComponent item={chatMessage.item} />
                             </div>
                           </Tooltip>
                         </div>
@@ -376,96 +344,68 @@ export function ChatComponent() {
                           {chatMessage.message}
                         </div>
                       )}
+
+                      {messageType === MESSAGE_TYPE.ENHANCED_LOG && (
+                        <div className="break-all pl-[5px] py-[4px] w-full border-t border-dashed border-b border-amber-800 cursor-pointer">
+                          {`[${toHHMM(new Date(chatMessage.timestamp))}] `}
+                          {`${chatMessage.nickname}: `}
+                          <Tooltip
+                            className="bg-transparent p-0"
+                            interactive
+                            placement="right"
+                            content={
+                              <EnhancedSnapshotBox
+                                enhancedLog={chatMessage.enhancedLog}
+                              />
+                            }
+                          >
+                            <div className="flex cursor-pointer flex-col">
+                              <div className="ff-gs bg-gray-400 text-white px-[4px] mb-[2px]">
+                                [공유] 강화로그
+                              </div>
+                              <div className="flex gap-[4px]">
+                                <div className="w-[36px] h-[36px] border border-gray-600 p-[2px]">
+                                  <img
+                                    className="w-full h-full"
+                                    src={toAPIHostURL(
+                                      chatMessage.enhancedLog.snapshot
+                                        .thumbnail,
+                                    )}
+                                  />
+                                </div>
+                                <div className="flex items-center">
+                                  <div className="flex items-center">
+                                    <div>
+                                      {chatMessage.enhancedLog.snapshot.name} +
+                                      {
+                                        chatMessage.enhancedLog.snapshot
+                                          .starForce
+                                      }
+                                    </div>
+                                    <div className="ml-[5px] text-[12px] flex items-center gap-[4px] font-bold">
+                                      <i className="fa-solid fa-arrow-right" />
+                                      <div className="bg-blue-600 text-white w-[18px] h-[18px] rounded-full flex items-center justify-center">
+                                        <i className="fa-solid fa-question" />
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </Tooltip>
+                        </div>
+                      )}
                     </div>
                   )
                 })}
               </div>
             </div>
             <div className="flex items-stretch">
-              <Popover
-                handler={setOpenPopover}
-                open={openPopover}
-                placement="left"
-              >
-                <PopoverHandler>
-                  <div className="w-[32px] h-[32px] border border-r-0 flex items-center justify-center cursor-pointer">
-                    <img src="/images/emoji/icon_emoji_select.png" />
-                  </div>
-                </PopoverHandler>
-                <PopoverContent className="rounded p-0 m-0 p-[10px]">
-                  <div className="flex w-full overflow-x-scroll text-[16px]">
-                    {Object.keys(EmoticonKind).map(
-                      (emoticonName, index, row) => {
-                        return (
-                          <div
-                            key={`emoji_${emoticonName}`}
-                            onClick={() =>
-                              setSelectedEmoticonGroup(
-                                emoticonName as EmoticonKind,
-                              )
-                            }
-                            className={`${emoticonName === selectedEmoticonGroup ? 'bg-dark-blue text-white' : ''} flex items-center justify-center ff-ba ff-skew border border-gray-400 min-w-[40px] min-h-[24px] px-[2px] cursor-pointer border-b-0 ${row.length === index + 1 ? '' : 'border-r-0'}`}
-                          >
-                            {emoticonName}
-                          </div>
-                        )
-                      },
-                    )}
-                  </div>
-                  <div className="flex flex-wrap content-start gap-[1px] w-[604px] overflow-y-scroll gap-y-0 h-[300px] border-gray-500 border">
-                    {selectedEmoticonGroup === EmoticonKind.BlueArchive &&
-                      new Array(28).fill(1).map((v, index) => {
-                        const src = `/images/emoji/ClanChat_Emoji_${`${index + 1}`.padStart(2, '0')}_Kr.png`
-                        return (
-                          <img
-                            key={createKey()}
-                            src={src}
-                            onClick={() => selectEmoji(src)}
-                            className="w-[80px] h-[80px] cursor-pointer"
-                          />
-                        )
-                      })}
-                    {selectedEmoticonGroup === EmoticonKind.Pepe &&
-                      new Array(15).fill(1).map((v, index) => {
-                        const src = `/images/emoji/pepe_${`${index + 1}`.padStart(3, '0')}.png`
-                        return (
-                          <img
-                            key={createKey()}
-                            src={src}
-                            onClick={() => selectEmoji(src)}
-                            className="w-[80px] h-[80px] cursor-pointer"
-                          />
-                        )
-                      })}
-                    {selectedEmoticonGroup === EmoticonKind.Mangu &&
-                      new Array(10).fill(1).map((v, index) => {
-                        const src = `/images/emoji/mangu_${`${index + 1}`.padStart(3, '0')}.png`
-                        return (
-                          <img
-                            key={createKey()}
-                            src={src}
-                            onClick={() => selectEmoji(src)}
-                            className="w-[80px] h-[80px] cursor-pointer"
-                          />
-                        )
-                      })}
-                    {selectedEmoticonGroup === EmoticonKind.Nike &&
-                      new Array(24).fill(1).map((v, index) => {
-                        const src = `/images/emoji/nike_${`${index + 1}`.padStart(3, '0')}.png`
-                        return (
-                          <img
-                            key={createKey()}
-                            src={src}
-                            onClick={() => selectEmoji(src)}
-                            className="w-[80px] h-[80px] cursor-pointer"
-                          />
-                        )
-                      })}
-                  </div>
-                </PopoverContent>
-              </Popover>
+              <EmojiPopOver
+                onSelect={(emojiSrc: string) => selectEmoji(emojiSrc)}
+              />
               <input
-                className="border p-[4px] w-full text-[14px]"
+                className="border border-l-0 p-[4px] w-full text-[14px]"
                 placeholder="채팅 내용을 입력하세요. 입력 후 엔터"
                 value={enteredMessage}
                 onChange={(e) => {

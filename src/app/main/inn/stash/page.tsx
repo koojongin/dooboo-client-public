@@ -1,6 +1,6 @@
 'use client'
 
-import { Card } from '@material-tailwind/react'
+import { Card, Tooltip } from '@material-tailwind/react'
 import React, {
   Dispatch,
   SetStateAction,
@@ -10,6 +10,7 @@ import React, {
   useState,
 } from 'react'
 import Swal from 'sweetalert2'
+import _ from 'lodash'
 import {
   fetchGetMyInventory,
   fetchGetMyStash,
@@ -17,9 +18,10 @@ import {
   fetchItemToInventory,
   fetchItemToStash,
   fetchMe,
+  fetchMergeStackedItemInInventory,
   fetchSellItems,
 } from '@/services/api-fetch'
-import { InnItem } from '@/interfaces/item.interface'
+import { InnItem, ItemTypeKind } from '@/interfaces/item.interface'
 import createKey from '@/services/key-generator'
 import { getItemByType } from '@/services/util'
 import { MeResponse } from '@/interfaces/user.interface'
@@ -45,7 +47,10 @@ export default function StashPage() {
 
   const loadStash = useCallback(async (stashId: string) => {
     const result = await fetchGetMyStash(stashId)
-    setSelectedStash(result.stash)
+    setSelectedStash({
+      ...result.stash,
+      items: [..._.sortBy(result.stash.items, 'updatedAt')],
+    })
   }, [])
 
   const loadStashes = useCallback(async () => {
@@ -135,9 +140,17 @@ function InnInventory({
   const sellItem = (item: InnItem) => {}
   const leftInventoryRef = useRef<any>()
 
+  const mergeStackableItems = useCallback(async () => {
+    await fetchMergeStackedItemInInventory()
+    await syncData()
+  }, [syncData])
   const sellSelectedItems = async () => {
     const selectedItems = items.filter((item) => item.isSelected)
     const totalPrice = selectedItems.reduce((prev, next) => {
+      const { iType, baseMisc, stack } = getItemByType(next)
+      if (iType === ItemTypeKind.Misc) {
+        return prev + baseMisc.gold * stack
+      }
       return prev + getItemByType(next).gold
     }, 0)
 
@@ -282,11 +295,11 @@ function InnInventory({
   }
 
   return (
-    <div className="">
+    <div className="[&_*]:select-none">
       {/* Start Inventory Horizontal */}
       <div className="flex gap-[10px]">
         {/* Left Inventory */}
-        <div className="w-[420px]">
+        <div className="w-[520px]">
           <div className="flex">
             <div
               className="border py-[2px] px-[5px] text-[16px] rounded text-white bg-green-400 cursor-pointer hover:bg-green-300"
@@ -300,6 +313,14 @@ function InnInventory({
             >
               선택된 아이템 판매
             </div>
+            <Tooltip content="중첩 가능한 아이템이 있는 경우 합칩니다.">
+              <div
+                className="border py-[2px] px-[5px] text-[16px] rounded text-white bg-ruliweb cursor-pointer"
+                onClick={() => mergeStackableItems()}
+              >
+                합치기
+              </div>
+            </Tooltip>
           </div>
           <div className="flex justify-between ff-ba mt-[5px]">
             <div className="text-blue-gray-600 border-blue-gray-900 border-b-0 border min-w-[60px] flex items-center justify-center ff-ba text-[18px] h-[27px] px-[4px]">
@@ -314,7 +335,7 @@ function InnInventory({
           </div>
           <div ref={leftInventoryRef}>
             <div className="w-full flex justify-center bg-gray-100 border-gray-600 py-[4px] border rounded-b">
-              <div className="flex flex-wrap max-w-[414px] bg-gray-100 p-[2px] rounded shadow-md gap-[1px]">
+              <div className="flex flex-wrap bg-gray-100 p-[2px] rounded shadow-md gap-[1px]">
                 {maxInventorySize.map((value, index) => {
                   const item = items[index]
                   const disableSlotClass = 'bg-gray-800'
@@ -322,7 +343,7 @@ function InnInventory({
                   return (
                     <div
                       key={`trade_inventory_slot_${item?._id || createKey()}`}
-                      className={`relative bg-white flex border-[1px] border-r rounded-md w-[40px] h-[40px] ${isOveredSlot ? disableSlotClass : ''}`}
+                      className={`relative bg-white flex border-[1px] border-r rounded-md w-[50px] h-[50px] ${isOveredSlot ? disableSlotClass : ''}`}
                       style={{
                         borderColor: `${item?.isSelected ? 'transparent' : ''}`,
                       }}
@@ -333,7 +354,7 @@ function InnInventory({
                         <div className="w-full h-full absolute left-0 top-0 bg-red-500" />
                       )}
                       {isOveredSlot && (
-                        <div className="absolute z-10 bg-gray-800 bg-opacity-60 w-[40px] h-[40px] rounded" />
+                        <div className="absolute z-10 bg-gray-800 bg-opacity-60 w-[50px] h-[50px] rounded" />
                       )}
                       {item && (
                         <ItemBoxComponent
@@ -384,7 +405,7 @@ function InnInventory({
           </div>
         </div>
         {/* Right Inventory */}
-        <div className="w-[420px]">
+        <div className="w-[520px]">
           <div className="flex">
             <div
               className="border py-[2px] px-[5px] text-[16px] rounded text-white bg-green-400 cursor-pointer hover:bg-green-300"
@@ -411,7 +432,7 @@ function InnInventory({
             })}
           </div>
           <div className="w-full flex justify-center bg-gray-100 border-gray-600 py-[4px] border border-t-0 rounded-b">
-            <div className="flex flex-wrap max-w-[414px] bg-gray-100 p-[2px] rounded shadow-md gap-[1px]">
+            <div className="flex flex-wrap max-w-[514px] bg-gray-100 p-[2px] rounded shadow-md gap-[1px]">
               {new Array(100).fill(1).map((value, index) => {
                 const item = selectedStash?.items[index] || {
                   isSelected: false,
@@ -422,7 +443,7 @@ function InnInventory({
                   <div
                     key={`trade_stash_slot_${item?._id || createKey()}`}
                     onClick={(e) => onSelectItem(item, e, true)}
-                    className={`relative bg-white flex border-[1px] border-r rounded-md w-[40px] h-[40px] ${isOveredSlot ? disableSlotClass : ''}`}
+                    className={`relative bg-white flex border-[1px] border-r rounded-md w-[50px] h-[50px] ${isOveredSlot ? disableSlotClass : ''}`}
                     style={{
                       borderColor: `${item?.isSelected ? 'transparent' : ''}`,
                     }}
@@ -431,7 +452,7 @@ function InnInventory({
                       <div className="w-full h-full absolute left-0 top-0 bg-red-500" />
                     )}
                     {isOveredSlot && (
-                      <div className="absolute z-10 bg-gray-800 bg-opacity-60 w-[40px] h-[40px] rounded" />
+                      <div className="absolute z-10 bg-gray-800 bg-opacity-60 w-[50px] h-[50px] rounded" />
                     )}
                     {item && (
                       <ItemBoxComponent

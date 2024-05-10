@@ -35,7 +35,7 @@ export default function RootLayout({
             <div onClick={() => navigate('/admindooboo/item/etc')}>
               기타 목록
             </div>
-            <div onClick={() => navigate('/admindooboo/item/etc/create')}>
+            <div onClick={() => navigate('/admindooboo/item/etc/edit/create')}>
               생성
             </div>
           </Breadcrumbs>

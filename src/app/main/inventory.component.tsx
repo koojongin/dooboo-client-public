@@ -52,7 +52,7 @@ function InventoryComponent(
 
   return (
     <Card
-      className={`rounded w-[460px] max-w-[460px] min-w-[460px] flex justify-center items-center min-h-40 ${borderStyle}`}
+      className={`rounded w-[560px] max-w-[560px] min-w-[560px] flex justify-center items-center min-h-40 ${borderStyle} [&_*]:select-none`}
     >
       <CardBody>
         <div>인벤토리</div>
@@ -75,7 +75,7 @@ function InventoryComponent(
             return (
               <div
                 key={`main_inventory_${item?._id || createKey()}`}
-                className={`relative flex border border-r rounded-md w-[40px] h-[40px] ${isOveredSlot ? 'bg-gray-800 bg-opacity-60' : ''}`}
+                className={`relative flex border border-r rounded-md w-[50px] h-[50px] ${isOveredSlot ? 'bg-gray-800 bg-opacity-60' : ''}`}
               >
                 {item && (
                   <ItemBoxComponent
