@@ -1,61 +1,110 @@
 'use client'
 
-import { DEFAULT_THUMBNAIL_URL } from '@/constants/constant'
+import { useCallback, useEffect, useState } from 'react'
+import Swal from 'sweetalert2'
 import { Pagination } from '@/interfaces/common.interface'
-import { Tooltip } from '@material-tailwind/react'
-import { getJobIconBgColor, getJobIconUrl, translate } from '@/services/util'
-import { useState } from 'react'
-import { socket } from '@/services/socket'
 import { EmojiPopOver } from '@/components/emoji/emoji-popover'
-import {
-  EMIT_CHAT_EMOJI_EVENT,
-  EMIT_CHAT_MESSAGE_EVENT,
-} from '@/interfaces/chat.interface'
 import createKey from '@/services/key-generator'
+import { Character } from '@/interfaces/user.interface'
+import { CommentListComponent } from '@/app/main/community/detail/[boardId]/board-blocks'
+import {
+  fetchGetProfileComments,
+  fetchWriteProfileComment,
+} from '@/services/api/api.profile'
 
-interface IProfileCommentProps {
-  character: { nickname: string; level: string; job: string }
-}
-
-export function ProfileCommentComponent({ character }: IProfileCommentProps) {
+export function ProfileCommentComponent({
+  character,
+  profileId,
+}: {
+  character: Character
+  profileId: string
+}) {
   const [pagination, setPagination] = useState<Pagination>()
-  const [enteredMessage, setEnteredMessage] = useState<string>('')
-
-  const sendMessage = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key !== 'Enter') return
-    if (!enteredMessage) return
-
-    socket.emit(EMIT_CHAT_MESSAGE_EVENT, { message: enteredMessage })
-
-    setEnteredMessage('')
-  }
-
-  const onChangeMessage = (message: string) => {
-    setEnteredMessage(message)
-  }
+  const [commentContent, setCommentContent] = useState<string>('')
+  const [characterId, setCharacterId] = useState<string>()
+  const [comments, setComments] = useState<any[]>([])
 
   const selectEmoji = (emojiSrc: string) => {
-    socket.emit(EMIT_CHAT_EMOJI_EVENT, { src: emojiSrc })
+    writeComment(`<img class="w-[90px]" src='${emojiSrc}'/>`)
   }
 
+  const loadComments = useCallback(
+    async (page = 1) => {
+      const result = await fetchGetProfileComments(profileId!, {
+        condition: {},
+        opts: { page },
+      })
+      setComments(
+        result.comments.map((comment: any) => {
+          // eslint-disable-next-line no-param-reassign
+          comment.character = comment.owner
+          return comment
+        }) || [],
+      )
+      setPagination({ ...result })
+    },
+    [profileId],
+  )
+
+  const writeComment = useCallback(
+    async (comment?: string) => {
+      if (!comment && !commentContent) return
+      await fetchWriteProfileComment(character._id, {
+        content: comment || commentContent,
+      })
+      await Promise.all([
+        Swal.fire({
+          title: '댓글이 등록되었습니다',
+          icon: 'success',
+          confirmButtonText: '확인',
+        }),
+        loadComments(),
+      ])
+
+      setCommentContent('')
+    },
+    [character._id, commentContent, loadComments],
+  )
+
+  useEffect(() => {
+    setCharacterId(localStorage.getItem('characterId') || '')
+    if (profileId) loadComments()
+  }, [loadComments, profileId])
+
   return (
-    <div className="flex flex-col w-2/3 h-full">
+    <div className="flex flex-col h-full w-full">
       {/* 코멘트 */}
-      {new Array(4).fill(1).map(() => {
-        return <CommentBox character={character} />
-      })}
-      {/* 댓글 입력 창 */}
-      <div className="flex items-stretch">
-        <EmojiPopOver onSelect={(emojiSrc: string) => selectEmoji(emojiSrc)} />
-        <input
-          className="border border-l-0 p-[4px] w-full text-[14px]"
-          placeholder="댓글 내용을 입력하세요. 입력 후 엔터"
-          value={enteredMessage}
-          onChange={(e) => {
-            onChangeMessage(e.target.value)
-          }}
-          onKeyDown={(event) => sendMessage(event)}
+      <div className="w-full border border-gray-400 text-[14px]">
+        {comments.length === 0 && (
+          <div className="min-h-[200px] flex items-center justify-center">
+            등록된 댓글이 없습니다.
+          </div>
+        )}
+        <CommentListComponent
+          comments={comments}
+          characterId={characterId}
+          onRefresh={loadComments}
+          disableSubComment
         />
+      </div>
+
+      {/* 댓글 입력 창 */}
+      <div className="mt-[10px]">
+        <EmojiPopOver onSelect={(emojiSrc: string) => selectEmoji(emojiSrc)} />
+        <div className="border border-gray-400 flex min-h-[80px] text-[12px]">
+          <textarea
+            className="w-full focus-visible:outline-0 overflow-y-scroll"
+            placeholder="인터넷은 우리가 함께 만들어가는 소중한 공간입니다. 댓글 작성 시 타인에 대한 배려와 책임을 담아주세요."
+            value={commentContent}
+            onChange={(e) => setCommentContent(e.target.value)}
+          />
+          <div
+            className="min-w-[100px] flex items-center justify-center bg-ruliweb text-white cursor-pointer"
+            onClick={() => writeComment()}
+          >
+            등록
+          </div>
+        </div>
       </div>
       {/* 페이지네이션 */}
       <div className="w-full flex justify-center mt-[15px]">
@@ -65,7 +114,7 @@ export function ProfileCommentComponent({ character }: IProfileCommentProps) {
               return (
                 <div
                   className={`cursor-pointer flex justify-center items-center w-[24px] h-[24px] text-[14px] font-bold ${index + 1 === pagination.page ? 'border text-[#5795dd]' : ''} hover:text-[#5795dd] hover:border`}
-                  // onClick={() => loadCharacters(index + 1)}
+                  onClick={() => loadComments(index + 1)}
                   key={createKey()}
                 >
                   {index + 1}
@@ -74,54 +123,6 @@ export function ProfileCommentComponent({ character }: IProfileCommentProps) {
             })}
           </div>
         )}
-      </div>
-    </div>
-  )
-}
-
-function CommentBox({ character }: IProfileCommentProps) {
-  return (
-    <div className="border border-black w-full h-1/5 flex">
-      {/* 댓글 작성자 */}
-      <div className="flex items-center gap-1 bg-blue-gray-50 w-1/5 h-full p-4">
-        <div className="w-[40px] h-[40px] min-w-[40px] min-h-[40px] border border-gray-600 rounded p-[1px] flex items-center justify-center">
-          <img className="w-full" src={DEFAULT_THUMBNAIL_URL} />
-        </div>
-        <div className="w-full flex flex-col gap-[2px]">
-          <Tooltip
-            content={`[${translate(`job:${character.job ? character.job : 'novice'}`)}]${
-              character.nickname
-            }`}
-          >
-            <div className="flex items-center gap-[2px]">
-              <div
-                className="w-[20px] h-[20px] min-w-[20px] min-h-[20px]"
-                style={{
-                  background: getJobIconBgColor(character.job),
-                }}
-              >
-                <img
-                  src={getJobIconUrl(character.job)}
-                  className="w-full h-full"
-                />
-              </div>
-              <div className="ff-score font-bold leading-[100%] overflow-ellipsis truncate ">
-                {character.nickname}
-              </div>
-            </div>
-          </Tooltip>
-          <div className="w-full flex justify-between ">
-            <div>Lv.{character.level}</div>
-          </div>
-        </div>
-      </div>
-      {/* 댓글 내용 */}
-      <div className="bg-orange-50 w-3/5 h-full flex items-center p-4">
-        이모지 or 댓글내용
-      </div>
-      {/* 댓글 작성 날짜 */}
-      <div className="bg-orange-100 w-1/5 h-full flex items-center justify-center">
-        {new Date().toLocaleString()}
       </div>
     </div>
   )

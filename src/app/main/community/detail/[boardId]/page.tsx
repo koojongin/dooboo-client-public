@@ -179,7 +179,7 @@ export default function BoardDetail({
       >
         <BoardCommentListBlock board={board} refresh={loadBoard} />
       </div>
-      <div className=" mt-[10px]">
+      <div className="mt-[10px]">
         <EmojiPopOver
           onSelect={(emojiSrc: string) => onSelectEmoji(emojiSrc)}
         />

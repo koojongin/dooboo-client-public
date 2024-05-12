@@ -59,7 +59,6 @@ export default function CommunityPage() {
     setRankLogs(newRanks)
   }, [])
 
-  // 클릭하면 넘어가기
   const goToProfile = (characterId: string) => {
     router.push(`/main/profile/${characterId}`)
   }
@@ -108,11 +107,7 @@ export default function CommunityPage() {
                   }}
                   className={tableClass[2]}
                 >
-                  <Tooltip
-                    content={`[${translate(`job:${character.job ? character.job : 'novice'}`)}]${
-                      character.nickname
-                    }`}
-                  >
+                  <Tooltip content="클릭 시 프로필로 이동합니다.">
                     <div className="flex items-center gap-[2px]">
                       <div
                         className="w-[20px] h-[20px] min-w-[20px] min-h-[20px]"
@@ -204,12 +199,13 @@ export default function CommunityPage() {
                   <div className="w-[40px] text-center">
                     {rankLog.owner.level}
                   </div>
-                  <Tooltip
-                    content={`[${translate(`job:${rankLog.owner.job ? rankLog.owner.job : 'novice'}`)}]${
-                      rankLog.owner.nickname
-                    }`}
-                  >
-                    <div className="w-[120px] text-left flex items-center gap-[2px] cursor-pointer">
+                  <Tooltip content="클릭 시 프로필로 이동합니다.">
+                    <div
+                      className="w-[120px] text-left flex items-center gap-[2px] cursor-pointer"
+                      onClick={() => {
+                        goToProfile(rankLog.owner._id)
+                      }}
+                    >
                       <div
                         className="w-[20px] h-[20px] min-w-[20px] min-h-[20px]"
                         style={{

@@ -8,8 +8,6 @@ export interface Board extends MongooseDocument {
   reads: number
   recommends: number
   title: string
-  user: User
-  userId: string
   comments?: any[]
 }
 

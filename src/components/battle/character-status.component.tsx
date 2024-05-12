@@ -41,7 +41,7 @@ export default (function CharacterStatusComponent({
             <div className="w-full flex flex-col gap-[2px]">
               <div className="flex w-full justify-between">
                 <div>Lv.{character.level}</div>
-                <div>{user.nickname}</div>
+                <div>{character.nickname}</div>
               </div>
               <div className="w-full flex justify-between">
                 <div>골드</div>

@@ -149,7 +149,7 @@ export default function CommunityBoardPage() {
                   />
                 </div>
                 <div className="min-w-[100px] max-w-[100px] truncate">
-                  {board.user.nickname}
+                  {board.character.nickname}
                 </div>
               </div>
               <div className="min-w-[50px] justify-center">

@@ -1,25 +1,28 @@
 'use client'
 
-import { DEFAULT_THUMBNAIL_URL } from '@/constants/constant'
 import { Button, Tooltip } from '@material-tailwind/react'
+import Swal from 'sweetalert2'
+import { DEFAULT_THUMBNAIL_URL } from '@/constants/constant'
 import { getJobIconBgColor, getJobIconUrl, translate } from '@/services/util'
-// import { fetchMe } from '@/services/api-fetch'
 
-interface IProfileBoxProps {
-  character: { nickname: string; level: string; job: string }
-  user: { nickname: string }
-}
-
-export function ProfileBoxComponent({ character, user }: IProfileBoxProps) {
+export function ProfileBoxComponent({ character }: { character: any }) {
   const goToSkillTech = () => {
-    console.log('스킬트리 창 띄우거나 보내기')
+    Swal.fire({
+      title: '준비중',
+      text: '준비중',
+      icon: 'info',
+      confirmButtonText: '확인',
+    })
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex gap-1">
-        <div className="w-[150px] h-[150px] min-w-[150px] min-h-[150px] border border-gray-600 rounded p-[1px] flex items-center justify-center">
-          <img className="w-full" src={DEFAULT_THUMBNAIL_URL} />
+    <div className="flex flex-col">
+      <div className="flex gap-[10px]">
+        <div className="w-[50px] h-[50px] min-w-[50px] min-h-[50px] border border-gray-600 rounded p-[1px] flex items-center justify-center">
+          <img
+            className="w-full"
+            src={character.thumbnail || DEFAULT_THUMBNAIL_URL}
+          />
         </div>
         <div className="w-full flex flex-col gap-[2px]">
           <Tooltip
@@ -29,7 +32,7 @@ export function ProfileBoxComponent({ character, user }: IProfileBoxProps) {
           >
             <div className="flex items-center gap-[2px]">
               <div
-                className="w-[40px] h-[40px] min-w-[40px] min-h-[40px]"
+                className="w-[20px] h-[20px] min-w-[20px] min-h-[20px]"
                 style={{
                   background: getJobIconBgColor(character.job),
                 }}
@@ -39,24 +42,24 @@ export function ProfileBoxComponent({ character, user }: IProfileBoxProps) {
                   className="w-full h-full"
                 />
               </div>
-              <div className="ff-score font-bold leading-[100%] overflow-ellipsis truncate text-2xl">
+              <div className="ff-score font-bold overflow-ellipsis truncate">
                 {character.nickname}
               </div>
             </div>
           </Tooltip>
-          <div className="w-full flex justify-between text-2xl">
+          <div className="w-full flex justify-between">
             <div>Lv.{character.level}</div>
           </div>
         </div>
       </div>
-      <Button
-        className="w-full text-xl"
-        size="md"
-        color="cyan"
-        onClick={goToSkillTech}
-      >
-        스킬트리보기
-      </Button>
+      <div className="flex mt-[4px]">
+        <div
+          className="bg-cyan-900 text-white flex items-center justify-center min-w-[120px] min-h-[30px] rounded shadow-md shadow-cyan-800 cursor-pointer"
+          onClick={goToSkillTech}
+        >
+          스킬트리보기
+        </div>
+      </div>
     </div>
   )
 }

@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import { DEFAULT_THUMBNAIL_URL } from '@/constants/constant'
-import { toYYYYMMDDHHMMSS } from '@/services/util'
+import {
+  getJobIconBgColor,
+  getJobIconUrl,
+  toYYYYMMDDHHMMSS,
+} from '@/services/util'
 import createKey from '@/services/key-generator'
 import { Board } from '@/interfaces/board.interface'
 import {
@@ -17,9 +21,76 @@ export function BoardCommentListBlock({
   board: Board | undefined
   refresh?: () => void
 }) {
+  const [characterId, setCharacterId] = useState<string>()
+
+  useEffect(() => {
+    setCharacterId(localStorage.getItem('characterId') || '')
+  }, [])
+
+  return (
+    <>
+      <CommentListComponent
+        comments={board?.comments || []}
+        characterId={characterId}
+        onRefresh={refresh}
+        boardId={board?._id}
+      />
+    </>
+  )
+}
+
+export function CommentListComponent({
+  comments,
+  characterId,
+  onRefresh = () => {},
+  boardId,
+  disableSubComment = false,
+}: {
+  characterId: string | undefined
+  comments: any[]
+  disableSubComment?: boolean
+  onRefresh?: () => void
+  boardId?: string
+}) {
   const [selectedCommentBoxIndex, setSelectedCommentBoxIndex] =
     useState<number>(-1)
-  const [characterId, setCharacterId] = useState<string>()
+
+  const onSelectEmoji = async (parentCommentId: string, src: string) => {
+    await writeSubComment(
+      parentCommentId,
+      `<img class="w-[90px]" src='${src}'/>`,
+    )
+  }
+  const writeSubComment = async (
+    parentCommentId: string,
+    customContent?: string,
+  ) => {
+    if (!boardId) return
+    const element: any =
+      document.querySelector('textarea.comment-textarea') || {}
+    const commentText = customContent || element?.value
+    if (!commentText)
+      return Swal.fire({
+        title: '내용을 입력하세요.',
+        icon: 'error',
+        confirmButtonText: '확인',
+      })
+
+    await fetchPostBoardComment(boardId!, {
+      content: commentText,
+      parentCommentId,
+    })
+
+    await Promise.all([
+      Swal.fire({
+        title: '댓글이 등록되었습니다',
+        icon: 'success',
+        confirmButtonText: '확인',
+      }),
+      onRefresh(),
+    ])
+  }
+
   const deleteComment = async (commentId: string) => {
     const { isConfirmed } = await Swal.fire({
       title: '댓글을 정말로 삭제하시겠습니까?',
@@ -31,64 +102,22 @@ export function BoardCommentListBlock({
 
     if (isConfirmed) {
       await fetchDeleteCommentOne(commentId)
-      if (refresh) refresh()
+      onRefresh()
     }
   }
-
-  const onSelectEmoji = async (parentCommentId: string, src: string) => {
-    await writeSubComment(
-      parentCommentId,
-      `<img class="w-[90px]" src='${src}'/>`,
-    )
-  }
-
-  const writeSubComment = async (
-    parentCommentId: string,
-    customContent?: string,
-  ) => {
-    if (!board) return
-    const element: any =
-      document.querySelector('textarea.comment-textarea') || {}
-    const commentText = customContent || element?.value
-    if (!commentText)
-      return Swal.fire({
-        title: '내용을 입력하세요.',
-        icon: 'error',
-        confirmButtonText: '확인',
-      })
-
-    await fetchPostBoardComment(board._id!, {
-      content: commentText,
-      parentCommentId,
-    })
-
-    await Promise.all([
-      Swal.fire({
-        title: '댓글이 등록되었습니다',
-        icon: 'success',
-        confirmButtonText: '확인',
-      }),
-      refresh(),
-    ])
-  }
-
-  useEffect(() => {
-    setCharacterId(localStorage.getItem('characterId') || '')
-  }, [])
-
   return (
     <>
-      {board?.comments?.map((comment, index) => {
+      {comments?.map((comment, index) => {
         // COMMENT START----------------------------------
         return (
           <div key={createKey()}>
             <div
               className={`w-full flex items-stretch border border-t-gray-400 border-dotted ${index === 0 ? 'border-t-0' : ''}`}
             >
-              <div className="w-[200px] p-[8px] bg-gray-100 flex items-center gap-[4px]">
+              <div className="max-w-[160px] min-w-[160px] w-[160px] p-[8px] bg-gray-100 flex items-center gap-[4px]">
                 {!comment.isDeleted && (
                   <>
-                    <div className="w-[40px] h-[40px]">
+                    <div className="w-[40px] h-[40px] min-w-[40px] min-h-[40px]">
                       <img
                         className="w-full h-full"
                         src={
@@ -96,11 +125,26 @@ export function BoardCommentListBlock({
                         }
                       />
                     </div>
-                    <div className="font-bold flex gap-[2px] items-start flex-col">
+                    <div className="font-bold flex gap-[2px] items-start flex-col w-full">
                       <div className="text-[11px] border rounded-[2px] px-[4px] py-[1px] bg-ruliweb text-white border-blue-900 ff-dodoom">
                         Lv.{comment.character.level}
                       </div>
-                      <div>{comment.character.nickname}</div>
+                      <div className="flex items-center gap-[4px]">
+                        <div className="w-[18px] h-[18px]">
+                          <img
+                            style={{
+                              background: getJobIconBgColor(
+                                comment.character.job,
+                              ),
+                            }}
+                            src={getJobIconUrl(comment.character.job)}
+                            className="w-full h-full"
+                          />
+                        </div>
+                        <div className="font-normal ff-skew ff-ba text-[16px] overflow-ellipsis truncate max-w-[80px]">
+                          {comment.character.nickname}
+                        </div>
+                      </div>
                     </div>
                   </>
                 )}
@@ -120,15 +164,17 @@ export function BoardCommentListBlock({
                         }}
                       />
                       <span className="pl-[10px] flex items-center gap-[10px]">
-                        <span
-                          className="text-ruliweb text-[12px] flex items-center gap-[2px] py-[4px] cursor-pointer"
-                          onClick={() => {
-                            setSelectedCommentBoxIndex(index)
-                          }}
-                        >
-                          <i className="fa-solid fa-turn-up rotate-90" />
-                          답글
-                        </span>
+                        {!disableSubComment && (
+                          <span
+                            className="text-ruliweb text-[12px] flex items-center gap-[2px] py-[4px] cursor-pointer"
+                            onClick={() => {
+                              setSelectedCommentBoxIndex(index)
+                            }}
+                          >
+                            <i className="fa-solid fa-turn-up rotate-90" />
+                            답글
+                          </span>
+                        )}
                         {characterId === comment.character._id && (
                           <div
                             className="flex items-center cursor-pointer text-red-600"
@@ -177,13 +223,13 @@ export function BoardCommentListBlock({
                 </div>
               </div>
             </div>
-            {comment.subComments.map((subComment: any) => {
+            {comment?.subComments?.map((subComment: any) => {
               return (
                 <div
                   className="w-full flex items-stretch border border-t-gray-400 border-dotted"
                   key={createKey()}
                 >
-                  <div className="w-[200px] p-[8px] bg-gray-100 flex items-center gap-[4px]">
+                  <div className="max-w-[160px] min-w-[160px] w-[160px] p-[8px] bg-gray-100 flex items-center gap-[4px]">
                     <span
                       className="text-ruliweb text-[12px] flex items-center gap-[2px] py-[4px] cursor-pointer"
                       onClick={() => {
