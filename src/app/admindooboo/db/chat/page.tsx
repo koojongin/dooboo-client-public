@@ -1,12 +1,14 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Card } from '@material-tailwind/react'
+import { Card, Tooltip } from '@material-tailwind/react'
 import { fetchGetChatMessageList } from '@/services/api-admin-fetch'
 import { toMMDDHHMM, toMMDDHHMMSS } from '@/services/util'
 import createKey from '@/services/key-generator'
 import { Pagination } from '@/interfaces/common.interface'
 import ItemBoxComponent from '@/components/item/item-box'
+import { EnhancedLogBoxComponent } from '@/components/chat/enhanced-log-box.component'
+import { EnhancedSnapshotBox } from '@/app/main/inn/black-smith/enhanced-result-dialog'
 
 export default function AdminChatListPage() {
   const [pagination, setPagination] = useState<Pagination>()
@@ -47,10 +49,30 @@ export default function AdminChatListPage() {
                 )}
                 {!chatMessage.snapshot?.message && (
                   <div>
-                    <ItemBoxComponent
-                      item={chatMessage.snapshot}
-                      className=""
-                    />
+                    {chatMessage.snapshot?.originWeaponId && (
+                      <Tooltip
+                        className="bg-transparent p-0"
+                        interactive
+                        placement="right"
+                        content={
+                          <EnhancedSnapshotBox
+                            enhancedLog={chatMessage.snapshot}
+                          />
+                        }
+                      >
+                        <div>
+                          <EnhancedLogBoxComponent
+                            enhancedLog={chatMessage.snapshot}
+                          />
+                        </div>
+                      </Tooltip>
+                    )}
+                    {!chatMessage.snapshot?.originWeaponId && (
+                      <ItemBoxComponent
+                        item={chatMessage.snapshot}
+                        className=""
+                      />
+                    )}
                   </div>
                 )}
               </div>

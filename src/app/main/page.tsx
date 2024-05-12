@@ -1,14 +1,13 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
-import { IoProvider } from 'socket.io-react-hook'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Battle from '@/components/battle/battle.component'
-import CharacterStatusComponent from '@/app/main/character-status.component'
+import CharacterStatusComponent from '@/components/battle/character-status.component'
 import { Character, CharacterStat, User } from '@/interfaces/user.interface'
-import InventoryComponent from '@/app/main/inventory.component'
+import InventoryComponent from '@/components/battle/inventory.component'
 import { fetchMe } from '@/services/api-fetch'
 import { InventoryRef, Item } from '@/interfaces/item.interface'
+import { Battle } from '@/components/battle/battle.component'
 
 export default function Main() {
   // const [onLoading, setOnLoading] = useState(false)
@@ -21,7 +20,7 @@ export default function Main() {
 
   const inventoryRef = useRef<InventoryRef>(null)
 
-  const refreshMe = async () => {
+  const refreshMe = useCallback(async () => {
     try {
       const {
         nextExp: rNextExp,
@@ -47,7 +46,7 @@ export default function Main() {
         router.push(`/register?accessToken=${token}`)
       }
     }
-  }
+  }, [router])
 
   const battleHandler = {
     refreshCharacterComponent: async () => {
@@ -60,7 +59,7 @@ export default function Main() {
   }
   useEffect(() => {
     refreshMe()
-  }, [])
+  }, [refreshMe])
 
   return (
     <div className="w-full">

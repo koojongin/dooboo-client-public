@@ -1,51 +1,46 @@
-import { Button, Card, Chip, Option, Select } from '@material-tailwind/react'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import Swal from 'sweetalert2'
-import createKey from '@/services/key-generator'
-import { fetchBattle, fetchGetMapsName } from '@/services/api-fetch'
+import { Card, Chip } from '@material-tailwind/react'
+import { useMemo, useRef, useState } from 'react'
+import _ from 'lodash'
+import { fetchBattle } from '@/services/api-fetch'
 import toAPIHostURL from '@/services/image-name-parser'
-import { DbMap } from '@/interfaces/map.interface'
-import { Item } from '@/interfaces/item.interface'
 import { Character } from '@/interfaces/user.interface'
 import { DEFAULT_THUMBNAIL_URL } from '@/constants/constant'
 import { formatNumber, translate } from '@/services/util'
-import ItemBoxComponent from '../item/item-box'
+import { DropResultComponent } from '@/components/battle/drop-result.component'
+import { MapSelectComponent } from '@/components/battle/map-select-popover.component'
+import {
+  BattlePreferenceRef,
+  DropSoundKind,
+} from '@/components/battle/battle.interface'
+import BattlePreference from './battle-preference'
+import { ItemTypeKind } from '@/interfaces/item.interface'
 
-export default (function Battle({
-  headCss,
-  battleHandler,
-  refreshInventory,
-}: any) {
-  const [maps, setMaps] = useState<DbMap[]>([])
-  const [selectedMap, setSelectedMap] = useState<string>()
+export function Battle({ headCss, battleHandler, refreshInventory }: any) {
   const [battleResult, setBattleResult]: any = useState()
   const [battleLogs, setBattleLogs]: any = useState([])
-  const [isAutoRunning, setIsAutoRunning] = useState<boolean>(false)
-  const timerRef = useRef<NodeJS.Timeout>()
   const [character, setCharacter] = useState<Character>()
   const battleScrollDivRef = useRef<HTMLDivElement>(null)
+  const battlePreferenceRef = useRef<BattlePreferenceRef>()
 
-  const onChangeMap = (mapName: string | undefined) => {
-    if (!mapName) return
-    setSelectedMap(mapName)
-  }
   const activateBattle = async (mapName: string) => {
     setBattleResult(null)
-    if (!maps!.map((d) => d.name)!.includes(mapName)) {
-      stopBattleInterval()
-      return Swal.fire({
-        title: '사냥터를 선택해주세요',
-        text: '문제가 계속되면 관리자에게 문의해주세요',
-        icon: 'error',
-        confirmButtonText: '확인',
-      })
-    }
-
-    setIsAutoRunning(true)
     const result = await fetchBattle(mapName)
     if ((result?.drops?.length || 0) > 0) {
       refreshInventory()
-      playDropSound()
+      const types = _.uniq(result.drops!.map((item) => item.iType))
+      types.forEach((type) => {
+        console.log(type)
+        switch (type) {
+          case ItemTypeKind.Weapon:
+            battlePreferenceRef.current?.play(DropSoundKind.Weapon)
+            break
+          case ItemTypeKind.Misc:
+            battlePreferenceRef.current?.play(DropSoundKind.Etc)
+            break
+          default:
+            break
+        }
+      })
     }
     setBattleResult(result)
     setBattleLogs(result.battleLogs)
@@ -56,50 +51,7 @@ export default (function Battle({
     }
   }
 
-  const startBattleInterval = (mapName: string) => {
-    if (!timerRef.current) {
-      timerRef.current = setInterval(async () => {
-        try {
-          await activateBattle(mapName)
-        } catch (error: any) {
-          stopBattleInterval()
-        }
-      }, 5000)
-    }
-  }
-
-  const audio = new Audio('/audio/item_drop.mp3')
-  const audioEndOfBattle = new Audio('/audio/end_of_battle.mp3')
-
-  const stopBattleInterval = useCallback(() => {
-    setIsAutoRunning(false)
-    if (timerRef.current) {
-      if (selectedMap && timerRef?.current) {
-        audioEndOfBattle.volume = 0.5
-        audioEndOfBattle.play()
-      }
-      clearInterval(timerRef.current)
-      timerRef.current = undefined
-    }
-  }, [selectedMap])
-
-  const battle = (mapName: string) => {
-    if (!isAutoRunning) {
-      setIsAutoRunning(true)
-      try {
-        startBattleInterval(mapName)
-      } catch (error: any) {
-        setIsAutoRunning(false)
-      }
-    } else {
-      stopBattleInterval()
-    }
-  }
-
-  const refreshMaps = useCallback(async () => {
-    const { maps: rMaps } = await fetchGetMapsName()
-    setMaps(rMaps)
-  }, [])
+  const audio = useMemo(() => new Audio('/audio/item_drop.mp3'), [])
 
   const playDropSound = () => {
     audio.volume = 0.1
@@ -110,43 +62,11 @@ export default (function Battle({
     battleScrollDivRef.current?.scrollTo(0, 9999999999999)
   }
 
-  useEffect(() => {
-    refreshMaps()
-    return () => {
-      stopBattleInterval()
-    }
-  }, [refreshMaps, stopBattleInterval])
   return (
     <Card className={headCss}>
-      <div className="flex mb-5 px-[24px] pt-[20px]">
-        <div className="w-72">
-          {maps && maps.length > 0 && (
-            <Select
-              disabled={isAutoRunning}
-              className="rounded-r-none"
-              label="선택된 사냥터"
-              value={selectedMap}
-              onChange={(value) => onChangeMap(value)}
-            >
-              {maps.map((map) => {
-                return (
-                  <Option key={createKey()} value={map.name}>
-                    {map.name}(Lv.{map.level})
-                  </Option>
-                )
-              })}
-            </Select>
-          )}
-        </div>
-        <Button
-          className="rounded-l-none"
-          color={!isAutoRunning ? 'indigo' : 'red'}
-          size="sm"
-          variant="filled"
-          onClick={() => battle(selectedMap!)}
-        >
-          {isAutoRunning ? '자동사냥중' : '사냥하기'}
-        </Button>
+      <div className="mb-[5px] px-[24px] pt-[20px] flex gap-[10px] items-center">
+        <MapSelectComponent activateBattle={activateBattle} />
+        <BattlePreference ref={battlePreferenceRef} />
       </div>
       {/* 전투로그 */}
       <div
@@ -155,8 +75,8 @@ export default (function Battle({
       >
         {battleResult && battleResult.monster && (
           <div className="mb-[10px]">
-            <div className="w-[300px] flex gap-1 text-sm ">
-              <div>전투일시</div>
+            <div className="w-[400px] flex items-center gap-[4px] text-sm ff-gs text-white text-[16px] pl-1 bg-gradient-to-r from-blue-gray-700 to-ruliweb/0 rounded-t">
+              <div className="ff-gs p-[4px]">전투일시</div>
               <div>
                 {new Date(battleResult.battledAt).toLocaleDateString()}{' '}
                 {new Date(battleResult.battledAt).toLocaleTimeString()}
@@ -316,60 +236,12 @@ export default (function Battle({
                 했습니다!
               </div>
               {battleResult.isWin && (
-                <div>
-                  <div className="flex gap-1">
-                    <Chip
-                      color="teal"
-                      variant="gradient"
-                      size="sm"
-                      value={`+${battleResult.monster.experience} exp`}
-                    />
-                    <Chip
-                      color="yellow"
-                      variant="gradient"
-                      size="sm"
-                      value={`+${battleResult.monster.gold} Gold`}
-                    />
-                  </div>
-                  {battleResult.drops.length > 0 && (
-                    <DropListComponent drops={battleResult.drops} />
-                  )}
-                </div>
+                <DropResultComponent battleResult={battleResult} />
               )}
             </div>
           </div>
         )}
       </div>
     </Card>
-  )
-})
-
-function DropListComponent({ drops }: { drops: Item[] }) {
-  return (
-    <div className="flex flex-col gap-1 mt-10">
-      <div className="bg-indigo-400 text-white text-[20px] pl-1">
-        획득한 아이템
-      </div>
-      <div className="flex flex-row gap-1">
-        {drops.map((item) => {
-          return (
-            <ItemBoxComponent
-              item={item}
-              key={`drops_${item._id}`}
-              className="border p-[2px]"
-            />
-            // <div
-            //   key={item._id}
-            //   className="w-[40px] h-[40px] border-dark-blue border rounded"
-            // >
-            //   <img
-            //     src={toAPIHostURL(item.thumbnail)}
-            //     className="w-full h-full p-[2px]"
-            //   />
-            // </div>
-          )
-        })}
-      </div>
-    </div>
   )
 }

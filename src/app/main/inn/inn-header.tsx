@@ -31,7 +31,7 @@ export default function InnHeader() {
     },
     {
       name: '거래소',
-      url: '/main/inn/trade',
+      url: '/main/inn/trade/weapon',
       thumbnail: '/images/icon_trade.webp',
     },
   ]

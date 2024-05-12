@@ -3,12 +3,13 @@
 import Swal from 'sweetalert2'
 import _ from 'lodash'
 import { Weapon } from '@/interfaces/item.interface'
-import { fetchEquipItem, fetchPostAddToAuction } from '@/services/api-fetch'
+import { fetchEquipItem } from '@/services/api-fetch'
 import { socket } from '@/services/socket'
 import { EMIT_SHARE_ITEM_EVENT } from '@/interfaces/chat.interface'
 import createKey from '@/services/key-generator'
 import { toColorByGrade, toMMDDHHMMSS, translate } from '@/services/util'
 import { InventoryActionKind } from './item.interface'
+import { confirmSaleSetting } from '@/components/auction/add-to-auction-confirm'
 
 export default function WeaponBoxDetailComponent({
   item,
@@ -53,43 +54,7 @@ export default function WeaponBoxDetailComponent({
 
   const addToAuction = async () => {
     if (actionCallback) actionCallback(InventoryActionKind.AddToAuction)
-    const { isConfirmed, value } = await Swal.fire({
-      title: `판매 가격을 설정하세요`,
-      input: 'number',
-      html: `<div><div>${item.weapon.name}</div><div>판매 수수료는 10%입니다.</div><div>등록은 무료이며, 수수료는 판매되는 순간 정산됩니다.</div></div>`,
-      inputAttributes: {
-        autocapitalize: 'off',
-      },
-      showCancelButton: true,
-      confirmButtonText: '등록하기',
-      cancelButtonText: '취소',
-      showLoaderOnConfirm: true,
-      preConfirm: async (goldString: string) => {
-        const gold = parseInt(goldString, 10)
-        const minGold = 1
-        const maxGold = 100000000
-        if (gold < minGold) {
-          return Swal.showValidationMessage(
-            `최소 설정 금액 제한
-            ${minGold.toLocaleString()}`,
-          )
-        }
-        if (gold > maxGold) {
-          return Swal.showValidationMessage(
-            `최대 설정 금액 한도 초과
-            ${maxGold.toLocaleString()}`,
-          )
-        }
-        try {
-          return await fetchPostAddToAuction(item._id, { gold })
-        } catch (error) {
-          Swal.showValidationMessage(`
-        Request failed: ${error}
-      `)
-        }
-      },
-      allowOutsideClick: () => !Swal.isLoading(),
-    })
+    const { isConfirmed, value } = (await confirmSaleSetting(item)) || {}
 
     if (isConfirmed) {
       await Swal.fire({

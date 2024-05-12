@@ -55,6 +55,12 @@ export interface BaseMisc extends MongooseDocument {
   thumbnail: string
   iType: string
   maxStack: number
+  iGrade: string
+}
+
+export interface Misc extends MongooseDocument {
+  stack: number
+  baseMisc: BaseMisc
 }
 
 export interface BaseWeapon extends MongooseDocument {
@@ -133,7 +139,7 @@ export interface Item extends MongooseDocument {
   weapon?: any
   misc?: any
 
-  item?: BaseWeapon | any
+  item?: any
   roll?: number
 
   owner?: any

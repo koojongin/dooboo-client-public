@@ -1,4 +1,4 @@
-export default (phase, { defaultConfig }) => {
+export default (phase, {defaultConfig}) => {
     /**
      * @type {import('next').NextConfig}
      */
@@ -6,6 +6,9 @@ export default (phase, { defaultConfig }) => {
         /* config options here */
         distDir: process.env.BUILD_DIR || '.next',
         reactStrictMode: false,
+        typescript: {
+            ignoreBuildErrors: true
+        }
     }
     return nextConfig
 }

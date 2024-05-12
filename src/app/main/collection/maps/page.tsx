@@ -98,7 +98,7 @@ export default function CollectionMapsPage() {
                   className="flex border-b border-blue-gray-50 py-[6px]"
                 >
                   {/* MonsterDiv Start */}
-                  <div className="flex gap-[1px] flex-col justify-center items-start w-[200px]">
+                  <div className="flex gap-[1px] flex-col justify-start items-start w-[200px]">
                     <div className="flex gap-[10px] justify-center items-center">
                       <img
                         src={toAPIHostURL(monster.thumbnail)}
@@ -126,7 +126,7 @@ export default function CollectionMapsPage() {
                   {/* MonsterDiv End */}
 
                   {/* ItemList Start */}
-                  <div className="flex gap-[5px] items-center">
+                  <div className="flex flex-wrap gap-[5px] items-center max-w-[600px]">
                     {monster.drop?.items.map((itemData) => {
                       const { item } = itemData
                       return (

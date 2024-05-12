@@ -55,6 +55,18 @@ export const toEmojiPath = (path: string) => {
 export const translate = (text: string) => {
   let parsedText = text
   switch (text) {
+    case 'menu:weapon':
+      parsedText = '무기'
+      break
+    case 'menu:misc':
+      parsedText = '기타'
+      break
+    case 'map:Normal':
+      parsedText = '일반'
+      break
+    case 'map:Raid':
+      parsedText = '레이드'
+      break
     case 'etc':
       parsedText = '기타'
       break

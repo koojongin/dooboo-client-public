@@ -24,18 +24,19 @@ api.interceptors.response.use(
     return response
   },
   async (error) => {
-    const { code, message, response } = error
+    const { code, message, response, request } = error
     const { status, data } = response || {}
+
+    if (status === 600) {
+      return Promise.reject(error)
+    }
+
     await Swal.fire({
       text: code,
       title: data?.message || message,
       icon: 'error',
       confirmButtonText: '확인',
     })
-
-    if (status === 400) {
-      // localStorage.removeItem('token')
-    }
     return Promise.reject(error)
   },
 )

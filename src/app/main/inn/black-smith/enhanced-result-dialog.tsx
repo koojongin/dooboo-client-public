@@ -1,3 +1,5 @@
+'use client'
+
 import { Dialog, DialogBody } from '@material-tailwind/react'
 import { ForwardedRef, forwardRef, useImperativeHandle, useState } from 'react'
 import {
@@ -7,12 +9,13 @@ import {
 import toAPIHostURL from '@/services/image-name-parser'
 import createKey from '@/services/key-generator'
 import { toColorByGrade, toYYYYMMDDHHMMSS, translate } from '@/services/util'
+import { getTotalFlatDamage } from '@/services/yg-util'
 
 export function EnhancedSnapshotBox({ enhancedLog }: { enhancedLog: any }) {
   const enhancedWeapon = enhancedLog.snapshot
-  const originWeapon = enhancedLog?.weapon
+  const afterWeapon = enhancedLog?.snapshot?.after
   return (
-    <div className="flex flex-col rounded shadow-gray-400 shadow-md bg-gradient-to-br from-slate-500 via-gray-300 to-slate-600">
+    <div className="flex flex-col rounded shadow-gray-400 shadow-md bg-gradient-to-br from-slate-500 via-gray-300 to-slate-600 border-2">
       <div className="flex flex-row justify-stretch items-stretch p-[5px]">
         <div className="min-w-[240px] p-[1px]">
           <div className="flex justify-center text-[20px] h-[30px] items-center">
@@ -63,43 +66,50 @@ export function EnhancedSnapshotBox({ enhancedLog }: { enhancedLog: any }) {
                 </div>
               </div>
               <div className="px-[6px] mt-[10px]">
-                <div className="flex justify-between">
-                  <div>물리 피해</div>
-                  <div>{enhancedWeapon.damageOfPhysical}</div>
+                <div className="">
+                  기본 속성({getTotalFlatDamage(enhancedWeapon)})
                 </div>
+                <div className="border-b border-b-white my-[2px]" />
+                <div>
+                  <div className="flex justify-between">
+                    <div>물리 피해</div>
+                    <div>{enhancedWeapon.damageOfPhysical}</div>
+                  </div>
 
-                <div className="flex justify-between">
-                  <div>화염 피해</div>
-                  <div>{enhancedWeapon.damageOfFire}</div>
-                </div>
+                  <div className="flex justify-between">
+                    <div>화염 피해</div>
+                    <div>{enhancedWeapon.damageOfFire}</div>
+                  </div>
 
-                <div className="flex justify-between">
-                  <div>번개 피해</div>
-                  <div>{enhancedWeapon.damageOfLightning}</div>
-                </div>
+                  <div className="flex justify-between">
+                    <div>번개 피해</div>
+                    <div>{enhancedWeapon.damageOfLightning}</div>
+                  </div>
 
-                <div className="flex justify-between">
-                  <div>냉기 피해</div>
-                  <div>{enhancedWeapon.damageOfCold}</div>
-                </div>
+                  <div className="flex justify-between">
+                    <div>냉기 피해</div>
+                    <div>{enhancedWeapon.damageOfCold}</div>
+                  </div>
 
-                <div className="flex justify-between">
-                  <div>치명타 확률</div>
-                  <div>+{enhancedWeapon.criticalRate}%</div>
-                </div>
+                  <div className="flex justify-between">
+                    <div>치명타 확률</div>
+                    <div>+{enhancedWeapon.criticalRate}%</div>
+                  </div>
 
-                <div className="flex justify-between">
-                  <div>치명타 배율</div>
-                  <div>+{enhancedWeapon.criticalMultiplier}%</div>
+                  <div className="flex justify-between">
+                    <div>치명타 배율</div>
+                    <div>+{enhancedWeapon.criticalMultiplier}%</div>
+                  </div>
                 </div>
               </div>
               <div className="px-[6px]">
                 {Object.keys(enhancedWeapon.additionalAttributes || {}).length >
                   0 && (
                   <div className="mt-[5px]">
-                    <div className="text-[#ffea00] border-b border-b-gray-200">
+                    <div className="text-[#ffea00] ff-score font-bold">
                       추가 속성
                     </div>
+                    <div className="border-b border-b-white mt-[2px] mb-[4px]" />
                     {Object.keys(enhancedWeapon.additionalAttributes!).map(
                       (key: string) => {
                         if (!enhancedWeapon.additionalAttributes) return
@@ -122,32 +132,30 @@ export function EnhancedSnapshotBox({ enhancedLog }: { enhancedLog: any }) {
           </div>
         </div>
 
-        {/*------------------------------------------------*/}
+        {/* LEFT------------------------------------------------*/}
 
         <div className="flex items-center px-[10px] text-[#4e4e4e] text-[20px]">
           <i className="fa-solid fa-arrow-right" />
         </div>
 
-        {/*------------------------------------------------*/}
+        {/* RIGHT------------------------------------------------*/}
         <div className="min-w-[240px] p-[1px]">
           <div className="flex justify-center text-[20px] h-[30px] items-center">
-            {originWeapon && (
-              <div className="text-[20px] flex items-center ff-gs">
-                현재 원본 아이템
-              </div>
+            {afterWeapon && (
+              <div className="text-[20px] flex items-center ff-gs">강화 후</div>
             )}
-            {!originWeapon && (
+            {!afterWeapon && (
               <div className="flex justify-center items-center text-[14px] bg-opacity-55 p-[1px] rounded ff-gs">
-                원본 아이템이 없습니다
+                강화 기록을 찾을 수 없습니다.
               </div>
             )}
           </div>
-          {originWeapon && (
+          {afterWeapon && (
             <div className="bg-gray-800 rounded">
               <div
                 className="pb-[8px] rounded bg-gradient-to-br from-[#5b5b5b80] to-blue-gray-100/50 h-full"
                 style={{
-                  borderColor: toColorByGrade(originWeapon.iGrade),
+                  borderColor: toColorByGrade(afterWeapon.iGrade),
                   borderWidth: '2px',
                   borderRadius: '4px',
                 }}
@@ -160,7 +168,7 @@ export function EnhancedSnapshotBox({ enhancedLog }: { enhancedLog: any }) {
                       src="/images/star_on.png"
                     />
                     <div className="ff-score font-bold">
-                      {originWeapon.starForce}
+                      {afterWeapon.starForce}
                     </div>
                   </div>
                   <div className="ff-score font-bold">/</div>
@@ -171,7 +179,7 @@ export function EnhancedSnapshotBox({ enhancedLog }: { enhancedLog: any }) {
                       src="/images/star_off.png"
                     />
                     <div className="ff-score font-bold">
-                      {originWeapon.maxStarForce}
+                      {afterWeapon.maxStarForce}
                     </div>
                   </div>
                 </div>
@@ -182,54 +190,61 @@ export function EnhancedSnapshotBox({ enhancedLog }: { enhancedLog: any }) {
                       borderWidth: '2px',
                       borderRadius: '4px',
                     }}
-                    src={toAPIHostURL(originWeapon.thumbnail)}
+                    src={toAPIHostURL(afterWeapon.thumbnail)}
                   />
                   <div className="flex justify-center ff-wavve text-[20px]">
-                    {originWeapon.name}+{originWeapon.starForce}
+                    {afterWeapon.name}+{afterWeapon.starForce}
                   </div>
                 </div>
                 <div className="px-[6px] mt-[10px]">
-                  <div className="flex justify-between">
-                    <div>물리 피해</div>
-                    <div>{originWeapon.damageOfPhysical}</div>
+                  <div className="">
+                    기본 속성({getTotalFlatDamage(afterWeapon)})
                   </div>
+                  <div className="border-b border-b-white my-[2px]" />
+                  <div>
+                    <div className="flex justify-between">
+                      <div>물리 피해</div>
+                      <div>{afterWeapon.damageOfPhysical}</div>
+                    </div>
 
-                  <div className="flex justify-between">
-                    <div>화염 피해</div>
-                    <div>{originWeapon.damageOfFire}</div>
-                  </div>
+                    <div className="flex justify-between">
+                      <div>화염 피해</div>
+                      <div>{afterWeapon.damageOfFire}</div>
+                    </div>
 
-                  <div className="flex justify-between">
-                    <div>번개 피해</div>
-                    <div>{originWeapon.damageOfLightning}</div>
-                  </div>
+                    <div className="flex justify-between">
+                      <div>번개 피해</div>
+                      <div>{afterWeapon.damageOfLightning}</div>
+                    </div>
 
-                  <div className="flex justify-between">
-                    <div>냉기 피해</div>
-                    <div>{originWeapon.damageOfCold}</div>
-                  </div>
+                    <div className="flex justify-between">
+                      <div>냉기 피해</div>
+                      <div>{afterWeapon.damageOfCold}</div>
+                    </div>
 
-                  <div className="flex justify-between">
-                    <div>치명타 확률</div>
-                    <div>+{originWeapon.criticalRate}%</div>
-                  </div>
+                    <div className="flex justify-between">
+                      <div>치명타 확률</div>
+                      <div>+{afterWeapon.criticalRate}%</div>
+                    </div>
 
-                  <div className="flex justify-between">
-                    <div>치명타 배율</div>
-                    <div>+{originWeapon.criticalMultiplier}%</div>
+                    <div className="flex justify-between">
+                      <div>치명타 배율</div>
+                      <div>+{afterWeapon.criticalMultiplier}%</div>
+                    </div>
                   </div>
                 </div>
                 <div className="px-[6px]">
-                  {Object.keys(originWeapon.additionalAttributes || {}).length >
+                  {Object.keys(afterWeapon.additionalAttributes || {}).length >
                     0 && (
                     <div className="mt-[5px]">
-                      <div className="text-[#ffea00] border-b border-b-gray-200">
+                      <div className="text-[#ffea00] ff-score font-bold">
                         추가 속성
                       </div>
-                      {Object.keys(originWeapon.additionalAttributes!).map(
+                      <div className="border-b border-b-white mt-[2px] mb-[4px]" />
+                      {Object.keys(afterWeapon.additionalAttributes!).map(
                         (key: string) => {
-                          if (!originWeapon.additionalAttributes) return
-                          const value = originWeapon.additionalAttributes[key]
+                          if (!afterWeapon.additionalAttributes) return
+                          const value = afterWeapon.additionalAttributes[key]
                           return (
                             <div
                               key={createKey()}

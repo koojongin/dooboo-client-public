@@ -28,8 +28,11 @@ import WeaponBoxDetailComponent from '@/components/item/weapon-box-detail.compon
 import { EmojiPopOver, EmoticonKind } from '@/components/emoji/emoji-popover'
 import { ItemTypeKind } from '@/interfaces/item.interface'
 import MiscBoxDetailComponent from '@/components/item/misc-box-detail.component'
-import { EnhancedSnapshotBox } from '@/app/main/inn/black-smith/enhanced-result-dialog'
+import enhancedResultDialog, {
+  EnhancedSnapshotBox,
+} from '@/app/main/inn/black-smith/enhanced-result-dialog'
 import ShareItemBoxComponent from '@/components/chat/share-item-box.component'
+import { EnhancedLogBoxComponent } from '@/components/chat/enhanced-log-box.component'
 
 interface ConnectedCharacter {
   characterId: string
@@ -254,7 +257,7 @@ export function ChatComponent() {
                 })}
               </div>
               <div
-                className={`overflow-y-scroll w-full text-[14px] ${pathname.indexOf('main/community') >= 0 ? 'h-full' : 'wide:h-full'} wide:max-h-[inherit] flex flex-col gap-[4px] wide:border-l`}
+                className={`overflow-y-scroll w-full text-[14px] ${pathname.indexOf('main/community') >= 0 ? 'h-full' : 'wide:h-full min-h-[300px]'} wide:max-h-[inherit] flex flex-col gap-[4px] wide:border-l`}
                 ref={chatElementRef}
               >
                 {chatMessages.map((chatMessage) => {
@@ -359,38 +362,10 @@ export function ChatComponent() {
                               />
                             }
                           >
-                            <div className="flex cursor-pointer flex-col">
-                              <div className="ff-gs bg-gray-400 text-white px-[4px] mb-[2px]">
-                                [공유] 강화로그
-                              </div>
-                              <div className="flex gap-[4px]">
-                                <div className="w-[36px] h-[36px] border border-gray-600 p-[2px]">
-                                  <img
-                                    className="w-full h-full"
-                                    src={toAPIHostURL(
-                                      chatMessage.enhancedLog.snapshot
-                                        .thumbnail,
-                                    )}
-                                  />
-                                </div>
-                                <div className="flex items-center">
-                                  <div className="flex items-center">
-                                    <div>
-                                      {chatMessage.enhancedLog.snapshot.name} +
-                                      {
-                                        chatMessage.enhancedLog.snapshot
-                                          .starForce
-                                      }
-                                    </div>
-                                    <div className="ml-[5px] text-[12px] flex items-center gap-[4px] font-bold">
-                                      <i className="fa-solid fa-arrow-right" />
-                                      <div className="bg-blue-600 text-white w-[18px] h-[18px] rounded-full flex items-center justify-center">
-                                        <i className="fa-solid fa-question" />
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
+                            <div>
+                              <EnhancedLogBoxComponent
+                                enhancedLog={chatMessage.enhancedLog}
+                              />
                             </div>
                           </Tooltip>
                         </div>

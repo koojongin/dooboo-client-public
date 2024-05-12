@@ -285,12 +285,20 @@ export async function fetchPutBoard(id: string, data: any): Promise<any> {
 }
 
 export async function fetchGetBoardList(
-  data: object,
-  opts = { page: 1 },
+  data: any,
+  opts: any = {},
 ): Promise<BoardListResponse> {
+  const _opts: any = { ...opts }
+  if (!_opts.page) {
+    _opts.page = 1
+  }
+
+  if (!_opts.limit) {
+    _opts.limit = 10
+  }
   const { data: response } = await api.post(`/board/list`, {
     condition: data,
-    opts,
+    opts: _opts,
   })
   return response
 }
@@ -319,39 +327,6 @@ export async function fetchDeleteCommentOne(
   id: string,
 ): Promise<{ board: Board }> {
   const { data: response } = await api.delete(`/board/comment/delete/${id}`)
-  return response
-}
-
-export async function fetchPostAddToAuction(
-  id: string,
-  data: { gold: number },
-) {
-  const { data: response } = await api.post(`/item/auction/add/${id}`, data)
-  return response
-}
-
-export async function fetchGetAuctions(
-  condition = {},
-  opts?: { page: number },
-): Promise<AuctionListResponse> {
-  const { data: response } = await api.post(`/item/auction/list`, {
-    condition,
-    opts,
-  })
-  return response
-}
-
-export async function fetchPurchaseAuctionItem(
-  id: string,
-): Promise<AuctionListResponse> {
-  const { data: response } = await api.post(`/item/auction/purchase/${id}`)
-  return response
-}
-
-export async function fetchRetrieveAuctionItem(
-  id: string,
-): Promise<AuctionListResponse> {
-  const { data: response } = await api.post(`/item/auction/retrieve/${id}`)
   return response
 }
 

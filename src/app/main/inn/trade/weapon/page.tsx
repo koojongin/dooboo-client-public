@@ -1,15 +1,10 @@
 'use client'
 
-import { Card, Option, Select } from '@material-tailwind/react'
+import { Card } from '@material-tailwind/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
-import {
-  fetchGetAuctions,
-  fetchGetMyCurrency,
-  fetchPurchaseAuctionItem,
-  fetchRetrieveAuctionItem,
-} from '@/services/api-fetch'
+import { fetchGetMyCurrency } from '@/services/api-fetch'
 import createKey from '@/services/key-generator'
 import toAPIHostURL from '@/services/image-name-parser'
 import { ago, toColorByGrade, toMMDDHHMMSS, translate } from '@/services/util'
@@ -20,8 +15,13 @@ import {
 } from '@/interfaces/item.interface'
 import useDebounce from '@/components/hooks/debounce'
 import { SortingType } from '@/interfaces/common.interface'
-import SelectItemDialog from '@/app/admindooboo/drop/select-item-dialog'
-import SimulateBattleDialog from './simulate-battle-dialog'
+import { getTotalFlatDamage } from '@/services/yg-util'
+import SimulateBattleDialog from '../simulate-battle-dialog'
+import {
+  fetchGetAuctionWeapons,
+  fetchPurchaseAuctionItem,
+  fetchRetrieveAuctionItem,
+} from '@/services/api/api.auction'
 
 const TradeSortType = {
   CREATED: 'trade-sort:created',
@@ -34,7 +34,8 @@ enum ListingType {
   Normal = 'Normal',
   Simplify = 'Simplify',
 }
-export default function TradePage() {
+
+export default function TradeWeaponPage() {
   const [characterId, setCharacterId] = useState<string>()
   const [currency, setCurrency] = useState<{ gold: number }>()
   const [auctions, setAuctions] = useState<Auction[]>([])
@@ -65,7 +66,10 @@ export default function TradePage() {
   )
 
   const [pagenation, setPagenation] = useState<any>()
-  const [lastSearchOptions, setLastSearchOptions] = useState<any>()
+  const [lastSearchOptions, setLastSearchOptions] = useState<{
+    condition: object
+    opts: any
+  }>()
   const router = useRouter()
 
   const loadWeapons = useCallback(
@@ -119,7 +123,7 @@ export default function TradePage() {
           break
       }
 
-      const result = await fetchGetAuctions(condition, opts)
+      const result = await fetchGetAuctionWeapons(condition, opts)
       setAuctions(result.auctions)
       setPagenation({
         page: result.page,
@@ -179,7 +183,7 @@ export default function TradePage() {
         icon: 'success',
         denyButtonText: `닫기`,
       })
-      loadWeapons()
+      loadWeapons(lastSearchOptions?.condition, lastSearchOptions?.opts)
     }
   }
 
@@ -199,7 +203,7 @@ export default function TradePage() {
         icon: 'success',
         denyButtonText: `닫기`,
       })
-      loadWeapons()
+      loadWeapons(lastSearchOptions?.condition, lastSearchOptions?.opts)
     }
   }
 
@@ -570,12 +574,12 @@ export default function TradePage() {
                         </div>
                       </div>
                       <div className="mt-[5px]">
-                        <div className="flex justify-between mb-[2px] border-b border-b-gray-400">
+                        <div className="flex justify-between mb-[2px] border-b border-b-gray-100 border-dashed mb-[4px]">
                           <div>착용 레벨</div>
                           <div>{weapon.requiredEquipmentLevel}</div>
                         </div>
                         <div className="border-b border-b-gray-400">
-                          기본 속성
+                          기본 속성({getTotalFlatDamage(weapon)})
                         </div>
                         {weapon.damageOfPhysical > 0 && (
                           <div className="flex justify-between">
@@ -666,8 +670,8 @@ export default function TradePage() {
                       <div
                         onClick={() =>
                           loadWeapons(
-                            { ...lastSearchOptions.condition },
-                            { ...lastSearchOptions.opts, page: index + 1 },
+                            { ...lastSearchOptions?.condition },
+                            { ...lastSearchOptions?.opts, page: index + 1 },
                           )
                         }
                         className={`flex justify-center items-center w-[24px] h-[24px] text-[12px] font-bold ${index + 1 === pagenation.page ? 'border text-[#5795dd]' : ''} hover:text-[#5795dd] hover:border`}

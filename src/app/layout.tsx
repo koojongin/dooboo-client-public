@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
-
-// const inter = Inter({ subsets: ['latin'] })
+import axios from 'axios'
+import { NoticeHeaderComponent } from '@/components/main/notice-header.component'
 
 export const metadata: Metadata = {
-  title: '두부 온라인',
+  title: `두부 온라인 ${process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ? ' - 테스트' : ''}`,
   description: '두부 온라인',
   openGraph: {
     images: [
@@ -15,11 +14,24 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export async function getNotice(): Promise<any | never> {
+  const baseURL = `https://dooboo.online:${process.env.NEXT_PUBLIC_SERVER_PORT}`
+  const response = await axios.post(`${baseURL}/board/list`, {
+    condition: { category: { $in: ['공지', '패치노트'] } },
+    opts: { page: 1, limit: 1 },
+  })
+
+  return response?.data
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // const { boards = [] } = await getNotice()
+  // const notice = boards[0]
+  const notice = undefined
   return (
     <html lang="en">
       <head>
@@ -48,11 +60,7 @@ export default function RootLayout({
       <body
         className={` bg-[url('/images/bg001.jpg')] bg-contain min-h-[500px] min-w-[900px] wide:w-full`}
       >
-        <div className="flex justify-start bg-gray-100 bg-opacity-65 w-full text-[14px] py-1">
-          <div className="min-w-[900px] px-3">
-            두부 온라인 - 공지 또는 외치기등.. 들어갈 영역
-          </div>
-        </div>
+        <NoticeHeaderComponent />
         <div className="px-3 min-w-fit">{children}</div>
         <div className="flex justify-center bg-gray-100 bg-opacity-65 w-full text-[14px] py-1">
           dev since 2024.03.26 ~

@@ -83,7 +83,7 @@ export default function ItemBoxComponent({
         <div
           className={`overflow-hidden relative cursor-pointer min-w-[50px] w-[50px] h-[50px] max-w-[50px] max-h-[50px] ${className}`}
           style={{
-            borderColor: toColorByGrade(selectedItem.iGrade),
+            borderColor: toColorByGrade(selectedItem?.iGrade),
             borderWidth: '2px',
             borderRadius: '4px',
           }}
