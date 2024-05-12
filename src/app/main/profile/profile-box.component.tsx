@@ -5,12 +5,12 @@ import { Button, Tooltip } from '@material-tailwind/react'
 import { getJobIconBgColor, getJobIconUrl, translate } from '@/services/util'
 // import { fetchMe } from '@/services/api-fetch'
 
-interface IProfileBoxComponent {
+interface IProfileBoxProps {
   character: { nickname: string; level: string; job: string }
   user: { nickname: string }
 }
 
-export function ProfileBoxComponent({ character, user }: IProfileBoxComponent) {
+export function ProfileBoxComponent({ character, user }: IProfileBoxProps) {
   const goToSkillTech = () => {
     console.log('스킬트리 창 띄우거나 보내기')
   }

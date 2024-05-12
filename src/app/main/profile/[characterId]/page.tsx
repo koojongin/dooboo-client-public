@@ -27,13 +27,13 @@ export default function ProfilePage({
 
   // API
   const getProfileInfo = async () => {
-    const dummyData = {
+    const DUMMY_DATA = {
       user: { nickname: '시나모롤' },
       character: { nickname: '시나모롤', level: '99', job: 'bowman' },
     }
 
-    setUser(dummyData.user)
-    setCharacter(dummyData.character)
+    setUser(DUMMY_DATA.user)
+    setCharacter(DUMMY_DATA.character)
 
     // try {
     //   const {
@@ -59,14 +59,11 @@ export default function ProfilePage({
   }, [])
 
   return (
-    <div className="w-full">
-      <Card className="rounded w-full ">
-        <CardBody className="flex justify-between">
-          {user && <ProfileBoxComponent character={character!} user={user} />}
-
-          <ProfileCommentComponent />
-        </CardBody>
-      </Card>
-    </div>
+    <Card className="rounded w-full h-[75vh] max-h-[75vh]">
+      <CardBody className="flex justify-between w-full h-full">
+        {user && <ProfileBoxComponent character={character!} user={user} />}
+        {user && <ProfileCommentComponent character={character!} />}
+      </CardBody>
+    </Card>
   )
 }
