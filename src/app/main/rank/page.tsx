@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Tooltip } from '@material-tailwind/react'
 import {
   fetchGetRankByDamageList,
@@ -24,6 +25,7 @@ import { RankLog } from '@/interfaces/user.interface'
 import WeaponBoxDetailComponent from '@/components/item/weapon-box-detail.component'
 
 export default function CommunityPage() {
+  const router = useRouter()
   const [characters, setCharacters] = useState<any[]>([])
   const [rankLogs, setRankLogs] = useState<RankLog[]>([])
 
@@ -57,10 +59,16 @@ export default function CommunityPage() {
     setRankLogs(newRanks)
   }, [])
 
+  // 클릭하면 넘어가기
+  const goToProfile = (characterId: string) => {
+    router.push(`/main/profile/${characterId}`)
+  }
+
   useEffect(() => {
     loadRanks()
     loadRankByDamages()
   }, [loadRanks, loadRankByDamages])
+
   return (
     <div className="flex flex-wrap gap-[10px]">
       <div className="w-[500px]">
@@ -94,7 +102,12 @@ export default function CommunityPage() {
               >
                 <div className={tableClass[0]}>{index + 1}</div>
                 <div className={tableClass[1]}>{character.level}</div>
-                <div className={tableClass[2]}>
+                <div
+                  onClick={() => {
+                    goToProfile(character._id)
+                  }}
+                  className={tableClass[2]}
+                >
                   <Tooltip
                     content={`[${translate(`job:${character.job ? character.job : 'novice'}`)}]${
                       character.nickname
