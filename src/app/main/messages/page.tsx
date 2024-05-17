@@ -234,9 +234,19 @@ function MessageLogList({ messageLogs }: { messageLogs: any[] }) {
   )
 }
 function MessageLogTitleBox({ messageLog }: any) {
-  // MessageLogCategoryKind
   return (
     <div className="flex border-b border-dashed border-b-gray-800">
+      {messageLog.category === MessageLogCategoryKind.PickupLog && (
+        <div className="flex items-center w-full px-[4px] py-[2px]">
+          <div className="min-w-[100px]">{ago(messageLog.createdAt)}</div>
+          <div className="flex gap-[4px] text-gray-800">
+            <div>
+              가챠 로그 - {messageLog.snapshot?.pickedCards?.length} 모집
+            </div>
+            <div>(데이터 기록을 일단 남기고 추후에 연계 기능 들어갈 예정)</div>
+          </div>
+        </div>
+      )}
       {messageLog.category === MessageLogCategoryKind.AuctionAdd && (
         <div className="flex items-center w-full px-[4px] py-[2px]">
           <div className="min-w-[100px]">{ago(messageLog.createdAt)}</div>

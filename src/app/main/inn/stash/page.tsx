@@ -12,6 +12,8 @@ import React, {
 import Swal from 'sweetalert2'
 import _ from 'lodash'
 import {
+  CurrencyResponse,
+  fetchGetMyCurrency,
   fetchGetMyInventory,
   fetchGetMyStash,
   fetchGetMyStashes,
@@ -29,7 +31,6 @@ import { InventoryActionKind } from '@/components/item/item.interface'
 import ItemBoxComponent from '@/components/item/item-box'
 import { Stash } from '@/interfaces/stash.interface'
 
-// eslint-disable-next-line react/display-name
 export default function StashPage() {
   const [items, setItems] = useState<InnItem[]>([])
   const [characterData, setCharacterData] = useState<MeResponse>()
@@ -37,6 +38,7 @@ export default function StashPage() {
   const [isFulledInventory, setIsFulledInventory] = useState<boolean>()
   const [stashes, setStashes] = useState<Stash[]>([])
   const [selectedStash, setSelectedStash] = useState<Stash>()
+  const [currency, setCurrency] = useState<CurrencyResponse>()
 
   const refreshInventory = useCallback(async () => {
     const { items: rItems, slots, isFulled } = await fetchGetMyInventory()
@@ -51,6 +53,11 @@ export default function StashPage() {
       ...result.stash,
       items: [..._.sortBy(result.stash.items, 'updatedAt')],
     })
+  }, [])
+
+  const loadMyCurrency = useCallback(async () => {
+    const result = await fetchGetMyCurrency()
+    setCurrency(result)
   }, [])
 
   const loadStashes = useCallback(async () => {
@@ -75,7 +82,8 @@ export default function StashPage() {
   useEffect(() => {
     syncData()
     loadStashes()
-  }, [loadStashes, syncData])
+    loadMyCurrency()
+  }, [loadMyCurrency, loadStashes, syncData])
 
   return (
     <div className="rounded w-full min-h-[500px]">
@@ -89,13 +97,17 @@ export default function StashPage() {
                   {characterData.character.gold.toLocaleString()}
                 </div>
               </div>
-              <div className="flex items-center gap-[2px]">
-                <img
-                  src="/images/icon_diamond.webp"
-                  className="w-[22px] mr-[2px] mb-[2px]"
-                />
-                <div className="text-[24px] ff-ba">0</div>
-              </div>
+              {currency && (
+                <div className="flex items-center gap-[2px]">
+                  <img
+                    src="/images/icon_diamond.webp"
+                    className="w-[22px] mr-[2px] mb-[2px]"
+                  />
+                  <div className="text-[24px] ff-ba">
+                    {currency.diamond.toLocaleString()}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </Card>
@@ -363,6 +375,7 @@ function InnInventory({
                           actions={[
                             InventoryActionKind.Share,
                             InventoryActionKind.AddToAuction,
+                            InventoryActionKind.Consume,
                           ]}
                           onShowTotalDamage
                           actionCallback={syncData}

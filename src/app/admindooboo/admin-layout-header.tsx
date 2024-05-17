@@ -21,6 +21,7 @@ export default function AdminLayoutHeader() {
         캐릭
       </Button>
       <Button onClick={() => navigate('/admindooboo/db/stash')}>stash</Button>
+      <Button onClick={() => navigate('/admindooboo/shop')}>shop</Button>
     </ButtonGroup>
   )
 }

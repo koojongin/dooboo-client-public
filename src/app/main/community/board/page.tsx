@@ -123,7 +123,7 @@ export default function CommunityBoardPage() {
               <div className="pl-2 min-w-[100px]">
                 {board.category || '자유'}
               </div>
-              <div className="w-full flex gap-[1px] w-[400px] truncate overflow-ellipsis wide:w-full">
+              <div className="w-full flex gap-[1px] truncate overflow-ellipsis wide:w-full">
                 <div
                   className="max-w-[600px] truncate cursor-pointer hover:underline"
                   onClick={() => goToDetailPage(board._id)}
@@ -141,7 +141,12 @@ export default function CommunityBoardPage() {
                   </div>
                 )}
               </div>
-              <div className="min-w-[100px] max-w-[100px] gap-[2px]">
+              <div
+                className="min-w-[100px] max-w-[100px] gap-[2px] cursor-pointer"
+                onClick={() =>
+                  router.push(`/main/profile/${board.character._id}`)
+                }
+              >
                 <div className="w-full min-w-[22px] min-h-[22px] max-w-[22px] rounded-full border border-white">
                   <img
                     className="w-full h-full"

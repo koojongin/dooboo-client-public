@@ -18,7 +18,13 @@ import createKey from '@/services/key-generator'
 import { fetchGetBaseMiscList } from '@/services/api-admin-fetch'
 
 function SelectItemDialog(
-  { onSelectItem }: any,
+  {
+    onSelectItem,
+    onlyMisc = false,
+  }: {
+    onSelectItem: any
+    onlyMisc: boolean
+  },
   ref: ForwardedRef<SelectItemDialogRef>,
 ) {
   const [selectedIndex, setSelectedIndex] = useState<number>()
@@ -76,47 +82,54 @@ function SelectItemDialog(
         <div>아이템 목록 - 클릭시 선택됩니다.</div>
         <div>
           {/* Weapon List */}
-          <div className="flex flex-wrap gap-1">
-            {baseWeapons.map((baseWeapon) => {
-              return (
-                <div
-                  key={baseWeapon._id}
-                  className="cursor-pointer"
-                  onClick={() => selectItem(baseWeapon)}
-                >
-                  <Tooltip interactive content={<div>{baseWeapon.name}</div>}>
-                    <div className="max-w-[36px] w-[36px] h-[36px] p-[2px] border border-dark-blue">
-                      <img
-                        className="w-full h-full"
-                        src={toAPIHostURL(baseWeapon.thumbnail)}
-                      />
-                    </div>
-                  </Tooltip>
-                </div>
-              )
-            })}
-          </div>
-          <div>
-            {paginationBw && (
-              <div className="w-full flex justify-start mt-[15px]">
-                <div className="flex gap-[4px]">
-                  {new Array(paginationBw.totalPages)
-                    .fill(1)
-                    .map((value, index) => {
-                      return (
-                        <div
-                          className={`cursor-pointer flex justify-center items-center w-[24px] h-[24px] text-[14px] font-bold ${index + 1 === paginationBw.page ? 'border text-[#5795dd]' : ''} hover:text-[#5795dd] hover:border`}
-                          onClick={() => loadBaseWeapons(index + 1)}
-                          key={createKey()}
-                        >
-                          {index + 1}
+          {!onlyMisc && (
+            <div>
+              <div className="flex flex-wrap gap-1">
+                {baseWeapons.map((baseWeapon) => {
+                  return (
+                    <div
+                      key={baseWeapon._id}
+                      className="cursor-pointer"
+                      onClick={() => selectItem(baseWeapon)}
+                    >
+                      <Tooltip
+                        interactive
+                        content={<div>{baseWeapon.name}</div>}
+                      >
+                        <div className="max-w-[36px] w-[36px] h-[36px] p-[2px] border border-dark-blue">
+                          <img
+                            className="w-full h-full"
+                            src={toAPIHostURL(baseWeapon.thumbnail)}
+                          />
                         </div>
-                      )
-                    })}
-                </div>
+                      </Tooltip>
+                    </div>
+                  )
+                })}
               </div>
-            )}
-          </div>
+              <div>
+                {paginationBw && (
+                  <div className="w-full flex justify-start mt-[15px]">
+                    <div className="flex gap-[4px]">
+                      {new Array(paginationBw.totalPages)
+                        .fill(1)
+                        .map((value, index) => {
+                          return (
+                            <div
+                              className={`cursor-pointer flex justify-center items-center w-[24px] h-[24px] text-[14px] font-bold ${index + 1 === paginationBw.page ? 'border text-[#5795dd]' : ''} hover:text-[#5795dd] hover:border`}
+                              onClick={() => loadBaseWeapons(index + 1)}
+                              key={createKey()}
+                            >
+                              {index + 1}
+                            </div>
+                          )
+                        })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           {/* Weapon List End */}
 
           {/* Misc List */}

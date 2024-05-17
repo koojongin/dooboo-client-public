@@ -23,4 +23,5 @@ export const MessageLogCategoryKind = {
   AuctionSold: 'auction-sold',
   AuctionPurchase: 'auction-purchase',
   AuctionRetrieve: 'auction-retrieve',
+  PickupLog: 'pickup-log',
 }

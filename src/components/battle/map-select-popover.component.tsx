@@ -60,12 +60,12 @@ export function MapSelectComponent({
         } catch (error: any) {
           const { response } = error
           const { status, data } = response || {}
-          if (status === 600) {
+          if ([429, 600].includes(status)) {
             return
           }
           stopBattleInterval()
         }
-      }, 5000)
+      }, 5500)
     }
   }
 

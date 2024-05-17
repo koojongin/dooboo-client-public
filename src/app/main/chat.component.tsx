@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, Tooltip } from '@material-tailwind/react'
+import { Card } from '@material-tailwind/react'
 import { KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { Socket } from 'socket.io-client'
@@ -19,31 +19,19 @@ import {
   ON_ENHANCED_LOG_MESSAGE_EVENT,
   ON_GET_CHARACTERS_EVENT,
   ON_NOTICE_MESSAGE_EVENT,
+  ON_PICKUP_LOG_MESSAGE_EVENT,
+  ON_SHARE_GOLD_BOX_RESULT_EVENT,
   ON_SHARE_ITEM_EVENT,
 } from '@/interfaces/chat.interface'
 import createKey from '@/services/key-generator'
 import { isExistLoginToken, parseHtml, toHHMM } from '@/services/util'
-import toAPIHostURL from '@/services/image-name-parser'
-import WeaponBoxDetailComponent from '@/components/item/weapon-box-detail.component'
 import { EmojiPopOver, EmoticonKind } from '@/components/emoji/emoji-popover'
-import { ItemTypeKind } from '@/interfaces/item.interface'
-import MiscBoxDetailComponent from '@/components/item/misc-box-detail.component'
-import enhancedResultDialog, {
-  EnhancedSnapshotBox,
-} from '@/app/main/inn/black-smith/enhanced-result-dialog'
-import ShareItemBoxComponent from '@/components/chat/share-item-box.component'
-import { EnhancedLogBoxComponent } from '@/components/chat/enhanced-log-box.component'
-
-interface ConnectedCharacter {
-  characterId: string
-  exp: number
-  iat: number
-  nickname: string
-}
-
-interface ConnectedCharacterWrapper {
-  [id: string]: ConnectedCharacter
-}
+import { ChatEnhancedLogComponent } from '@/components/chat/components/chat-enhanced-log.component'
+import { ChatItemShareComponent } from '@/components/chat/components/chat-item-share.component'
+import { ChatPickupLogComponent } from '@/components/chat/components/chat-pickup-log.component'
+import { ChatCharacterPopOver } from '@/components/chat/components/chat-character-pop-over'
+import { ConnectedCharacterWrapper } from '@/components/chat/components/chat.types'
+import { ChatGoldBoxResultComponent } from '@/components/chat/components/chat-gold-box-result.component'
 
 export function ChatComponent() {
   const pathname = usePathname()
@@ -109,6 +97,11 @@ export function ChatComponent() {
     addMessageEvent(socket)
   }
 
+  const onClickMessage = (message: { characterId: string }) => {
+    if (!message?.characterId) return
+    window?.open(`/main/profile/${message.characterId}`, '_blank')
+  }
+
   const addMessageEvent = (selectedSocket: Socket) => {
     selectedSocket.on(MESSAGE_EVENT, (eventName, data) => {
       const localNickName = localStorage.getItem('nickname')
@@ -153,7 +146,17 @@ export function ChatComponent() {
             return [...before, data]
           })
           break
+        case ON_PICKUP_LOG_MESSAGE_EVENT:
+          setChatMessages((before) => {
+            return [...before, data]
+          })
+          break
         case ON_CHAT_EMOJI_EVENT:
+          setChatMessages((before) => {
+            return [...before, data]
+          })
+          break
+        case ON_SHARE_GOLD_BOX_RESULT_EVENT:
           setChatMessages((before) => {
             return [...before, data]
           })
@@ -175,7 +178,15 @@ export function ChatComponent() {
 
   useEffect(() => {
     if (chatElementRef?.current) {
-      chatElementRef?.current.scrollTo(0, 99999999999)
+      const { scrollTop, scrollHeight, offsetHeight } = chatElementRef.current
+      if (
+        scrollHeight - scrollTop - offsetHeight <= 150 ||
+        scrollHeight <= offsetHeight * 2
+      ) {
+        chatElementRef?.current.scrollTo(0, 99999999999)
+      }
+
+      if (chatMessages.length > 50) setChatMessages(chatMessages.slice(-50))
     }
   }, [chatMessages])
 
@@ -244,20 +255,21 @@ export function ChatComponent() {
                   const { nickname } = connectedCharacter
                   return (
                     <div key={createKey()} className="hover:bg-gray-100">
-                      <div
-                        className="cursor-pointer"
-                        onClick={() => {
-                          onClickCharacter(connectedCharacter)
-                        }}
-                      >
-                        {nickname}
+                      <div className="cursor-pointer">
+                        <ChatCharacterPopOver
+                          connectedCharacter={connectedCharacter}
+                          onClickCall={() =>
+                            onClickCharacter(connectedCharacter)
+                          }
+                          child={<div>{nickname}</div>}
+                        />
                       </div>
                     </div>
                   )
                 })}
               </div>
               <div
-                className={`overflow-y-scroll w-full text-[14px] ${pathname.indexOf('main/community') >= 0 ? 'h-full' : 'wide:h-full min-h-[300px]'} wide:max-h-[inherit] flex flex-col gap-[4px] wide:border-l`}
+                className={`overflow-y-scroll w-full text-[14px] ${pathname.indexOf('main/community') >= 0 ? 'h-full' : 'wide:h-full wide:min-h-[300px]'} wide:max-h-[inherit] flex flex-col gap-[4px] wide:border-l`}
                 ref={chatElementRef}
               >
                 {chatMessages.map((chatMessage) => {
@@ -279,36 +291,15 @@ export function ChatComponent() {
                   }
 
                   return (
-                    <div key={createKey()} className="flex flex-wrap">
+                    <div
+                      key={createKey()}
+                      className="flex flex-wrap cursor-pointer"
+                      onClick={() => {
+                        onClickMessage(chatMessage)
+                      }}
+                    >
                       {messageType === MESSAGE_TYPE.ITEM_SHARE && (
-                        <div className="break-all pl-[5px] w-full border-t border-dashed border-b border-amber-800 cursor-pointer py-[4px]">
-                          {`[${toHHMM(new Date(chatMessage.timestamp))}] `}
-                          {`${chatMessage.nickname}: `}
-                          <Tooltip
-                            className="rounded-none bg-transparent"
-                            interactive
-                            content={
-                              <>
-                                {chatMessage.item.iType ===
-                                  ItemTypeKind.Weapon && (
-                                  <WeaponBoxDetailComponent
-                                    item={chatMessage.item}
-                                  />
-                                )}
-                                {chatMessage.item.iType ===
-                                  ItemTypeKind.Misc && (
-                                  <MiscBoxDetailComponent
-                                    item={chatMessage.item}
-                                  />
-                                )}
-                              </>
-                            }
-                          >
-                            <div>
-                              <ShareItemBoxComponent item={chatMessage.item} />
-                            </div>
-                          </Tooltip>
-                        </div>
+                        <ChatItemShareComponent chatMessage={chatMessage} />
                       )}
 
                       {messageType === MESSAGE_TYPE.NORMAL && (
@@ -349,26 +340,15 @@ export function ChatComponent() {
                       )}
 
                       {messageType === MESSAGE_TYPE.ENHANCED_LOG && (
-                        <div className="break-all pl-[5px] py-[4px] w-full border-t border-dashed border-b border-amber-800 cursor-pointer">
-                          {`[${toHHMM(new Date(chatMessage.timestamp))}] `}
-                          {`${chatMessage.nickname}: `}
-                          <Tooltip
-                            className="bg-transparent p-0"
-                            interactive
-                            placement="right"
-                            content={
-                              <EnhancedSnapshotBox
-                                enhancedLog={chatMessage.enhancedLog}
-                              />
-                            }
-                          >
-                            <div>
-                              <EnhancedLogBoxComponent
-                                enhancedLog={chatMessage.enhancedLog}
-                              />
-                            </div>
-                          </Tooltip>
-                        </div>
+                        <ChatEnhancedLogComponent chatMessage={chatMessage} />
+                      )}
+
+                      {messageType === MESSAGE_TYPE.PICKUP_LOG && (
+                        <ChatPickupLogComponent chatMessage={chatMessage} />
+                      )}
+
+                      {messageType === MESSAGE_TYPE.GoldBoxResultShare && (
+                        <ChatGoldBoxResultComponent chatMessage={chatMessage} />
                       )}
                     </div>
                   )

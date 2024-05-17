@@ -21,33 +21,43 @@ export function Battle({ headCss, battleHandler, refreshInventory }: any) {
   const [character, setCharacter] = useState<Character>()
   const battleScrollDivRef = useRef<HTMLDivElement>(null)
   const battlePreferenceRef = useRef<BattlePreferenceRef>()
+  const [battleError, setBattleError] = useState<any>()
 
   const activateBattle = async (mapName: string) => {
     setBattleResult(null)
-    const result = await fetchBattle(mapName)
-    if ((result?.drops?.length || 0) > 0) {
-      refreshInventory()
-      const types = _.uniq(result.drops!.map((item) => item.iType))
-      types.forEach((type) => {
-        console.log(type)
-        switch (type) {
-          case ItemTypeKind.Weapon:
-            battlePreferenceRef.current?.play(DropSoundKind.Weapon)
-            break
-          case ItemTypeKind.Misc:
-            battlePreferenceRef.current?.play(DropSoundKind.Etc)
-            break
-          default:
-            break
-        }
-      })
-    }
-    setBattleResult(result)
-    setBattleLogs(result.battleLogs)
-    setCharacter(result.character)
+    setBattleError(null)
+    try {
+      const result = await fetchBattle(mapName)
+      if ((result?.drops?.length || 0) > 0) {
+        refreshInventory()
+        const types = _.uniq(result.drops!.map((item) => item.iType))
+        types.forEach((type) => {
+          switch (type) {
+            case ItemTypeKind.Weapon:
+              battlePreferenceRef.current?.play(DropSoundKind.Weapon)
+              break
+            case ItemTypeKind.Misc:
+              battlePreferenceRef.current?.play(DropSoundKind.Etc)
+              break
+            default:
+              break
+          }
+        })
+      }
+      setBattleResult(result)
+      setBattleLogs(result.battleLogs)
+      setCharacter(result.character)
 
-    if (result.isWin) {
-      await battleHandler.refreshCharacterComponent()
+      if (result.isWin) {
+        await battleHandler.refreshCharacterComponent()
+      }
+    } catch (error: any) {
+      const { response } = error
+      const { status, data } = response || {}
+      if ([429, 600].includes(status)) {
+        setBattleError({ status, message: data?.message })
+        return
+      }
     }
   }
 
@@ -73,6 +83,28 @@ export function Battle({ headCss, battleHandler, refreshInventory }: any) {
         className="px-[24px] overflow-y-scroll max-h-[350px] h-[350px]"
         ref={battleScrollDivRef}
       >
+        {battleError && (
+          <div className="h-[300px] flex flex-col items-center justify-center text-[40px] gap-[20px] border border-blue-500 border-dashed bg-blue-100/30 rounded-lg">
+            <i className="text-[80px]  text-red-500 fa-solid fa-circle-exclamation" />
+            <div>
+              <div>
+                전투 요청이 너무 많거나 빨라서 스킵됨({battleError?.status})
+              </div>
+              <div className="text-[16px] text-center">
+                전투는 5초에 1번 이뤄져야 합니다.
+              </div>
+              <div className="text-[16px] text-center">
+                인터넷 통신에 문제가 있는 경우 요청을 뭉쳐서 보내기 때문에 이런
+                경우에도 나타날 수 있습니다.
+              </div>
+              {battleError.message && (
+                <div className="text-[14px] text-center text-red-500">
+                  {battleError.message}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         {battleResult && battleResult.monster && (
           <div className="mb-[10px]">
             <div className="w-[400px] flex items-center gap-[4px] text-sm ff-gs text-white text-[16px] pl-1 bg-gradient-to-r from-blue-gray-700 to-ruliweb/0 rounded-t">
@@ -118,7 +150,7 @@ export function Battle({ headCss, battleHandler, refreshInventory }: any) {
                     <div
                       className="absolute left-0 top-0 z-0 min-h-full bg-blue-600 flex justify-center min-h-[20px] text-white"
                       style={{
-                        width: `${(battleResult.battleLogs[battleResult.battleLogs.length - 1].player.currentMp / battleResult.character.mp) * 100}%`,
+                        width: `${(battleResult.battleLogs[battleResult.battleLogs.length - 1].player.currentMp / battleResult.battleLogs[0].player.maxMp) * 100}%`,
                       }}
                     />
                     <div className="bg-[#a5a8df] rounded min-h-[20px]" />
@@ -128,7 +160,7 @@ export function Battle({ headCss, battleHandler, refreshInventory }: any) {
                           battleResult.battleLogs.length - 1
                         ].player.currentMp
                       }{' '}
-                      / {battleResult.character.mp}
+                      / {battleResult.battleLogs[0].player.maxMp}
                     </div>
                   </div>
                 </div>

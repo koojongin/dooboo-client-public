@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Item, ItemTypeKind, Weapon } from '@/interfaces/item.interface'
 import { getItemByType } from '@/services/util'
 
@@ -18,4 +19,9 @@ const totalMiscPrice = (items: Item[]) => {
     }
     return prev + getItemByType(next).gold
   }, 0)
+}
+
+export const getLeftTime = (time: Date) => {
+  const distance = moment.duration(moment(time).diff(new Date()))
+  return `${`${distance.hours()}`.padStart(2, '0')}:${`${distance.minutes()}`.padStart(2, '0')}:${`${distance.seconds()}`.padStart(2, '0')}`
 }

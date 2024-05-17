@@ -3,7 +3,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import CharacterStatusComponent from '@/components/battle/character-status.component'
-import { Character, CharacterStat, User } from '@/interfaces/user.interface'
+import {
+  Character,
+  CharacterStat,
+  MeResponse,
+  User,
+} from '@/interfaces/user.interface'
 import InventoryComponent from '@/components/battle/inventory.component'
 import { fetchMe } from '@/services/api-fetch'
 import { InventoryRef, Item } from '@/interfaces/item.interface'
@@ -18,17 +23,23 @@ export default function Main() {
   const [stat, setStat] = useState<CharacterStat>()
   const [equippedItems, setEquippedItems] = useState<Item[]>([])
 
+  const [meResponse, setMeResponse] = useState<MeResponse>()
+
   const inventoryRef = useRef<InventoryRef>(null)
 
   const refreshMe = useCallback(async () => {
     try {
+      const result = await fetchMe()
       const {
         nextExp: rNextExp,
         user: dUser,
         character: dCharacter,
         stat: rStat,
         equippedItems: rEquippedItems,
-      } = await fetchMe()
+        deck,
+      } = result
+
+      setMeResponse(result)
 
       localStorage.setItem('characterId', dCharacter._id!)
       localStorage.setItem('nickname', dCharacter.nickname!)
@@ -54,7 +65,7 @@ export default function Main() {
     },
   }
 
-  const refreshInventory = () => {
+  const refreshInventory = async () => {
     inventoryRef?.current?.refresh()
   }
   useEffect(() => {
@@ -73,16 +84,16 @@ export default function Main() {
             />
           )}
         </div>
-        <div className="justify-between w-full flex gap-1">
+        <div className="justify-between items-start w-full flex gap-1">
           {user && (
             <CharacterStatusComponent
               character={character!}
-              user={user}
               nextExp={nextExp}
-              stat={stat}
+              stat={stat!}
               equippedItems={equippedItems}
               refreshInventory={refreshInventory}
               refreshMe={refreshMe}
+              meResponse={meResponse!}
             />
           )}
           {user && (

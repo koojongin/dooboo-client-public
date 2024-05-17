@@ -3,16 +3,16 @@
 import { useEffect, useState } from 'react'
 import { Card, Tooltip } from '@material-tailwind/react'
 import _ from 'lodash'
-import { fetchGetMap, fetchGetMapsName } from '@/services/api-fetch'
+import { fetchGetMapsName } from '@/services/api-fetch'
 import { DbMap } from '@/interfaces/map.interface'
 import toAPIHostURL from '@/services/image-name-parser'
 import createKey from '@/services/key-generator'
-import { DropTableItem } from '@/interfaces/drop-table.interface'
 import { Monster } from '@/interfaces/monster.interface'
 import { translate } from '@/services/util'
-import { BaseItemTypeKind, ItemTypeKind } from '@/interfaces/item.interface'
+import { BaseItemTypeKind } from '@/interfaces/item.interface'
 import { BaseMiscBoxTooltipComponent } from './base-misc-box-tooltip.component'
 import { BaseWeaponBoxTooltipComponent } from './base-weapon-box-tooltip.component'
+import { fetchGetMap } from '@/services/api-admin-fetch'
 
 type SelectableDbMap = DbMap & { isSelected?: boolean }
 type MixedDbMap = DbMap & { monsters: Monster[]; totalWeight: number }

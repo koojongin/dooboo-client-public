@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
+import { useRouter } from 'next/navigation'
 import { DEFAULT_THUMBNAIL_URL } from '@/constants/constant'
 import {
   getJobIconBgColor,
@@ -52,6 +53,7 @@ export function CommentListComponent({
   onRefresh?: () => void
   boardId?: string
 }) {
+  const router = useRouter()
   const [selectedCommentBoxIndex, setSelectedCommentBoxIndex] =
     useState<number>(-1)
 
@@ -129,7 +131,12 @@ export function CommentListComponent({
                       <div className="text-[11px] border rounded-[2px] px-[4px] py-[1px] bg-ruliweb text-white border-blue-900 ff-dodoom">
                         Lv.{comment.character.level}
                       </div>
-                      <div className="flex items-center gap-[4px]">
+                      <div
+                        className="flex items-center gap-[4px] cursor-pointer"
+                        onClick={() =>
+                          router.push(`/main/profile/${comment.character._id}`)
+                        }
+                      >
                         <div className="w-[18px] h-[18px]">
                           <img
                             style={{
@@ -247,7 +254,12 @@ export function CommentListComponent({
                         }
                       />
                     </div>
-                    <div className="font-bold flex gap-[2px] items-start flex-col">
+                    <div
+                      className="font-bold flex gap-[2px] items-start flex-col cursor-pointer"
+                      onClick={() =>
+                        router.push(`/main/profile/${subComment.character._id}`)
+                      }
+                    >
                       <div className="text-[11px] border rounded-[2px] px-[4px] py-[1px] bg-ruliweb text-white border-blue-900">
                         Lv.{subComment.character.level}
                       </div>

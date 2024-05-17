@@ -257,7 +257,6 @@ export default function TradeWeaponPage() {
               </div>
               <select
                 className="w-full border border-blue-gray-500 text-blue-gray-500 text-[16px] h-[26px]"
-                // label="정렬타입"
                 value={selectedSortType}
                 onChange={(e: any) => {
                   setSelectedSortType(e.target.value)

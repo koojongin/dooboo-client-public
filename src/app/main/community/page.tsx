@@ -6,10 +6,12 @@ import { fetchGetBoardList } from '@/services/api-fetch'
 import { Board } from '@/interfaces/board.interface'
 import createKey from '@/services/key-generator'
 import { ago } from '@/services/util'
-import GoogleAd from '@/components/ads/ads'
+import { CardSetCategory } from '@/constants/cards.enum'
+import { PickUpBox } from '@/app/main/gatcha/pickup-box.component'
 
 const { env } = process
 export default function CommunityPage() {
+  const router = useRouter()
   const [notices, setNotices] = useState<Board[]>([])
   const [freeBoards, setFreeBoards] = useState<Board[]>([])
   const [boards, setBoards] = useState<
@@ -41,6 +43,10 @@ export default function CommunityPage() {
     ])
   }
 
+  const goToGatcha = () => {
+    router.push('/main/gatcha')
+  }
+
   useEffect(() => {
     loadBoards()
   }, [])
@@ -58,7 +64,28 @@ export default function CommunityPage() {
           />
         )
       })}
+
       {/* BOARD ITEMS END */}
+      <div className="flex flex-wrap gap-[4px]">
+        {[
+          CardSetCategory.All,
+          CardSetCategory.HoshinoAndShiroko,
+          CardSetCategory.Mashiro,
+          CardSetCategory.Aru,
+          CardSetCategory.Wakamo,
+          CardSetCategory.ShokuhouMisaki,
+        ].map((categoryName, index) => {
+          return (
+            <div
+              key={createKey()}
+              className="max-w-[150px]"
+              onClick={() => goToGatcha()}
+            >
+              <PickUpBox event={{ categoryName }} />
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }

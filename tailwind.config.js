@@ -32,8 +32,14 @@ module.exports = withMT({
           '0%': { opacity: 0 },
           '100%': { opacity: 1 },
         },
+        cardIdle: {
+          '0%': { height: '100px' },
+          '50%': { height: '200px' },
+          '100%': { height: '100px' },
+        },
       },
       animation: {
+        cardIdle: 'cardIdle 5s cubic-bezier(0.65, 0.05, 0.36, 1) infinite',
         slideIn: 'slideIn .25s ease-in-out forwards var(--delay, 0)',
       },
     },

@@ -150,7 +150,7 @@ export function RunningStatusChip({
             if (onClick) onClick(baseQuest)
           }}
         >
-          퀘스트 완료
+          퀘스트 완료하기
         </div>
       )}
     </>

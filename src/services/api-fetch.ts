@@ -9,6 +9,7 @@ import {
   BaseWeaponListResponseDto,
   BaseWeaponResponseDto,
   EnhancedResult,
+  InventoryResponse,
   Weapon,
 } from '@/interfaces/item.interface'
 import {
@@ -81,18 +82,13 @@ export async function fetchGetMonster(id: string) {
   const { data } = await api.get(`/monster/${id}`)
   return data
 }
-export async function fetchGetMonsters() {
-  const { data } = await api.get('/monster/list')
+export async function fetchGetMonsters(condition = {}, opts = {}) {
+  const { data } = await api.post('/monster/list', { condition, opts })
   return data
 }
 
 export async function fetchPostMap(data: any) {
   const { data: response } = await api.post('/map/create', data)
-  return response
-}
-
-export async function fetchGetMap(id: string): Promise<GetMapResponse> {
-  const { data: response } = await api.get(`/map/${id}`)
   return response
 }
 
@@ -165,7 +161,11 @@ export async function fetchGetRankList(): Promise<{ characters: Character[] }> {
   return response
 }
 
-export async function fetchGetMyCurrency(): Promise<{ gold: number }> {
+export type CurrencyResponse = {
+  gold: number
+  diamond: number
+}
+export async function fetchGetMyCurrency(): Promise<CurrencyResponse> {
   const { data: response } = await api.get(`/character/currency`)
   return response
 }
@@ -177,12 +177,7 @@ export async function fetchGetRankByDamageList(): Promise<{
   return response
 }
 
-export async function fetchGetMyInventory(): Promise<{
-  items: Array<Weapon | any>
-  slots: number
-  isFulled: boolean
-  gold: number
-}> {
+export async function fetchGetMyInventory(): Promise<InventoryResponse> {
   const { data: response } = await api.get(`/character/inventory`)
   return response
 }
@@ -271,6 +266,11 @@ export async function fetchEnhanceWeapon(
   data: { itemIds: string[] },
 ): Promise<EnhancedResult> {
   const { data: response } = await api.post(`/item/enhance/${id}`, data)
+  return response
+}
+
+export async function fetchReRollWeapon(id: string): Promise<any> {
+  const { data: response } = await api.post(`/craft/reroll/${id}`)
   return response
 }
 

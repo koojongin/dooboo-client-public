@@ -64,7 +64,10 @@ export default function ItemBoxComponent({
   }, [])
 
   const itemBoxActionCallback = (type: string | any) => {
-    if (type === InventoryActionKind.AddToAuction) {
+    if (
+      type === InventoryActionKind.AddToAuction ||
+      type === InventoryActionKind.Consume
+    ) {
       if (setLastOpenedItemId) setLastOpenedItemId(undefined)
       setOpen(false)
     }

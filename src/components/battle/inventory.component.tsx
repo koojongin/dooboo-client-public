@@ -88,6 +88,7 @@ function InventoryComponent(
                       InventoryActionKind.Share,
                       InventoryActionKind.Equip,
                       InventoryActionKind.AddToAuction,
+                      InventoryActionKind.Consume,
                     ]}
                     onShowTotalDamage
                     equippedItems={equippedItems}

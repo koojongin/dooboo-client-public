@@ -3,7 +3,6 @@
 import { Card } from '@material-tailwind/react'
 import { useCallback, useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
-import createKey from '@/services/key-generator'
 import {
   fetchAcceptBaseQuest,
   fetchBaseQuest,
@@ -19,11 +18,7 @@ import {
 } from '@/interfaces/quest.interface'
 import { Pagination } from '@/interfaces/common.interface'
 import {
-  EmptyQuestBlock,
   QuestContainer,
-  QuestList,
-  QuestListPagination,
-  QuestTitle,
   RunningStatusChip,
 } from '@/app/main/inn/quest/quest-blocks'
 
@@ -110,7 +105,7 @@ export default function QuestPage() {
     if (isConfirmed) {
       await fetchAcceptBaseQuest(baseQuest._id!)
       setSelectedBaseQuest(undefined)
-      loadBaseQuests()
+      selectMenu(QuestPageMenuType.Running)
 
       await Swal.fire({
         title: '퀘스트가 수락되었습니다.',

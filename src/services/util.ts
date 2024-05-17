@@ -21,12 +21,19 @@ export const toMMDDHHMMSS = (date: string | Date) => {
   return moment(date).format('MM/DD HH:mm:ss')
 }
 
+export const toMMDDHHMMSSvDot = (date: string | Date) => {
+  return moment(date).format('MM.DD HH:mm:ss')
+}
+
 export const toMMDDHHMM = (date: string | Date) => {
   return moment(date).format('MM/DD HH:mm')
 }
 
 export const toHHMM = (date: string | Date) => {
   return moment(date).format('HH:mm')
+}
+export const toHHMMSS = (date: string | Date) => {
+  return moment(date).format('HH:mm:ss')
 }
 
 export const getItemByType = (item: Item) => {
@@ -55,6 +62,236 @@ export const toEmojiPath = (path: string) => {
 export const translate = (text: string) => {
   let parsedText = text
   switch (text) {
+    case 'card:option:IncreasedAllDamage':
+      parsedText = '피해 증가(%)'
+      break
+    case 'card:option:IncreasedLightningDamage':
+      parsedText = '번개 피해 증가(%)'
+      break
+    case 'card:option:IncreasedColdDamage':
+      parsedText = '냉기 피해 증가(%)'
+      break
+    case 'card:option:IncreasedFireDamage':
+      parsedText = '화염 피해 증가(%)'
+      break
+    case 'card:option:IncreasedPhysicalDamage':
+      parsedText = '물리 피해 증가(%)'
+      break
+    case 'card:option:IncreasedBowmanDamage':
+      parsedText = '궁수 피해 증가(%)'
+      break
+    case 'card:option:IncreasedWarriorDamage':
+      parsedText = '전사 피해 증가(%)'
+      break
+    case 'card:option:IncreasedRogueDamage':
+      parsedText = '도적 피해 증가(%)'
+      break
+    case 'card:option:IncreasedPowerStrikeDamage':
+      parsedText = '파워 스트라이크 피해 증가(%)'
+      break
+    case 'card:option:IncreasedPowerStrikeActivationRate':
+      parsedText = '파워 스트라이크 발동 확률 증가(%)'
+      break
+    case 'card:option:AddedPowerStrikeMpConsumption':
+      parsedText = '파워 스트라이크 마나 소모량'
+      break
+    case 'card:option:IncreasedCriticalRate':
+      parsedText = '치명타 확률(%)'
+      break
+    case 'card:option:IncreasedCriticalMultiplier':
+      parsedText = '치명타 배율(%)'
+      break
+    case 'card:option:IncreasedOddTurnDamage':
+      parsedText = '홀수 턴 피해 증가(%)'
+      break
+    case 'card:option:IncreasedEvenTurnDamage':
+      parsedText = '짝수 턴 피해 증가(%)'
+      break
+    case 'card:option:AddedLightningDamage':
+      parsedText = '번개 피해 추가(+)'
+      break
+    case 'card:option:AddedColdDamage':
+      parsedText = '냉기 피해 추가(+)'
+      break
+    case 'card:option:AddedFireDamage':
+      parsedText = '화염 피해 추가(+)'
+      break
+    case 'card:option:AddedPhysicalDamage':
+      parsedText = '물리 피해 추가(+)'
+      break
+    case 'card:option:AddedMp':
+      parsedText = 'Mp 추가'
+      break
+    case 'card:option:AddedHp':
+      parsedText = 'Hp 추가'
+      break
+    case 'card:option:AddedTurn':
+      parsedText = '추가 공격'
+      break
+    case 'card:option:AddedStr':
+      parsedText = '힘'
+      break
+    case 'card:option:AddedDex':
+      parsedText = '민첩'
+      break
+    case 'card:option:AddedLuk':
+      parsedText = '행운'
+      break
+
+    /// ////////////////
+    case 'card:mutsuki':
+      parsedText = '무츠키'
+      break
+    case 'card:miyako':
+      parsedText = '미야코'
+      break
+    case 'card:sakurako':
+      parsedText = '사쿠라코'
+      break
+    case 'card:haruna':
+      parsedText = '하루나'
+      break
+    case 'card:kirino':
+      parsedText = '키리노'
+      break
+
+    case 'card:izumi':
+      parsedText = '이즈미'
+      break
+    case 'card:sena':
+      parsedText = '세나'
+      break
+    case 'card:neru':
+      parsedText = '네루'
+      break
+    case 'card:koyuki':
+      parsedText = '코유키'
+      break
+    case 'card:kikyou':
+      parsedText = '키쿄우'
+      break
+    case 'card:tsukuyo':
+      parsedText = '츠쿠요'
+      break
+    case 'card:saori':
+      parsedText = '사오리'
+      break
+    case 'card:shimiko':
+      parsedText = '시미코'
+      break
+    case 'card:marina':
+      parsedText = '마리나'
+      break
+    case 'card:mari':
+      parsedText = '마리'
+      break
+    case 'card:aru':
+      parsedText = '아루'
+      break
+
+    case 'card:wakamo':
+      parsedText = '와카모'
+      break
+
+    case 'card:shokuhou-misaki':
+      parsedText = '쇼쿠호 미사키'
+      break
+
+    case 'card:shiroko':
+      parsedText = '시로코'
+      break
+
+    case 'card:hoshino':
+      parsedText = '호시노'
+      break
+
+    case 'card:mashiro':
+      parsedText = '마시로'
+      break
+
+    case 'card:misaka-mikoto':
+      parsedText = '미사카 미코토'
+      break
+
+    case 'card:miku':
+      parsedText = '미쿠'
+      break
+
+    case 'card:kaho':
+      parsedText = '카호'
+      break
+
+    case 'card:kayoko':
+      parsedText = '카요코'
+      break
+
+    case 'card:megu':
+      parsedText = '메구'
+      break
+
+    case 'card:kaede':
+      parsedText = '카에데'
+      break
+
+    case 'card:iroha':
+      parsedText = '이로하'
+      break
+
+    case 'card:kotama':
+      parsedText = '코타마'
+      break
+
+    case 'card:saki':
+      parsedText = '사키'
+      break
+
+    case 'card:yuzu':
+      parsedText = '유즈'
+      break
+
+    case 'card:chise':
+      parsedText = '치세'
+      break
+
+    case 'card:hare':
+      parsedText = '하레'
+      break
+
+    case 'card:haruka':
+      parsedText = '하루카'
+      break
+
+    case 'card:tsurugi':
+      parsedText = '츠루기'
+      break
+
+    case 'card:serina':
+      parsedText = '세리나'
+      break
+
+    case 'card:serika':
+      parsedText = '세리카'
+      break
+
+    case 'card:nodoka':
+      parsedText = '노도카'
+      break
+
+    case 'card:tomoe':
+      parsedText = '토모에'
+      break
+    case 'card:kotori':
+      parsedText = '코토리'
+      break
+    case 'card:yoshimi':
+      parsedText = '요시미'
+      break
+    case 'card:akari':
+      parsedText = '아카리'
+      break
+
+    /// //////////////////////////////////////////////
+
     case 'menu:weapon':
       parsedText = '무기'
       break
@@ -69,6 +306,9 @@ export const translate = (text: string) => {
       break
     case 'etc':
       parsedText = '기타'
+      break
+    case 'consume':
+      parsedText = '소비'
       break
     case 'menu:MessageLog':
       parsedText = '쪽지'
@@ -381,4 +621,12 @@ export function getJobIconBgColor(job: string) {
 export function isExistLoginToken() {
   if (typeof window === 'undefined') return false
   return !!localStorage.getItem('token')
+}
+
+export const pickByRate = (rate: number) => {
+  const compensateValue = 10000
+  return (
+    Math.floor(Math.random() * ((100 + 1) * compensateValue)) <=
+    compensateValue * rate
+  )
 }

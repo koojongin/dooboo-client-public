@@ -34,7 +34,7 @@ export function EmojiPopOver({ onSelect }: any) {
           <img src="/images/emoji/icon_emoji_select.png" />
         </div>
       </PopoverHandler>
-      <PopoverContent className="rounded p-0 m-0 p-[10px]">
+      <PopoverContent className="rounded m-0 p-[10px]">
         <div className="flex w-full overflow-x-scroll text-[16px]">
           {Object.keys(EmoticonKind).map((emoticonName, index, row) => {
             return (

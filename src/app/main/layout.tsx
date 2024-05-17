@@ -2,19 +2,6 @@ import MainHeader from '@/app/main/header.component'
 import { ChatComponent } from '@/app/main/chat.component'
 import AudioPlayBar from './audio-play-bar'
 
-// export const metadata: Metadata = {
-//   title: '두부 온라인',
-//   description: '두부 온라인',
-//   openGraph: {
-//     images: [
-//       {
-//         url: 'http://dooboo.online:3002/images/tofu.webp',
-//       },
-//       // {url: 'http://dooboo.online:3002/images/tofu.webp'}
-//     ],
-//   },
-// }
-
 export default function RootLayout({
   children,
 }: Readonly<{

@@ -141,7 +141,12 @@ export default function BoardDetail({
               />
             </div>
             <div className="flex flex-col gap-[4px] justify-center">
-              <div className="font-bold">
+              <div
+                className="font-bold cursor-pointer"
+                onClick={() =>
+                  router.push(`/main/profile/${board.character?._id}`)
+                }
+              >
                 [Lv.{board.character?.level}]{board.character?.nickname}
               </div>
               <div className="flex items-center gap-[4px] text-[12px]">

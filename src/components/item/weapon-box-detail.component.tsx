@@ -73,25 +73,30 @@ export default function WeaponBoxDetailComponent({
       }}
     >
       <div className="flex items-center justify-center py-[6px]">
-        {new Array(selectedItem?.maxStarForce).fill(1).map((v, index) => {
-          const isOnStarForce = index < selectedItem.starForce
-          return (
-            <img
-              className="w-[16px] h-[16px]"
-              key={createKey()}
-              src={`/images/star_${isOnStarForce ? 'on' : 'off'}.png`}
-            />
-          )
-        })}
+        <div className="flex items-center justify-center flex-wrap max-w-[260px]">
+          {new Array(selectedItem?.maxStarForce).fill(1).map((v, index) => {
+            const isOnStarForce = index < selectedItem.starForce
+            return (
+              <div key={createKey()} className="flex">
+                {index > 3 &&
+                  (index + 1) % 5 === 1 &&
+                  (index + 1) % 15 !== 1 && (
+                    <div className="w-[10px] h-[2px]" />
+                  )}
+                <img
+                  className="w-[16px] h-[16px]"
+                  key={createKey()}
+                  src={`/images/star_${isOnStarForce ? 'on' : 'off'}.png`}
+                />
+              </div>
+            )
+          })}
+        </div>
       </div>
       <div className="text-center text-2xl bg-[#9bb5c44f] ff-wavve">
         {selectedItem.name}
       </div>
       <div className="px-[10px] py-[2px] pt-[6px]">
-        {/*  <div className="flex justify-between">
-        <div className="">iType</div>
-        <div>{selectedItem.iType}</div>
-      </div> */}
         <div className="flex justify-between">
           <div className="">장비 분류</div>
           <div>{translate(selectedItem.weaponType) || '없음'}</div>

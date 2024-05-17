@@ -18,6 +18,7 @@ import {
   useState,
 } from 'react'
 import { useRouter } from 'next/navigation'
+import _ from 'lodash'
 import { fetchGetMonsters } from '@/services/api-fetch'
 import createKey from '@/services/key-generator'
 import {
@@ -27,16 +28,29 @@ import {
 } from '@/interfaces/monster.interface'
 import UpdateMonsterDialog from './update-monster-dialog'
 import { API_SERVER_URL } from '@/constants/constant'
+import { Pagination } from '@/interfaces/common.interface'
 
-const TABLE_HEAD = ['이미지', 'name', 'experience', 'hp', 'gold', 'weight', '']
+const TABLE_HEAD = [
+  '이미지',
+  '_id',
+  'map',
+  'name',
+  'experience',
+  'hp',
+  'gold',
+  'weight',
+  '-',
+]
 
 export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
   { customCss }: any,
   forwardedRef: ForwardedRef<any>,
 ) {
   const router = useRouter()
-  const [monsters, setMonsters] = useState<Monster[]>([])
-  const [result, setResult] = useState<any>()
+  const [pagination, setPagination] = useState<Pagination>()
+  const [monsters, setMonsters] = useState<
+    Array<Monster & { map?: { name: string } }>
+  >([])
   const monsterUpdateDialogRef = useRef<UpdateMonsterDialogRef>(null)
   const handleOpenUpdateMonsterDialog = (monster: Monster) => {
     monsterUpdateDialogRef?.current?.openDialog(monster)
@@ -57,8 +71,8 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
       monster.thumbnail = `${API_SERVER_URL}/${monster.thumbnail}`
       return monster
     })
-    setMonsters(mixedMonsters)
-    setResult({
+    setMonsters(_.sortBy(mixedMonsters, 'map.name'))
+    setPagination({
       total,
       totalPages,
       page,
@@ -67,7 +81,7 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
 
   useEffect(() => {
     refreshMonsters()
-  }, [])
+  }, [refreshMonsters])
 
   useImperativeHandle(forwardedRef, () => ({
     refresh: () => {
@@ -125,6 +139,12 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
                         className="w-[30px] h-[30px] border border-blue-gray-50 bg-blue-gray-50/50 object-contain"
                       />
                     </td>
+                    <td className={`${classes}`}>
+                      <div>{monster._id}</div>
+                    </td>
+                    <td className={`${classes}`} style={{ padding: 0 }}>
+                      <div>{monster?.map?.name}</div>
+                    </td>
                     <td className={classes}>
                       <div>{monster.name}</div>
                     </td>
@@ -155,25 +175,25 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
           </tbody>
         </table>
       </CardBody>
-      {result && (
-        <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-1">
-          <Button variant="outlined" size="sm">
-            Previous
-          </Button>
-          <div className="flex items-center gap-1">
-            {new Array(result.totalPages).fill(1).map((value, index) => {
-              return (
-                <IconButton variant="outlined" size="sm" key={createKey()}>
-                  {index + 1}
-                </IconButton>
-              )
-            })}
+      <div className="min-h-[27px] flex items-center px-[8px] border-t border-t-gray-400">
+        {pagination && (
+          <div className="w-full flex justify-center">
+            <div className="flex gap-[4px]">
+              {new Array(pagination.totalPages).fill(1).map((value, index) => {
+                return (
+                  <div
+                    // onClick={() => onClick(index + 1)}
+                    className={`cursor-pointer flex justify-center items-center w-[24px] h-[24px] text-[14px] font-bold ${index + 1 === pagination.page ? 'border text-[#5795dd]' : ''} hover:text-[#5795dd] hover:border`}
+                    key={createKey()}
+                  >
+                    {index + 1}
+                  </div>
+                )
+              })}
+            </div>
           </div>
-          <Button variant="outlined" size="sm">
-            Next
-          </Button>
-        </CardFooter>
-      )}
+        )}
+      </div>
     </Card>
   )
 })

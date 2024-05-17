@@ -47,6 +47,14 @@ export default function AdminChatListPage() {
                 {chatMessage.snapshot?.message && (
                   <div>{chatMessage.snapshot?.message}</div>
                 )}
+                {!chatMessage.snapshot?.message &&
+                  chatMessage.snapshot?.category?.indexOf('OPENED_GOLD_BOX') >=
+                    0 && (
+                    <div>
+                      {chatMessage.snapshot.snapshot.from},{' '}
+                      {chatMessage.snapshot.snapshot.gold.toLocaleString()}
+                    </div>
+                  )}
                 {!chatMessage.snapshot?.message && (
                   <div>
                     {chatMessage.snapshot?.originWeaponId && (

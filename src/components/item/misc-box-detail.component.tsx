@@ -1,14 +1,47 @@
 'use client'
 
 import Swal from 'sweetalert2'
-import { Weapon } from '@/interfaces/item.interface'
+import withReactContent from 'sweetalert2-react-content'
+import { useState } from 'react'
+import {
+  ItemTypeKind,
+  MiscTypeCategoryKind,
+  Weapon,
+} from '@/interfaces/item.interface'
 import { socket } from '@/services/socket'
-import { EMIT_SHARE_ITEM_EVENT } from '@/interfaces/chat.interface'
+import {
+  EMIT_SHARE_GOLD_BOX_RESULT_EVENT,
+  EMIT_SHARE_ITEM_EVENT,
+} from '@/interfaces/chat.interface'
 import createKey from '@/services/key-generator'
-import { toColorByGrade, toMMDDHHMMSS, translate } from '@/services/util'
+import {
+  parseHtml,
+  toColorByGrade,
+  toMMDDHHMMSS,
+  translate,
+} from '@/services/util'
 import { InventoryActionKind } from './item.interface'
 import { confirmSaleSetting } from '@/components/auction/add-to-auction-confirm'
+import { fetchConsumptionItem } from '@/services/api/api.item'
 
+function ShareGoldBoxResultButton({ systemLogId }: { systemLogId: string }) {
+  const [isClicked, setIsClicked] = useState(false)
+  const onClickShare = () => {
+    setIsClicked(true)
+    socket.emit(EMIT_SHARE_GOLD_BOX_RESULT_EVENT, { systemLogId })
+  }
+
+  return (
+    <div
+      className={`cursor-pointer w-[100px] h-[30px] flex items-center justify-center bg-green-500 text-white rounded ${isClicked ? 'hidden' : ''}`}
+      onClick={() => {
+        onClickShare()
+      }}
+    >
+      공유하기
+    </div>
+  )
+}
 export default function MiscBoxDetailComponent({
   item,
   actionCallback,
@@ -36,6 +69,25 @@ export default function MiscBoxDetailComponent({
     })
   }
 
+  const consumeItem = async () => {
+    if (actionCallback) actionCallback(InventoryActionKind.Consume)
+    const result = await fetchConsumptionItem(item._id)
+
+    const { earnedGold, systemLog } = result
+    if (earnedGold) {
+      withReactContent(Swal).fire({
+        html: (
+          <div className="flex flex-col justify-center items-center">
+            <div>{earnedGold.toLocaleString()} 골드 획득!</div>
+            <ShareGoldBoxResultButton systemLogId={systemLog?._id} />
+          </div>
+        ),
+        confirmButtonText: '닫기',
+      })
+    }
+
+    if (actionCallback) actionCallback()
+  }
   const addToAuction = async () => {
     if (actionCallback) actionCallback(InventoryActionKind.AddToAuction)
 
@@ -86,8 +138,8 @@ export default function MiscBoxDetailComponent({
               </div>
             </div>
           </div>
-          <div className="flex justify-between bg-gray-300 text-blue-gray-600 min-h-[30px] p-[10px]">
-            {selectedItem.baseMisc.desc}
+          <div className="flex flex-wrap justify-between bg-gray-300 text-blue-gray-600 min-h-[30px] p-[10px] max-w-[300px]">
+            {parseHtml(selectedItem.baseMisc.desc)}
           </div>
           <div className="border-b border-b-gray-400 border-dotted" />
           <div className="px-[10px] py-[2px]">
@@ -127,6 +179,17 @@ export default function MiscBoxDetailComponent({
                       onClick={() => addToAuction()}
                     >
                       거래소 등록
+                    </div>
+                  )}
+                {actions &&
+                  actions.includes(InventoryActionKind.Consume) &&
+                  item.misc?.baseMisc?.category ===
+                    MiscTypeCategoryKind.Consume && (
+                    <div
+                      className="flex items-center justify-center border border-white min-w-[40px] bg-green-400 rounded text-white px-[2px] cursor-pointer"
+                      onClick={() => consumeItem()}
+                    >
+                      사용
                     </div>
                   )}
               </div>

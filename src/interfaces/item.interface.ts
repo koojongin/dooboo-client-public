@@ -2,6 +2,7 @@ import { MongooseDocument, Pagination } from './common.interface'
 
 export enum MiscTypeCategoryKind {
   Etc = 'etc',
+  Consume = 'consume',
 }
 
 export enum ItemGradeKind {
@@ -56,6 +57,7 @@ export interface BaseMisc extends MongooseDocument {
   iType: string
   maxStack: number
   iGrade: string
+  desc: string
 }
 
 export interface Misc extends MongooseDocument {
@@ -158,4 +160,11 @@ export interface EnhancedResult {
     snapshot: Weapon
   }
   isSuccess: boolean
+}
+
+export interface InventoryResponse {
+  items: Array<Weapon | any>
+  slots: number
+  isFulled: boolean
+  gold: number
 }

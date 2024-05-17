@@ -16,8 +16,11 @@ export default function MainHeader() {
 
   return (
     <div className="flex items-center justify-start w-full mb-2 gap-1 [&>*>img]:h-[80px] [&>a]:flex">
-      <Link href="/main" className=" duration-300 cursor-pointer">
+      <Link href="/main/battle" className=" duration-300 cursor-pointer">
         <img src="/images/icon_001_battle.png" />
+      </Link>
+      <Link href="/main/gatcha" className=" duration-300 cursor-pointer">
+        <img src="/images/icon_004_gatcha.png" />
       </Link>
       <Link href="/main/skill" className=" duration-300 cursor-pointer">
         <img src="/images/icon_002_skill.png" />

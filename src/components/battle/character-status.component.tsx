@@ -1,32 +1,53 @@
 'use client'
 
 import { Card, CardBody, Tooltip } from '@material-tailwind/react'
-import { MeResponse } from '@/interfaces/user.interface'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  Character,
+  CharacterStat,
+  MeResponse,
+} from '@/interfaces/user.interface'
 import { Item } from '@/interfaces/item.interface'
 import toAPIHostURL from '@/services/image-name-parser'
 import { fetchUnequipItem } from '@/services/api-fetch'
 import { DEFAULT_THUMBNAIL_URL } from '@/constants/constant'
 import WeaponBoxDetailComponent from '@/components/item/weapon-box-detail.component'
 import { InventoryActionKind } from '@/components/item/item.interface'
+import CharacterStatusDeckListComponent from '@/components/battle/character-status-deck-list.component'
+import { fetchGetAllCardSet } from '@/services/api/api.card'
+import { GatchaCard } from '@/interfaces/gatcha.interface'
 
 export default (function CharacterStatusComponent({
-  user,
   character,
   nextExp,
   stat,
   equippedItems,
   refreshInventory,
   refreshMe,
-}:
-  | (MeResponse & {
-      refreshInventory: Promise<void>
-      refreshMe: Promise<void>
-    })
-  | any): JSX.Element {
+  meResponse,
+}: {
+  character: Character
+  nextExp: number
+  equippedItems: Item[]
+  stat: CharacterStat
+  refreshInventory: () => Promise<void>
+  refreshMe: () => Promise<void>
+  meResponse: MeResponse
+}) {
+  const [allCardSet, setAllCardSet] = useState<GatchaCard[]>()
   const unequipItem = async (item: Item) => {
     await fetchUnequipItem(item._id!)
     await Promise.all([refreshInventory(), refreshMe()])
   }
+
+  const loadAllCardSet = useCallback(async () => {
+    const result = await fetchGetAllCardSet()
+    setAllCardSet(result.cardSet)
+  }, [])
+
+  useEffect(() => {
+    loadAllCardSet()
+  }, [loadAllCardSet])
 
   const EXP_WIDTH = 250
   return (
@@ -81,12 +102,10 @@ export default (function CharacterStatusComponent({
               </div>
             </div>
           </div>
-
           <div className="w-full flex justify-between">
             <div>물리 피해</div>
             <div>{stat.damageOfPhysical}</div>
           </div>
-
           <div className="w-full flex justify-between">
             <div>화염 피해</div>
             <div>{stat.damageOfFire}</div>
@@ -149,6 +168,18 @@ export default (function CharacterStatusComponent({
                     </div>
                   )
                 })}
+            </div>
+          </div>
+          <hr className="mb-1" />
+          <div>
+            <div>사용중인 덱</div>
+            <div>
+              {meResponse.deck && (
+                <CharacterStatusDeckListComponent
+                  deck={meResponse.deck}
+                  allCardSet={allCardSet || []}
+                />
+              )}
             </div>
           </div>
         </div>

@@ -27,7 +27,7 @@ api.interceptors.response.use(
     const { code, message, response, request } = error
     const { status, data } = response || {}
 
-    if (status === 600) {
+    if ([600, 429].includes(status)) {
       return Promise.reject(error)
     }
 

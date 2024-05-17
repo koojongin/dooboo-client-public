@@ -2,12 +2,14 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { Card } from '@material-tailwind/react'
+import { useRouter } from 'next/navigation'
 import { fetchGetCharacterList } from '@/services/api-admin-fetch'
 import { ago, toMMDDHHMMSS } from '@/services/util'
 import createKey from '@/services/key-generator'
 import { Pagination } from '@/interfaces/common.interface'
 
 export default function AdminCharacterListPage() {
+  const router = useRouter()
   const [pagination, setPagination] = useState<Pagination>()
   const [characters, setCharacters] = useState<any[]>([])
   const loadCharacters = useCallback(async (selectedPage = 1) => {
@@ -34,8 +36,11 @@ export default function AdminCharacterListPage() {
           {characters.map((character, index) => {
             return (
               <div
+                onClick={() =>
+                  router.push(`/admindooboo/db/character/deck/${character._id}`)
+                }
                 key={character._id}
-                className="text-[14px] flex border-b border-b-gray-400 px-[4px] py-[2px] items-center [&>div]:border-r [&>div]:border-gray-600"
+                className="hover:bg-gray-100 cursor-pointer text-[14px] flex border-b border-b-gray-400 px-[4px] py-[2px] items-center [&>div]:border-r [&>div]:border-gray-600"
               >
                 <div className="w-[30px]">{index}.</div>
                 <div className="w-[30px]">{character.level}</div>

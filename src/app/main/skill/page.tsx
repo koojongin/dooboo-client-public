@@ -86,7 +86,16 @@ export default function SkillPage() {
             </div>
             <div>
               <div className="text-red-500 text-[14px]">
-                * 주의 : 스킬 칸 우하단의 화살표 클릭 시 바로 습득 됩니다
+                <div>
+                  * 주의 : 스킬 칸 우하단의 화살표 클릭 시 바로 습득 됩니다
+                </div>
+                <div className="text-gray-500">
+                  * 1차 전직 스킬포인트는 6~30레벨 구간에서만 획득 할 수
+                  있습니다. (총 75포인트)
+                </div>
+                <div className="text-gray-500">
+                  * 1차 전직 스킬포인트는 각 레벨당 3포인트를 얻습니다.
+                </div>
               </div>
             </div>
             {/* SKILL BOX START */}
