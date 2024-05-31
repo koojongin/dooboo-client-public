@@ -3,7 +3,11 @@ import AdminLayoutHeader from './admin-layout-header'
 import createKey from '@/services/key-generator'
 import LoginTokenButton from '@/app/admindooboo/login-token-button'
 
-const MY_CHARACTER_ID = '6603b3d5b7868c3b327f4c53'
+const ADMIN_CHARACTER_ID = [
+  '6603b3d5b7868c3b327f4c53',
+  '661bb8d417b534690a0459dd',
+  '6603a434b7868c3b327f4bf9', // 귀차나
+]
 
 export default function AdminRootLayout({
   children,
@@ -13,7 +17,10 @@ export default function AdminRootLayout({
   const headersList: any = headers()
   const referer = headersList.get('referer')
   const token = headersList.get('token')
-  if (token !== MY_CHARACTER_ID) {
+  if (
+    !ADMIN_CHARACTER_ID.includes(token) &&
+    process.env.NEXT_PUBLIC_ENVIRONMENT !== 'local'
+  ) {
     return (
       <div className="p-[40px] min-h-[300px] w-full bg-white my-[10px] flex flex-col gap-[10px]">
         관리자 외 접근금지

@@ -4,6 +4,7 @@ import _ from 'lodash'
 import { useState } from 'react'
 import createKey from '@/services/key-generator'
 import { translate } from '@/services/util'
+import { GatchaCard } from '@/interfaces/gatcha.interface'
 
 export function GatchaRateBoxComponent({ cardSet }: { cardSet: any[] }) {
   const [selectedCard, setSelectedCard] = useState()
@@ -93,7 +94,7 @@ export function GatchaRateBoxComponent({ cardSet }: { cardSet: any[] }) {
   )
 }
 
-function CardBox({ card }: { card: any }) {
+function CardBox({ card }: { card: GatchaCard }) {
   return (
     <div className="">
       <div className="p-[10px] flex gap-[10px] items-center bg-gray-200/50 border-b border-b-gray-300">
@@ -108,19 +109,19 @@ function CardBox({ card }: { card: any }) {
         </div>
       </div>
       <div className="p-[10px]">
-        {card.options.map(
-          (option: { name: string; value: number; level: number }) => {
-            return (
-              <div
-                key={`${card.name}_${option.name}`}
-                className="flex justify-between"
-              >
+        {card.options.map((option) => {
+          return (
+            <div key={`${card.name}_${option.name}`} className="flex flex-col">
+              <div className="flex items-center justify-between">
                 <div>{translate(`card:option:${option.name}`)}</div>
                 <div>{option.value}</div>
               </div>
-            )
-          },
-        )}
+              <div>
+                <div className="break-all">{option.desc}</div>
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

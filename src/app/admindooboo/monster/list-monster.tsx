@@ -17,9 +17,8 @@ import {
   useRef,
   useState,
 } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import _ from 'lodash'
-import { fetchGetMonsters } from '@/services/api-fetch'
 import createKey from '@/services/key-generator'
 import {
   Monster,
@@ -29,11 +28,14 @@ import {
 import UpdateMonsterDialog from './update-monster-dialog'
 import { API_SERVER_URL } from '@/constants/constant'
 import { Pagination } from '@/interfaces/common.interface'
+import { fetchGetMonsters } from '@/services/api-admin-fetch'
+import { DbMap } from '@/interfaces/map.interface'
 
 const TABLE_HEAD = [
   '이미지',
   '_id',
   'map',
+  'level',
   'name',
   'experience',
   'hp',
@@ -43,13 +45,18 @@ const TABLE_HEAD = [
 ]
 
 export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
-  { customCss }: any,
+  {
+    customCss,
+  }: {
+    customCss: any
+  },
   forwardedRef: ForwardedRef<any>,
 ) {
+  const searchParams = useSearchParams()
   const router = useRouter()
   const [pagination, setPagination] = useState<Pagination>()
   const [monsters, setMonsters] = useState<
-    Array<Monster & { map?: { name: string } }>
+    Array<Monster & { map?: { name: string } | DbMap }>
   >([])
   const monsterUpdateDialogRef = useRef<UpdateMonsterDialogRef>(null)
   const handleOpenUpdateMonsterDialog = (monster: Monster) => {
@@ -59,13 +66,19 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
     // handleOpenUpdateMonsterDialog(monster)
     router.push(`/admindooboo/monster/edit/${monster._id}`)
   }
-  const refreshMonsters = useCallback(async () => {
+
+  const onClickMap = (map?: DbMap | any) => {
+    if (!map) return
+    router.push(`/admindooboo/monster/${map._id}`)
+  }
+
+  const refreshMonsters = useCallback(async (condition = {}, opts = {}) => {
     const {
       monsters: rMonsters,
       total,
       totalPages,
       page,
-    } = await fetchGetMonsters()
+    } = await fetchGetMonsters(condition, { ...opts, sort: { updatedAt: -1 } })
     const mixedMonsters = rMonsters.map((m: any) => {
       const monster = { ...m }
       monster.thumbnail = `${API_SERVER_URL}/${monster.thumbnail}`
@@ -80,6 +93,14 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
   }, [])
 
   useEffect(() => {
+    const current = new URLSearchParams(Array.from(searchParams.entries()))
+    _.chain(current)
+      .map((a) => {
+        console.log(a)
+        return a
+      })
+      .value()
+    // router.push(`${pathname}?${current.toString()}`)
     refreshMonsters()
   }, [refreshMonsters])
 
@@ -96,16 +117,9 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
         refreshMonsters={refreshMonsters}
       />
       <CardHeader floated={false} shadow={false} className="rounded-none">
-        <div className="mb-4 flex flex-col justify-between gap-8 md:flex-row md:items-center">
-          <div className="text-2xl">등록된 몬스터 목록</div>
-          <div className="flex w-full shrink-0 gap-1 md:w-max">
-            <div className="w-full md:w-72">
-              <Input label="Search" />
-            </div>
-            <Button className="flex items-center gap-3" size="sm">
-              검색준비중
-            </Button>
-          </div>
+        <div className="flex justify-start items-center gap-[10px] [&>div]:bg-green-800 [&>div]:text-white [&>div]:p-[4px] [&>div]:cursor-pointer">
+          <div onClick={() => refreshMonsters()}>전체</div>
+          <div onClick={() => refreshMonsters({ inRaid: true })}>레이드</div>
         </div>
       </CardHeader>
       <CardBody className="overflow-scroll px-0">
@@ -142,8 +156,19 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
                     <td className={`${classes}`}>
                       <div>{monster._id}</div>
                     </td>
+                    <td
+                      className={`${classes} flex items-center justify-start`}
+                      style={{ padding: 0 }}
+                    >
+                      <div
+                        className="bg-green-500 text-white cursor-pointer"
+                        onClick={() => onClickMap(monster?.map)}
+                      >
+                        {monster?.map?.name}
+                      </div>
+                    </td>
                     <td className={`${classes}`} style={{ padding: 0 }}>
-                      <div>{monster?.map?.name}</div>
+                      <div>{monster.level}</div>
                     </td>
                     <td className={classes}>
                       <div>{monster.name}</div>
@@ -182,7 +207,7 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
               {new Array(pagination.totalPages).fill(1).map((value, index) => {
                 return (
                   <div
-                    // onClick={() => onClick(index + 1)}
+                    onClick={() => refreshMonsters({}, { page: index + 1 })}
                     className={`cursor-pointer flex justify-center items-center w-[24px] h-[24px] text-[14px] font-bold ${index + 1 === pagination.page ? 'border text-[#5795dd]' : ''} hover:text-[#5795dd] hover:border`}
                     key={createKey()}
                   >

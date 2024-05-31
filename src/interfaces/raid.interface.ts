@@ -1,4 +1,4 @@
-import { MongooseDocument } from '@/interfaces/common.interface'
+import { MongooseDocument, Pagination } from '@/interfaces/common.interface'
 import { Monster } from './monster.interface'
 import { Character } from '@/interfaces/user.interface'
 import { BattleLog } from '@/interfaces/battle.interface'
@@ -13,6 +13,10 @@ export interface Raid extends MongooseDocument {
   monsters: RaidMonster[]
   name: string
   raidLogs?: RaidLog[]
+  requiredLevel: number
+  damage: {
+    [key: string]: number
+  }
 }
 
 export interface RaidLog extends MongooseDocument {
@@ -26,4 +30,17 @@ export interface MergedRaidLog {
   owner: Character
   raidLogs: RaidLog[]
   lastBattledAt: Date | string
+}
+
+export interface ListRaidRewardResponse extends Pagination {
+  raidRewards: RaidReward[]
+}
+
+export interface RaidReward extends MongooseDocument {
+  expiredAt: Date
+  isRewarded: boolean
+  raidId: string
+  ranks: any[]
+  isTopRanked: boolean
+  raid: Raid
 }

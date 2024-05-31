@@ -102,6 +102,20 @@ export default function Page({
             <form onSubmit={onSubmit}>
               <div className="[&>*]:flex [&>*]:items-center [&>*]:gap-1 [&>*>:first-child]:min-w-[150px] flex flex-col gap-2">
                 <div>
+                  <div>정렬 순서</div>
+                  <div>
+                    <input
+                      type="number"
+                      className="border p-[4px]"
+                      value={shopItem.order}
+                      onChange={(e) =>
+                        setShopItem({ ...shopItem, order: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div>
                   <div>아이템 명</div>
                   <div>
                     <input

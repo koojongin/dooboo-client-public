@@ -10,7 +10,10 @@ export interface Monster extends MongooseDocument {
   thumbnail: string // 'public/upload/monsters/6052639b-a346-4e7d-bb29-1ad88093a20d.png'
   weight: number // 55
   rate?: number
-  drop?: { items: DropTableItem[] }
+  level: number
+  inRaid: boolean
+  isHide: boolean
+  drop?: { items: DropTableItem[] } & MongooseDocument
 }
 
 export type MonsterListRef = {

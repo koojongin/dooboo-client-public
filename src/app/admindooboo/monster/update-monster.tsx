@@ -3,7 +3,7 @@
 import { Button, Card, Input, Typography } from '@material-tailwind/react'
 import { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
-import { fetchPostMonster, fetchPutMonster } from '@/services/api-fetch'
+import { fetchPutMonster } from '@/services/api-fetch'
 import { Monster } from '@/interfaces/monster.interface'
 import toAPIHostURL from '@/services/image-name-parser'
 

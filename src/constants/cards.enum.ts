@@ -5,4 +5,5 @@ export enum CardSetCategory {
   Aru = 'Aru',
   Wakamo = 'Wakamo',
   ShokuhouMisaki = 'ShokuhouMisaki',
+  AzusaSwimsuit = 'AzusaSwimsuit',
 }

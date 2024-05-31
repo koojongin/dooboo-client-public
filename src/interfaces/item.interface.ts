@@ -44,6 +44,7 @@ export interface Weapon extends MongooseDocument {
   starForce: number
   maxStarForce: number
   weaponType: string
+  enhancedValue: number
   additionalAttributes?: {
     [key: string]: number
   }
@@ -155,7 +156,7 @@ export interface InnItem extends Item {
 }
 
 export interface EnhancedResult {
-  updatedWeapon: Weapon
+  weapon: Weapon
   enhancedLog: {
     snapshot: Weapon
   }

@@ -12,7 +12,6 @@ import React, {
 import Swal from 'sweetalert2'
 import _ from 'lodash'
 import {
-  CurrencyResponse,
   fetchGetMyCurrency,
   fetchGetMyInventory,
   fetchGetMyStash,
@@ -30,6 +29,7 @@ import { MeResponse } from '@/interfaces/user.interface'
 import { InventoryActionKind } from '@/components/item/item.interface'
 import ItemBoxComponent from '@/components/item/item-box'
 import { Stash } from '@/interfaces/stash.interface'
+import { CurrencyResponse } from '@/interfaces/currency.interface'
 
 export default function StashPage() {
   const [items, setItems] = useState<InnItem[]>([])

@@ -7,7 +7,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const currentPath = ''
   return (
     <div className="flex justify-center mt-2">
       {/* 컨텐츠 */}

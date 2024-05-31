@@ -82,3 +82,13 @@ export async function fetchPutShopItem(
   const { data: response } = await api.put(`/shop/update`, { shopItem })
   return response
 }
+
+export async function fetchGetMonsters(condition = {}, opts = {}) {
+  const { data } = await api.post('/monster/list', { condition, opts })
+  return data
+}
+
+export async function fetchGetMonstersByMap(condition = {}, opts = {}) {
+  const { data } = await api.post('/monster/map/list', { condition, opts })
+  return data
+}

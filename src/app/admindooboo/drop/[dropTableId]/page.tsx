@@ -79,6 +79,7 @@ function DropTableMonsterComponent({
     newDropTable.items.push({
       iType: 'BaseWeapon',
       roll: 0,
+      amount: 1,
     })
     setDropTable({ ...newDropTable })
   }
@@ -195,7 +196,23 @@ function DropTableMonsterComponent({
                     }}
                     value={dropItem.roll}
                   />
-                  <div>{((1 / dropItem.roll) * 100).toFixed(5)}%</div>
+                  <div>{((1 / dropItem.roll) * 100).toFixed(3)}%</div>
+                  <div className="flex items-center border border-gray-600">
+                    <div>수량</div>
+                    <input
+                      type="number"
+                      placeholder="드랍수량"
+                      className="w-[150px] max-w-[150px] flex border-2 rounded-md border-blue-200"
+                      onChange={(e) => {
+                        const newDropTable = { ...dropTable }
+                        newDropTable.items[index as number].amount = Number(
+                          e.target.value,
+                        )
+                        setDropTable(newDropTable)
+                      }}
+                      value={dropItem.amount}
+                    />
+                  </div>
                 </div>
               )
             })}

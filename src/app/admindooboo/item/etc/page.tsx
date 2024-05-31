@@ -14,8 +14,8 @@ export default function ItemMiscPage() {
   const [baseMiscs, setBaseMiscs] = useState<any[]>([])
   const [pagination, setPagination] = useState<Pagination>()
 
-  const loadBaseMiscs = useCallback(async () => {
-    const result = await fetchGetBaseMiscList()
+  const loadBaseMiscs = useCallback(async (selectedPage = 1) => {
+    const result = await fetchGetBaseMiscList({}, { page: selectedPage })
     setBaseMiscs(result.baseMiscs)
     setPagination({ ...result })
   }, [])
@@ -36,7 +36,7 @@ export default function ItemMiscPage() {
           Misc 목록
         </CardHeader>
         <CardBody>
-          <table className="w-full min-w-max table-auto text-left">
+          <table className="w-full table-auto text-left">
             <thead>
               <tr>
                 {[
@@ -101,6 +101,27 @@ export default function ItemMiscPage() {
                     </tr>
                   )
                 })}
+              <div>
+                {pagination && (
+                  <div className="w-full flex justify-center mt-[15px]">
+                    <div className="flex gap-[4px]">
+                      {new Array(pagination.totalPages)
+                        .fill(1)
+                        .map((value, index) => {
+                          return (
+                            <div
+                              onClick={() => loadBaseMiscs(index + 1)}
+                              className={`cursor-pointer flex justify-center items-center w-[24px] h-[24px] text-[14px] font-bold ${index + 1 === pagination.page ? 'border text-[#5795dd]' : ''} hover:text-[#5795dd] hover:border`}
+                              key={createKey()}
+                            >
+                              {index + 1}
+                            </div>
+                          )
+                        })}
+                    </div>
+                  </div>
+                )}
+              </div>
             </tbody>
           </table>
         </CardBody>

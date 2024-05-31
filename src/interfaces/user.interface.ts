@@ -1,5 +1,5 @@
 import { Item } from './item.interface'
-import { MongooseDocument } from '@/interfaces/common.interface'
+import { MongooseDocument, Pagination } from '@/interfaces/common.interface'
 import { GatchaCard } from '@/interfaces/gatcha.interface'
 
 export interface CharacterStat {
@@ -53,4 +53,11 @@ export interface RankLog extends MongooseDocument {
     averageDamage: number
     weapon?: any
   }
+}
+
+export interface RankListResponse extends Pagination {
+  characters: Character[]
+}
+export interface RankOfDamageListResponse extends Pagination {
+  ranks: RankLog[]
 }

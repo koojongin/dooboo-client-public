@@ -143,11 +143,16 @@ export default function CollectionMapsPage() {
                               }
                             >
                               <div className="flex flex-col border border-gray-300 cursor-pointer">
-                                <img
-                                  className="border-b bg-gray-200 p-[4px] w-[42px] h-[42px]"
-                                  src={toAPIHostURL(item.thumbnail)}
-                                />
-                                <div className="mt-[2px] flex flex-col gap-[2px]">
+                                <div className="flex items-center justify-center border-b bg-gray-200 min-w-[60px] min-h-[60px]">
+                                  <img
+                                    className="p-[4px] w-[42px] h-[42px]"
+                                    src={toAPIHostURL(item.thumbnail)}
+                                  />
+                                </div>
+                                <div className="mt-[2px] flex flex-col gap-[2px] min-h-[65px]">
+                                  <div className="ff-ba ff-skew text-center text-[10px]">
+                                    {item.name}
+                                  </div>
                                   <div className="ff-ba ff-skew text-center text-[10px]">
                                     {translate(item.weaponType)}
                                   </div>
@@ -186,11 +191,13 @@ export default function CollectionMapsPage() {
                               }
                             >
                               <div className="flex flex-col border border-gray-300 cursor-pointer">
-                                <img
-                                  className="border-b bg-gray-200 p-[4px] w-[42px] h-[42px]"
-                                  src={toAPIHostURL(item.thumbnail)}
-                                />
-                                <div className="mt-[2px] flex flex-col gap-[2px] min-h-[51px]">
+                                <div className="flex items-center justify-center border-b bg-gray-200 min-w-[60px] min-h-[60px]">
+                                  <img
+                                    className="p-[4px] w-[42px] h-[42px]"
+                                    src={toAPIHostURL(item.thumbnail)}
+                                  />
+                                </div>
+                                <div className="mt-[2px] flex flex-col gap-[2px] min-h-[65px]">
                                   <div className="ff-ba ff-skew text-center text-[10px]">
                                     {translate(item.category)}
                                   </div>

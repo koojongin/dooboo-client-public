@@ -3,6 +3,7 @@
 import { Card, Tooltip } from '@material-tailwind/react'
 import { useCallback, useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
+import _ from 'lodash'
 import toAPIHostURL from '@/services/image-name-parser'
 import {
   fetchGetShopList,
@@ -13,10 +14,13 @@ import { BaseMisc, InventoryResponse, Item } from '@/interfaces/item.interface'
 import createKey from '@/services/key-generator'
 import ItemBoxComponent from '@/components/item/item-box'
 import { InventoryActionKind } from '@/components/item/item.interface'
-import { fetchGetMyInventory } from '@/services/api-fetch'
+import { fetchGetMyCurrency, fetchGetMyInventory } from '@/services/api-fetch'
+import { Currency } from '@/interfaces/currency.interface'
+import { formatNumber } from '@/services/util'
 
 export default function ShopPage() {
   const [shopItems, setShopItems] = useState<ShopItem[]>([])
+  const [currency, setCurrency] = useState<Currency>()
   const [inventoryRes, setInventoryRes] = useState<InventoryResponse>()
 
   const loadShopList = useCallback(async () => {
@@ -25,7 +29,12 @@ export default function ShopPage() {
   }, [])
 
   const loadInventory = useCallback(async () => {
-    const result = await fetchGetMyInventory()
+    const [result, resultOfCurrency] = await Promise.all([
+      fetchGetMyInventory(),
+      fetchGetMyCurrency(),
+    ])
+
+    setCurrency(resultOfCurrency.currency)
     setInventoryRes(result)
   }, [])
 
@@ -83,21 +92,65 @@ export default function ShopPage() {
           </div>
         </div>
       </Card>
-
-      <Card className="rounded p-[10px]">
-        <div className="flex flex-col ">
-          <div className="text-[16px]">인벤토리</div>
-          <div className="flex flex-wrap w-[520px] gap-[2px]">
-            {inventoryRes && (
-              <InventoryBox
-                onRefresh={loadInventory}
-                items={inventoryRes.items}
-                slots={inventoryRes.slots}
-              />
-            )}
+      <div className="flex flex-col gap-[10px]">
+        <Card
+          className="rounded p-[10px] bg-contain bg-no-repeat bg-right"
+          style={{
+            backgroundImage: `url("/images/pickup/window-background.png")`,
+          }}
+        >
+          <Tooltip content="조각은 협동전투(레이드)에서 획득할 수 있습니다.">
+            <div className="flex flex-wrap gap-[4px] cursor-pointer">
+              {['쥐 조각', '박쥐 조각', '뱀 조각'].map((raidPieceName) => {
+                const { raidPiece = {} } = currency || {}
+                let raidPieceAmount = 0
+                try {
+                  raidPieceAmount = raidPiece[raidPieceName] || 0
+                } catch (error) {
+                  console.log(error)
+                }
+                return (
+                  <div
+                    key={createKey()}
+                    className="flex border border-blueGray-300 rounded ff-score-all font-bold text-[16px] p-[4px] items-center bg-contain shadow"
+                    style={{
+                      backgroundImage: `url("/images/pickup/background.png")`,
+                    }}
+                  >
+                    <img
+                      className="w-[24px] p-[2px]"
+                      src="/images/shop/icon_raid_piece.png"
+                    />
+                    <div>{raidPieceName}</div>
+                    <div className="flex items-center px-[2px]">
+                      <div className="pl-[4px] text-[14px] ff-ba font-normal">
+                        x
+                      </div>
+                      <div className="text-[16px]">
+                        {formatNumber(raidPieceAmount)}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </Tooltip>
+        </Card>
+        <Card className="rounded p-[10px]">
+          <div className="flex flex-col ">
+            <div className="text-[16px]">인벤토리</div>
+            <div className="flex flex-wrap w-[520px] gap-[2px]">
+              {inventoryRes && (
+                <InventoryBox
+                  onRefresh={loadInventory}
+                  items={inventoryRes.items}
+                  slots={inventoryRes.slots}
+                />
+              )}
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
     </div>
   )
 }
@@ -127,7 +180,11 @@ function InventoryBox({
                 className="p-[2px]"
                 item={item}
                 key={`shop_inventory_${item?._id || createKey()}_box`}
-                actions={[InventoryActionKind.Consume]}
+                actions={[
+                  InventoryActionKind.Consume,
+                  InventoryActionKind.AddToAuction,
+                  InventoryActionKind.Share,
+                ]}
               />
             )}
           </div>

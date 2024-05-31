@@ -27,7 +27,11 @@ api.interceptors.response.use(
     const { code, message, response, request } = error
     const { status, data } = response || {}
 
-    if ([600, 429].includes(status)) {
+    if ([502].includes(status)) {
+      window.location.href = `/register?accessToken=${localStorage.getItem('token')}`
+    }
+
+    if ([600, 429, 601].includes(status)) {
       return Promise.reject(error)
     }
 

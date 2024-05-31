@@ -94,7 +94,11 @@ function SelectItemDialog(
                     >
                       <Tooltip
                         interactive
-                        content={<div>{baseWeapon.name}</div>}
+                        content={
+                          <div>
+                            {baseWeapon.iLevel}/{baseWeapon.name}
+                          </div>
+                        }
                       >
                         <div className="max-w-[36px] w-[36px] h-[36px] p-[2px] border border-dark-blue">
                           <img

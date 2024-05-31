@@ -17,11 +17,11 @@ export const SortingType = {
   Desc: 'desc',
 }
 
-export const MessageLogCategoryKind = {
-  Message: 'message',
-  AuctionAdd: 'auction-add',
-  AuctionSold: 'auction-sold',
-  AuctionPurchase: 'auction-purchase',
-  AuctionRetrieve: 'auction-retrieve',
-  PickupLog: 'pickup-log',
+export enum MessageLogCategoryKind {
+  Message = 'message',
+  AuctionAdd = 'auction-add',
+  AuctionSold = 'auction-sold',
+  AuctionPurchase = 'auction-purchase',
+  AuctionRetrieve = 'auction-retrieve',
+  PickupLog = 'pickup-log',
 }

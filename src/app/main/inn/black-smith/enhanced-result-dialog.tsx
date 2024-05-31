@@ -379,11 +379,10 @@ function EnhancedResultDialog(
                 <div className="border-b border-b-dark-blue mb-[4px]" />
                 <div>
                   <div className="flex gap-[1px] justify-center">
-                    {new Array(result.updatedWeapon.maxStarForce)
+                    {new Array(result.weapon.maxStarForce)
                       .fill(1)
                       .map((v, index) => {
-                        const isOnStarForce =
-                          index < result.updatedWeapon.starForce
+                        const isOnStarForce = index < result.weapon.starForce
                         return (
                           <img
                             className="w-[16px] h-[16px]"
@@ -396,40 +395,40 @@ function EnhancedResultDialog(
                   <div className="flex justify-center">
                     <img
                       className="w-[40px] h-[40px]"
-                      src={toAPIHostURL(result.updatedWeapon.thumbnail)}
+                      src={toAPIHostURL(result.weapon.thumbnail)}
                     />
                   </div>
                   <div className="flex justify-center">
-                    {result.updatedWeapon.name}
+                    {result.weapon.name}
                   </div>
                   <div className="flex justify-between">
                     <div>물리 피해</div>
-                    <div>{result.updatedWeapon.damageOfPhysical}</div>
+                    <div>{result.weapon.damageOfPhysical}</div>
                   </div>
 
                   <div className="flex justify-between">
                     <div>화염 피해</div>
-                    <div>{result.updatedWeapon.damageOfFire}</div>
+                    <div>{result.weapon.damageOfFire}</div>
                   </div>
 
                   <div className="flex justify-between">
                     <div>번개 피해</div>
-                    <div>{result.updatedWeapon.damageOfLightning}</div>
+                    <div>{result.weapon.damageOfLightning}</div>
                   </div>
 
                   <div className="flex justify-between">
                     <div>냉기 피해</div>
-                    <div>{result.updatedWeapon.damageOfCold}</div>
+                    <div>{result.weapon.damageOfCold}</div>
                   </div>
 
                   <div className="flex justify-between">
                     <div>치명타 확률</div>
-                    <div>+{result.updatedWeapon.criticalRate}%</div>
+                    <div>+{result.weapon.criticalRate}%</div>
                   </div>
 
                   <div className="flex justify-between">
                     <div>치명타 배율</div>
-                    <div>+{result.updatedWeapon.criticalMultiplier}%</div>
+                    <div>+{result.weapon.criticalMultiplier}%</div>
                   </div>
                 </div>
               </div>

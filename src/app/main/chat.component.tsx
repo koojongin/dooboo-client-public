@@ -12,7 +12,7 @@ import {
   EMIT_GET_CHARACTERS_EVENT,
   EMIT_NOTICE_MESSAGE_EVENT,
   MESSAGE_EVENT,
-  MESSAGE_TYPE,
+  MessageType,
   ON_CHAT_EMOJI_EVENT,
   ON_CHAT_JOIN_EVENT,
   ON_CHAT_MESSAGE_EVENT,
@@ -32,6 +32,7 @@ import { ChatPickupLogComponent } from '@/components/chat/components/chat-pickup
 import { ChatCharacterPopOver } from '@/components/chat/components/chat-character-pop-over'
 import { ConnectedCharacterWrapper } from '@/components/chat/components/chat.types'
 import { ChatGoldBoxResultComponent } from '@/components/chat/components/chat-gold-box-result.component'
+import { ChatRaidOpenComponent } from '@/components/chat/components/chat-raid-open.component'
 
 export function ChatComponent() {
   const pathname = usePathname()
@@ -104,6 +105,7 @@ export function ChatComponent() {
 
   const addMessageEvent = (selectedSocket: Socket) => {
     selectedSocket.on(MESSAGE_EVENT, (eventName, data) => {
+      console.log(eventName, data)
       const localNickName = localStorage.getItem('nickname')
       const isMe = data?.message?.indexOf(`@${localNickName}`) >= 0 || false
       switch (eventName) {
@@ -157,6 +159,11 @@ export function ChatComponent() {
           })
           break
         case ON_SHARE_GOLD_BOX_RESULT_EVENT:
+          setChatMessages((before) => {
+            return [...before, data]
+          })
+          break
+        case MessageType.RaidOpen:
           setChatMessages((before) => {
             return [...before, data]
           })
@@ -276,13 +283,13 @@ export function ChatComponent() {
                   let messageType = ''
 
                   if (chatMessage.isSystem) {
-                    messageType = MESSAGE_TYPE.SYSTEM
+                    messageType = MessageType.System
                   }
 
                   if (!chatMessage.isSystem) {
-                    messageType = MESSAGE_TYPE.NORMAL
+                    messageType = MessageType.Normal
                     if (chatMessage.item) {
-                      messageType = MESSAGE_TYPE.ITEM_SHARE
+                      messageType = MessageType.ItemShare
                     }
                   }
 
@@ -298,11 +305,11 @@ export function ChatComponent() {
                         onClickMessage(chatMessage)
                       }}
                     >
-                      {messageType === MESSAGE_TYPE.ITEM_SHARE && (
+                      {messageType === MessageType.ItemShare && (
                         <ChatItemShareComponent chatMessage={chatMessage} />
                       )}
 
-                      {messageType === MESSAGE_TYPE.NORMAL && (
+                      {messageType === MessageType.Normal && (
                         <div className="break-all pl-[5px]">
                           {parseHtml(
                             `[${toHHMM(new Date(chatMessage.timestamp))}] ${chatMessage.nickname}: ${chatMessage.message}`,
@@ -312,7 +319,7 @@ export function ChatComponent() {
                         </div>
                       )}
 
-                      {messageType === MESSAGE_TYPE.EMOJI && (
+                      {messageType === MessageType.Emoji && (
                         <div className="break-all pl-[5px] flex flex-col wide:w-full">
                           <div>
                             {`[${toHHMM(new Date(chatMessage.timestamp))}] `}{' '}
@@ -326,29 +333,33 @@ export function ChatComponent() {
                         </div>
                       )}
 
-                      {messageType === MESSAGE_TYPE.SYSTEM && (
+                      {messageType === MessageType.System && (
                         <div className="break-all pl-[5px]">
                           {`[${toHHMM(new Date(chatMessage.timestamp))}] `}
                           {chatMessage.message}
                         </div>
                       )}
 
-                      {messageType === MESSAGE_TYPE.NOTICE && (
+                      {messageType === MessageType.Notice && (
                         <div className="break-all pl-[5px] bg-blue-gray-500 text-white py-[2px] text-[16px] w-full ff-ba ff-skew">
                           {chatMessage.message}
                         </div>
                       )}
 
-                      {messageType === MESSAGE_TYPE.ENHANCED_LOG && (
+                      {messageType === MessageType.EnhancedLog && (
                         <ChatEnhancedLogComponent chatMessage={chatMessage} />
                       )}
 
-                      {messageType === MESSAGE_TYPE.PICKUP_LOG && (
+                      {messageType === MessageType.PickUpLog && (
                         <ChatPickupLogComponent chatMessage={chatMessage} />
                       )}
 
-                      {messageType === MESSAGE_TYPE.GoldBoxResultShare && (
+                      {messageType === MessageType.GoldBoxResultShare && (
                         <ChatGoldBoxResultComponent chatMessage={chatMessage} />
+                      )}
+
+                      {messageType === MessageType.RaidOpen && (
+                        <ChatRaidOpenComponent chatMessage={chatMessage} />
                       )}
                     </div>
                   )

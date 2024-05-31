@@ -6,6 +6,7 @@ export interface DropTableItem extends MongooseDocument {
   item?: BaseWeapon | any
   iType: 'BaseWeapon' | string
   roll: number
+  amount: number
 }
 export interface DropTable extends MongooseDocument {
   items: DropTableItem[]

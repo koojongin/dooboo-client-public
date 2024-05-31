@@ -9,6 +9,7 @@ import createKey from '@/services/key-generator'
 const TIER_LEVEL_LIMIT = {
   tier1: 0,
   tier2: 20,
+  tier3: 31,
 }
 
 const getMaxTierByItemLevel = (iLevel: number) => {
@@ -160,6 +161,12 @@ export default function GradeInfoPage() {
                       </div>
                       <div className="flex justify-center items-center min-w-[80px]">
                         {attribute.tier2.range.join('~')}
+                      </div>
+                      <div className="flex justify-center items-center min-w-[80px]">
+                        {attribute.tier3.range.join('~')}
+                      </div>
+                      <div className="flex justify-center items-center min-w-[80px]">
+                        {attribute.tier4?.range.join('~')}
                       </div>
                     </div>
                   </div>

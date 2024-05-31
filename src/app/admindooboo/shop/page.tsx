@@ -54,10 +54,11 @@ export default function ItemMiscPage() {
           </div>
         </CardHeader>
         <CardBody>
-          <table className="w-full min-w-max table-auto text-left">
+          <table className="w-full table-auto text-left">
             <thead>
               <tr>
                 {[
+                  '순서',
                   '',
                   'name',
                   'content',
@@ -87,13 +88,14 @@ export default function ItemMiscPage() {
                       key={createKey()}
                       className="hover:bg-gray-100 [&>*:nth-child(even)]:bg-blue-gray-50/50"
                     >
+                      <td className="min-w-[40px]">{shopItem.order}</td>
                       <td className={`${classes} w-[50px]`}>
                         <img
                           src={toAPIHostURL(baseMisc.thumbnail)}
                           className="w-[40px] h-[40px] border border-blue-gray-50 bg-blue-gray-50/50 object-contain"
                         />
                       </td>
-                      <td>{baseMisc.name}</td>
+                      <td className="min-w-[150px]">{baseMisc.name}</td>
                       <td>{shopItem.content}</td>
                       <td>{baseMisc.desc}</td>
                       <td>{baseMisc.iGrade}</td>

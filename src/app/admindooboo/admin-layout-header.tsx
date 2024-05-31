@@ -10,7 +10,7 @@ export default function AdminLayoutHeader() {
   }
   return (
     <ButtonGroup>
-      <Button onClick={() => navigate('/')}>홈</Button>
+      {/* <Button onClick={() => navigate('/')}>홈</Button> */}
       <Button onClick={() => navigate('/admindooboo/monster')}>몬스터</Button>
       <Button onClick={() => navigate('/admindooboo/drop')}>드랍</Button>
       <Button onClick={() => navigate('/admindooboo/item')}>아이템</Button>

@@ -5,5 +5,5 @@ export default function ProfilePage({
 }: {
   params: { profileId: string }
 }) {
-  return <div />
+  return <div>프로필 페이지</div>
 }

@@ -93,8 +93,19 @@ export default function WeaponBoxDetailComponent({
           })}
         </div>
       </div>
-      <div className="text-center text-2xl bg-[#9bb5c44f] ff-wavve">
-        {selectedItem.name}
+      <div className="text-center bg-[#9bb5c44f] py-[5px]">
+        <div className="ff-wavve text-[24px]">{selectedItem.name}</div>
+        {selectedItem.starForce > 0 && selectedItem.iLevel > 30 && (
+          <div className="flex items-center justify-center gap-[4px]">
+            <div
+              className="bg-contain bg-no-repeat bg-center w-[20px] h-[20px]"
+              style={{
+                backgroundImage: `url('/images/black-smith/scroll.png')`,
+              }}
+            />
+            <div className="ff-wavve">+{selectedItem.enhancedValue}</div>
+          </div>
+        )}
       </div>
       <div className="px-[10px] py-[2px] pt-[6px]">
         <div className="flex justify-between">

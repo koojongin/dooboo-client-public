@@ -79,3 +79,10 @@ export async function fetchPickUpGuarenteedCard(
   })
   return response
 }
+
+export async function fetchChangeProfileCard(cardName: string) {
+  const { data: response } = await api.post(`/card/change-profile`, {
+    name: cardName,
+  })
+  return response
+}

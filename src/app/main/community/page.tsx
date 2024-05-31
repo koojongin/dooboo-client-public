@@ -66,7 +66,7 @@ export default function CommunityPage() {
       })}
 
       {/* BOARD ITEMS END */}
-      <div className="flex flex-wrap gap-[4px]">
+      {/* <div className="flex flex-wrap gap-[4px]">
         {[
           CardSetCategory.All,
           CardSetCategory.HoshinoAndShiroko,
@@ -85,7 +85,7 @@ export default function CommunityPage() {
             </div>
           )
         })}
-      </div>
+      </div> */}
     </div>
   )
 }

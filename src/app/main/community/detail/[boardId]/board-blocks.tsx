@@ -119,12 +119,12 @@ export function CommentListComponent({
               <div className="max-w-[160px] min-w-[160px] w-[160px] p-[8px] bg-gray-100 flex items-center gap-[4px]">
                 {!comment.isDeleted && (
                   <>
-                    <div className="w-[40px] h-[40px] min-w-[40px] min-h-[40px]">
-                      <img
-                        className="w-full h-full"
-                        src={
-                          comment.character.thumbnail || DEFAULT_THUMBNAIL_URL
-                        }
+                    <div className="w-[50px] h-[50px] min-w-[50px] min-h-[50px] p-[2px] border border-gray-200 rounded overflow-hidden bg-white">
+                      <div
+                        className="w-full h-full bg-center bg-cover"
+                        style={{
+                          backgroundImage: `url('${comment.character.thumbnail || DEFAULT_THUMBNAIL_URL}')`,
+                        }}
                       />
                     </div>
                     <div className="font-bold flex gap-[2px] items-start flex-col w-full">

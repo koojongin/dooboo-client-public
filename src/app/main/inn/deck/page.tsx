@@ -142,25 +142,34 @@ export default function DeckPage() {
                         )}
                         {baseCard && (
                           <Tooltip
+                            className="bg-black/80"
                             content={
                               <div>
-                                <div className="border-b border-b-white">
-                                  클릭시 덱에서 제외됩니다.
+                                <div className="border-b border-b-white mb-[5px]">
+                                  클릭 시 덱에서 제외됩니다.
                                 </div>
                                 {card?.options?.map((option) => {
                                   return (
                                     <div
                                       key={createKey()}
-                                      className="flex items-center justify-between"
+                                      className="flex flex-col"
                                     >
-                                      <div>
-                                        {translate(
-                                          `card:option:${option.name}`,
-                                        )}
+                                      <div className="flex items-center justify-between">
+                                        <div>
+                                          {translate(
+                                            `card:option:${option.name}`,
+                                          )}
+                                        </div>
+                                        <div className="ml-[10px]">
+                                          {option.value}
+                                        </div>
                                       </div>
-                                      <div className="ml-[10px]">
-                                        {option.value}
-                                      </div>
+                                      {option.desc && (
+                                        <div className="flex items-center gap-[5px]">
+                                          <i className="ml-[10px] fa-solid fa-turn-up rotate-90" />
+                                          <div>{option.desc}</div>
+                                        </div>
+                                      )}
                                     </div>
                                   )
                                 })}
@@ -199,20 +208,26 @@ export default function DeckPage() {
               .map((card) => {
                 return (
                   <Tooltip
+                    className="bg-black/80"
                     interactive
                     key={`card_frame_${card.name}`}
                     content={
                       <div>
                         {card.options.map((option) => {
                           return (
-                            <div
-                              key={createKey()}
-                              className="flex items-center justify-between"
-                            >
-                              <div>
-                                {translate(`card:option:${option.name}`)}
+                            <div key={createKey()} className="flex flex-col">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  {translate(`card:option:${option.name}`)}
+                                </div>
+                                <div className="ml-[10px]">{option.value}</div>
                               </div>
-                              <div className="ml-[10px]">{option.value}</div>
+                              {option.desc && (
+                                <div className="flex items-center gap-[5px]">
+                                  <i className="ml-[10px] fa-solid fa-turn-up rotate-90" />
+                                  <div>{option.desc}</div>
+                                </div>
+                              )}
                             </div>
                           )
                         })}
@@ -223,7 +238,7 @@ export default function DeckPage() {
                       className="p-[1px] border border-gray-500 shadow-md shadow-gray-400 cursor-pointer"
                       onClick={() => onClickCard(card)}
                     >
-                      <div className="flex flex-col border border-gray-300 min-w-[100px] items-center">
+                      <div className="flex flex-col border border-gray-300 min-w-[100px] max-w-[100px] items-center">
                         <div
                           className={`relative w-[100px] h-[100px] bg-cover bg-no-repeat bg-center ${(card.stack || 0) > 0 ? '' : 'brightness-[.2]'}`}
                           style={{
@@ -245,8 +260,10 @@ export default function DeckPage() {
                             />
                           ))}
                         </div>
-                        <div className="flex items-center justify-center ff-ba text-[16px] py-[4px] bg-blueGray-500 text-white w-full">
-                          {translate(`card:${card.name}`)}
+                        <div className="flex items-center justify-center py-[4px] bg-blueGray-500 text-white w-full max-w-full">
+                          <div className="ff-ba text-[16px] overflow-ellipsis truncate px-[4px]">
+                            {translate(`card:${card.name}`)}
+                          </div>
                         </div>
                       </div>
                     </div>

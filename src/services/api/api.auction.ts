@@ -44,3 +44,8 @@ export async function fetchRetrieveAuctionItem(
   const { data: response } = await api.post(`/auction/retrieve/${id}`)
   return response
 }
+
+export async function fetchStatistic(): Promise<any> {
+  const { data: response } = await api.post(`/auction/stat`)
+  return response
+}

@@ -17,9 +17,10 @@ import { CardSetCategory } from '@/constants/cards.enum'
 import { socket } from '@/services/socket'
 import { EMIT_PICKUP_LOG_MESSAGE_EVENT } from '@/interfaces/chat.interface'
 import { GatchaCard } from '@/interfaces/gatcha.interface'
-import { CurrencyResponse, fetchGetMyCurrency } from '@/services/api-fetch'
+import { fetchGetMyCurrency } from '@/services/api-fetch'
 import GuaranteedSelectDialog from '@/components/gatcha/guaranteed-select-dialog'
 import { GuaranteedSelectDialogRef } from '@/components/gatcha/gatcha.interface'
+import { CurrencyResponse } from '@/interfaces/currency.interface'
 
 enum GatchaState {
   Init = 'Init',
@@ -159,6 +160,7 @@ export default function SkillPage() {
               CardSetCategory.Aru,
               CardSetCategory.Wakamo,
               CardSetCategory.ShokuhouMisaki,
+              CardSetCategory.AzusaSwimsuit,
             ].map((categoryName, index) => {
               return (
                 <div
@@ -178,7 +180,7 @@ export default function SkillPage() {
                 className={`${gatchaState === GatchaState.Init ? '' : 'hidden'}`}
               >
                 <div
-                  className="flex flex-col gap-[20px] w-full justify-center items-center min-h-[500px]"
+                  className="flex flex-col gap-[20px] w-full justify-center items-center min-h-[500px] py-[20px]"
                   style={{ background: `url('/images/pickup/background.png')` }}
                 >
                   {cardSetCategory === CardSetCategory.All && (
@@ -200,7 +202,7 @@ export default function SkillPage() {
                       </div>
                     </div>
                   )}
-                  <div className="bg-white ff-ba ff-skew text-[20px] rounded border-gray-300 border shadow-lg shadow-gray-400">
+                  <div className="bg-white ff-ba ff-skew text-[20px] rounded border-gray-300 border shadow-lg shadow-gray-400 w-[500px]">
                     {!cardSetCategory && (
                       <div className="bg-transparent">데이터 불러오는중...</div>
                     )}

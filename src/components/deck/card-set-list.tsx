@@ -16,18 +16,24 @@ export function CardSetList({
         .map((card) => {
           return (
             <Tooltip
+              className="bg-black/75"
               interactive
               key={`card_frame_${card.name}`}
               content={
                 <div>
                   {card.options.map((option) => {
                     return (
-                      <div
-                        key={createKey()}
-                        className="flex items-center justify-between"
-                      >
-                        <div>{translate(`card:option:${option.name}`)}</div>
-                        <div className="ml-[10px]">{option.value}</div>
+                      <div key={createKey()} className="flex flex-col">
+                        <div className="flex items-center justify-between">
+                          <div>{translate(`card:option:${option.name}`)}</div>
+                          <div className="ml-[10px]">{option.value}</div>
+                        </div>
+                        {option.desc && (
+                          <div className="flex items-center gap-[5px]">
+                            <i className="ml-[10px] fa-solid fa-turn-up rotate-90" />
+                            <div>{option.desc}</div>
+                          </div>
+                        )}
                       </div>
                     )
                   })}

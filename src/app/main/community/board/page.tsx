@@ -104,7 +104,7 @@ export default function CommunityBoardPage() {
         <div className="bg-blue-gray-500 text-white py-1.5 border-b border-gray-300 flex gap-[1px]">
           <div className="pl-2 min-w-[100px]">구분</div>
           <div className="w-full flex gap-1 w-[400px] wide:w-full">제목</div>
-          <div className="min-w-[100px] max-w-[100px]">글쓴이</div>
+          <div className="min-w-[150px] max-w-[150px]">글쓴이</div>
           <div className="min-w-[50px] text-center">조회</div>
           <div className="min-w-[50px] text-center">추천</div>
           <div className="min-w-[120px] text-center">날짜</div>
@@ -142,15 +142,17 @@ export default function CommunityBoardPage() {
                 )}
               </div>
               <div
-                className="min-w-[100px] max-w-[100px] gap-[2px] cursor-pointer"
+                className="min-w-[150px] max-w-[150px] gap-[2px] cursor-pointer"
                 onClick={() =>
                   router.push(`/main/profile/${board.character._id}`)
                 }
               >
-                <div className="w-full min-w-[22px] min-h-[22px] max-w-[22px] rounded-full border border-white">
-                  <img
-                    className="w-full h-full"
-                    src={board.character.thumbnail || DEFAULT_THUMBNAIL_URL}
+                <div className="flex items-center justify-between min-w-[40px] min-h-[40px] w-[40px] h-[40px] rounded border border-gray-200 overflow-hidden p-[2px] bg-white">
+                  <div
+                    className="w-full h-full bg-cover bg-center"
+                    style={{
+                      backgroundImage: `url('${board.character.thumbnail || DEFAULT_THUMBNAIL_URL}')`,
+                    }}
                   />
                 </div>
                 <div className="min-w-[100px] max-w-[100px] truncate">

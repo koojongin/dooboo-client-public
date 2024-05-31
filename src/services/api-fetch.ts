@@ -1,16 +1,19 @@
 import api from '@/services/api'
-import { GetMapResponse, GetMapsResponse } from '@/interfaces/map.interface'
+import { GetMapsResponse } from '@/interfaces/map.interface'
 import { BattleResponseDto } from '@/interfaces/battle.interface'
-import { Character, MeResponse, RankLog } from '@/interfaces/user.interface'
 import {
-  BaseMisc,
-  BaseMiscListResponseDto,
+  Character,
+  MeResponse,
+  RankListResponse,
+  RankLog,
+  RankOfDamageListResponse,
+} from '@/interfaces/user.interface'
+import {
   BaseWeapon,
   BaseWeaponListResponseDto,
   BaseWeaponResponseDto,
   EnhancedResult,
   InventoryResponse,
-  Weapon,
 } from '@/interfaces/item.interface'
 import {
   DropTable,
@@ -18,8 +21,6 @@ import {
   DropTableResponseDto,
 } from '@/interfaces/drop-table.interface'
 import { Board, BoardListResponse } from '@/interfaces/board.interface'
-import { MongooseDocument, Pagination } from '@/interfaces/common.interface'
-import { AuctionListResponse } from '@/interfaces/auction.interface'
 import { SkillMeResponse } from '@/interfaces/skill.interface'
 import {
   BaseQuest,
@@ -31,6 +32,8 @@ import {
   MyStashListResponse,
   MyStashResponse,
 } from '@/interfaces/stash.interface'
+import { CurrencyResponse } from '@/interfaces/currency.interface'
+import { Pagination } from '@/interfaces/common.interface'
 
 interface CreateMonsterResponse {
   monster: {
@@ -82,11 +85,6 @@ export async function fetchGetMonster(id: string) {
   const { data } = await api.get(`/monster/${id}`)
   return data
 }
-export async function fetchGetMonsters(condition = {}, opts = {}) {
-  const { data } = await api.post('/monster/list', { condition, opts })
-  return data
-}
-
 export async function fetchPostMap(data: any) {
   const { data: response } = await api.post('/map/create', data)
   return response
@@ -156,24 +154,30 @@ export async function fetchDeleteBaseWeapon(
   return response
 }
 
-export async function fetchGetRankList(): Promise<{ characters: Character[] }> {
-  const { data: response } = await api.get(`/character/rank`)
+export async function fetchGetRankList(
+  condition = {},
+  opts = {},
+): Promise<RankListResponse> {
+  const { data: response } = await api.post(`/character/rank`, {
+    condition,
+    opts,
+  })
   return response
 }
 
-export type CurrencyResponse = {
-  gold: number
-  diamond: number
+export async function fetchGetRankByDamageList(
+  condition = {},
+  opts = {},
+): Promise<RankOfDamageListResponse> {
+  const { data: response } = await api.post(`/character/rank-by-damage`, {
+    condition,
+    opts,
+  })
+  return response
 }
+
 export async function fetchGetMyCurrency(): Promise<CurrencyResponse> {
   const { data: response } = await api.get(`/character/currency`)
-  return response
-}
-
-export async function fetchGetRankByDamageList(): Promise<{
-  ranks: RankLog[]
-}> {
-  const { data: response } = await api.get(`/character/rank-by-damage`)
   return response
 }
 
@@ -256,14 +260,28 @@ export async function fetchSellItems(
 
 export async function fetchGetEnhancePrice(
   id: string,
-): Promise<{ price: number } & any> {
-  const { data: response } = await api.get(`/item/enhance-price/${id}`)
+  data?: { scrollPercent: number },
+): Promise<
+  {
+    price: number
+    data: {
+      randomFlatDamage: number
+      randomFlatDamageRange: number
+      selectedFlat:
+        | 'damageOfPhysical'
+        | 'damageOfCold'
+        | 'damageOfFire'
+        | 'damageOfLightning'
+    }
+  } & any
+> {
+  const { data: response } = await api.post(`/item/enhance-price/${id}`, data)
   return response
 }
 
 export async function fetchEnhanceWeapon(
   id: string,
-  data: { itemIds: string[] },
+  data: { itemIds: string[]; scrollPercent: number },
 ): Promise<EnhancedResult> {
   const { data: response } = await api.post(`/item/enhance/${id}`, data)
   return response
@@ -271,6 +289,26 @@ export async function fetchEnhanceWeapon(
 
 export async function fetchReRollWeapon(id: string): Promise<any> {
   const { data: response } = await api.post(`/craft/reroll/${id}`)
+  return response
+}
+
+export async function fetchConvertWeapon(
+  id: string,
+  convertType: string,
+): Promise<any> {
+  const { data: response } = await api.post(`/craft/convert/${id}`, {
+    convertType,
+  })
+  return response
+}
+
+export async function fetchSplitWeapon(
+  id: string,
+  convertType: string,
+): Promise<any> {
+  const { data: response } = await api.post(`/craft/split/${id}`, {
+    convertType,
+  })
   return response
 }
 

@@ -15,6 +15,7 @@ export function PickUpBox({
     if (categoryName === CardSetCategory.Aru) return 3
     if (categoryName === CardSetCategory.ShokuhouMisaki) return 4
     if (categoryName === CardSetCategory.Wakamo) return 5
+    if (categoryName === CardSetCategory.AzusaSwimsuit) return 6
     return 0
   }
 
@@ -23,7 +24,7 @@ export function PickUpBox({
       <div className="border border-gray-600 flex flex-col p-[10px] rounded gap-[2px] border-dashed">
         <div className="ff-ba ff-skew">픽업 모집중</div>
         <div className="border-b-gray-500 border-b border-dashed my-[2px]" />
-        <div className="max-w-[250px]">
+        <div className="max-w-full w-full">
           <img
             className="w-full"
             src={`/images/pickup/pickup_${`${getEventNumber()}`.padStart(3, '0')}.webp`}

@@ -1,4 +1,4 @@
 export enum MapType {
   Normal = 'Normal',
-  Raid = 'Raid',
+  // Raid = 'Raid',
 }

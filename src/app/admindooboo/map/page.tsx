@@ -33,6 +33,7 @@ export default function MapPage() {
   }
 
   const editMap = (map: DbMap) => {
+    router.push(`/admindooboo/monster/${map._id}`)
     return
   }
   const deleteMap = async (map: DbMap) => {

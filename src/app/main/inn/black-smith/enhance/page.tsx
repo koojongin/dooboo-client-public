@@ -1,7 +1,7 @@
 'use client'
 
-import { Card } from '@material-tailwind/react'
-import { useEffect, useRef, useState } from 'react'
+import { Card, Tooltip } from '@material-tailwind/react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Swal from 'sweetalert2'
 import {
   fetchEnhanceWeapon,
@@ -16,6 +16,7 @@ import {
 import createKey from '@/services/key-generator'
 import ItemBoxComponent from '@/components/item/item-box'
 import EnhancedResultDialog from '../enhanced-result-dialog'
+import { InventoryActionKind } from '@/components/item/item.interface'
 
 export default function BlackSmithEnhancePage() {
   const enhancedResultDialogRef = useRef<EnhancedResultDialogRef>()
@@ -27,6 +28,12 @@ export default function BlackSmithEnhancePage() {
   const [enhancePrice, setEnhancePrice] = useState<{
     price: number
     successRate: number
+  }>()
+
+  const [scrollOption, setScrollOption] = useState<{ percent: number }>()
+
+  const [enhanceData, setEnhanceData] = useState<{
+    randomFlatDamageRange: number
   }>()
 
   const [enhancedResult, setEnhancedResult] = useState<any>()
@@ -58,7 +65,6 @@ export default function BlackSmithEnhancePage() {
 
     const { isConfirmed } = await Swal.fire({
       title: '정말로 강화하시겠습니까?',
-      text: '-' || '?',
       icon: 'question',
       confirmButtonText: '예',
       denyButtonText: `닫기`,
@@ -72,6 +78,7 @@ export default function BlackSmithEnhancePage() {
           selectedWeapons[2]._id!,
           selectedWeapons[3]._id!,
         ],
+        scrollPercent: scrollOption?.percent || 0,
       })
       await initialRefresh()
 
@@ -124,43 +131,107 @@ export default function BlackSmithEnhancePage() {
     }
   }
 
-  const updateEnhancePrice = async () => {
+  const updateEnhancePrice = useCallback(async () => {
     setEnhancePrice(undefined)
     if (!selectedWeapons[0]) return
-    const result = await fetchGetEnhancePrice(selectedWeapons[0]._id!)
+    if (selectedWeapons[0].weapon.iLevel > 30 && !scrollOption?.percent) return
+    const result = await fetchGetEnhancePrice(selectedWeapons[0]._id!, {
+      scrollPercent: scrollOption?.percent || 0,
+    })
     if (selectedWeapons[0]) setEnhancePrice(result)
-  }
+    setEnhanceData(result.data)
+  }, [scrollOption?.percent, selectedWeapons])
 
-  const initialRefresh = async () => {
+  const initialRefresh = useCallback(async () => {
     await refreshInventory()
     setSelectedWeapons([])
     setEnhancePrice(undefined)
-  }
+  }, [])
+
+  const onClickScroll = useCallback(async (percent: number) => {
+    setScrollOption({ percent })
+  }, [])
 
   useEffect(() => {
     if (selectedWeapons?.length <= 0) return
     updateEnhancePrice()
-  }, [selectedWeapons])
+  }, [selectedWeapons, updateEnhancePrice])
 
   useEffect(() => {
     initialRefresh()
-  }, [])
+  }, [initialRefresh])
   return (
     <div>
       <EnhancedResultDialog
         ref={enhancedResultDialogRef}
         result={enhancedResult}
       />
-      <Card className="rounded p-[8px]">
+      <Card className="rounded p-[8px] ff-score-all font-bold">
         <div className="flex items-center">
           <img src="/images/icon_currency.png" className="w-[30px]" />
           <div>{gold.toLocaleString()}</div>
         </div>
         <div className="flex items-stretch gap-[10px]">
-          <div className="grow basis-1 border flex flex-col gap-[2px] p-[8px] justify-center">
+          <div className="border flex flex-col gap-[2px] p-[8px] justify-center w-[650px]">
+            <div className="flex justify-center items-center">
+              스타포스는 무기 상단에 표시되어있는{' '}
+              <img
+                className="mb-[4px] w-[24px] h-[24px]"
+                src="/images/star_on.png"
+              />
+              입니다.
+            </div>
             <div className="w-full text-[16px] flex justify-center mb-[20px]">
               오른쪽의 인벤토리에서 강화할 아이템과 재료 아이템을 선택하세요
             </div>
+
+            {selectedWeapons[0]?.weapon.iLevel > 30 && (
+              <>
+                <div className="text-center text-[16px]">
+                  아래 주문서 중 하나를 선택하세요.
+                </div>
+                <div className="flex justify-center gap-[4px] mb-[20px]">
+                  {[
+                    { value: 2, percent: 100 },
+                    { value: 6, percent: 60 },
+                    { value: 15, percent: 10 },
+                  ].map((data) => {
+                    return (
+                      <Tooltip
+                        key={createKey()}
+                        content={
+                          <div>
+                            <div>{data.percent}% 확률로 성공</div>
+                            <div>
+                              성공 시 무작위 기본 피해 속성 +{data.value} 추가
+                              및 동일한 수치의 스타포스 파워 추가
+                            </div>
+                            <div>실패하더라도 스타포스 레벨 +1 추가</div>
+                          </div>
+                        }
+                      >
+                        <div
+                          className={`flex flex-col border p-[4px] pb-[2px] rounded cursor-pointer 
+                          ${scrollOption?.percent === data.percent ? 'border-2 border-green-800' : 'border-gray-200'}`}
+                          onClick={() => onClickScroll(data.percent)}
+                        >
+                          <img
+                            className="w-[40px]"
+                            src={`/images/black-smith/scroll${data.percent}.png`}
+                          />
+                          <div className="text-[14px] text-center">
+                            {data.percent}%
+                          </div>
+                          <div className="text-center text-[14px]">
+                            +{data.value}
+                          </div>
+                        </div>
+                      </Tooltip>
+                    )
+                  })}
+                </div>
+              </>
+            )}
 
             <div className="flex items-center justify-center gap-[2px]">
               <div>원본</div>
@@ -214,87 +285,210 @@ export default function BlackSmithEnhancePage() {
             </div>
             <div className="flex justify-center items-center w-full border rounded">
               <div className="text-[20px] min-h-[30px] flex justify-center items-center">
-                {enhancePrice && (
-                  <div className="flex items-center gap-[2px]">
-                    <div className="text-green-500">
-                      성공률: {enhancePrice.successRate}%
-                    </div>
-                    <div className="flex items-center text-amber-600">
-                      <div>{enhancePrice.price.toLocaleString()}</div>
-                      <img
-                        src="/images/icon_currency.png"
-                        className="w-[30px]"
-                      />
-                    </div>
-                  </div>
-                )}
                 {!enhancePrice && <div>알수없음</div>}
+                {enhancePrice && selectedWeapons[0]?.weapon.iLevel <= 30 && (
+                  <EnhancePriceInformation
+                    enhanceData={enhanceData}
+                    enhancePrice={enhancePrice}
+                  />
+                )}
+                {enhancePrice && selectedWeapons[0]?.weapon.iLevel > 30 && (
+                  <EnhancePriceScrollInformation
+                    enhanceData={enhanceData}
+                    enhancePrice={enhancePrice}
+                  />
+                )}
               </div>
             </div>
-
             <div className="flex justify-center">
               <div
                 className="text-[24px] bg-green-500 text-white px-[6px] py-[4px] rounded cursor-pointer"
                 onClick={() => enhanceWeapon()}
               >
-                강화하기
+                제련하기
               </div>
             </div>
 
-            <div className="flex flex-col gap-[2px] text-[16px] mt-[20px]">
-              <div className="text-[20px]">강화</div>
-              <div>재료 아이템 3개를 소모하여, 원본 아이템을 강화합니다.</div>
-              <div>
-                원본과 재료는 동일한 아이템 이어야하며, 소모된 아이템은
-                삭제됩니다.
-              </div>
-              <div>강화 성공 확률은 현재 강화레벨에 따라 변동됩니다.</div>
-              <div>
-                강화 성공 시, 아이템의 [1 ~ (총 물리+화염+냉기+번개 데미지)의
-                10% ] 값이 랜덤한 데미지로 추가 됩니다.
-              </div>
-            </div>
+            {/* Information----------------------*/}
+            {!selectedWeapons[0] && (
+              <>
+                <EnhanceBaseInformation />
+                <EnhanceScrollInformation />
+              </>
+            )}
+            {selectedWeapons[0] && (
+              <>
+                {selectedWeapons[0].weapon.iLevel > 30 && (
+                  <EnhanceScrollInformation />
+                )}
+                {selectedWeapons[0].weapon.iLevel <= 30 && (
+                  <EnhanceBaseInformation />
+                )}
+              </>
+            )}
           </div>
 
-          <div className="grow basis-1 border flex justify-center">
-            <div className="flex  flex-col">
+          <div className="border flex justify-center p-[10px]">
+            <div className="flex flex-col">
               <div>인벤토리</div>
-              <div className="">
-                <div>
-                  <div className="flex flex-wrap min-w-[514px] max-w-[514px] bg-gray-100 p-[2px] rounded shadow-md gap-[1px]">
-                    {new Array(100).fill(1).map((value, index) => {
-                      const item = items[index] || {}
-                      const disableSlotClass = 'bg-gray-800'
-                      const isOveredSlot =
-                        index >= maxItemSlots ||
-                        item?.iType === ItemTypeKind.Misc
-                      return (
-                        <div
-                          key={`black_smith_${item?._id || createKey()}`}
-                          className={`bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] ${isOveredSlot ? disableSlotClass : ''}`}
-                        >
-                          {isOveredSlot && (
-                            <div className="absolute z-10 bg-gray-800 bg-opacity-60 w-[50px] h-[50px] rounded" />
-                          )}
-                          {item && (
-                            <ItemBoxComponent
-                              className={`p-[2px] ${item?.isSelected ? 'bg-red-500' : ''}`}
-                              item={item}
-                              onShowTotalDamage
-                              actionCallback={() => {}}
-                              onSelect={onSelectItem}
-                            />
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
+              <div className="flex flex-wrap min-w-[514px] max-w-[514px] bg-gray-100 p-[2px] rounded shadow-md gap-[1px]">
+                {new Array(100).fill(1).map((value, index) => {
+                  const item = items[index] || {}
+                  const disableSlotClass = 'bg-gray-800'
+                  const isOveredSlot =
+                    index >= maxItemSlots || item?.iType === ItemTypeKind.Misc
+                  return (
+                    <div
+                      key={`black_smith_${item?._id || createKey()}`}
+                      className={`bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] ${isOveredSlot ? disableSlotClass : ''}`}
+                    >
+                      {isOveredSlot && (
+                        <div className="absolute z-10 bg-gray-800 bg-opacity-60 w-[50px] h-[50px] rounded" />
+                      )}
+                      {item && (
+                        <ItemBoxComponent
+                          className={`p-[2px] ${item?.isSelected ? 'bg-red-500' : ''}`}
+                          item={item}
+                          onShowTotalDamage
+                          actions={[InventoryActionKind.Share]}
+                          actionCallback={() => {}}
+                          onSelect={onSelectItem}
+                        />
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>
         </div>
       </Card>
+    </div>
+  )
+}
+
+function EnhanceBaseInformation() {
+  return (
+    <div className="flex flex-col gap-[2px] text-[16px] mt-[20px]">
+      <div className="text-[20px]">
+        일반 제련(아이템 레벨 30
+        <i className="fa-solid fa-arrow-down" />)
+      </div>
+      <div>재료 아이템 3개를 소모하여, 원본 아이템을 강화합니다.</div>
+      <div>
+        원본과 재료는 동일한 아이템 이어야하며, 소모된 아이템은 삭제됩니다.
+      </div>
+      <div>강화 성공 확률은 현재 강화레벨에 따라 변동됩니다.</div>
+      <div>
+        강화 성공 시, 아이템의 [1 ~ (총 기본속성 물리+화염+냉기+번개 데미지의
+        10%) ] 값이 무작위 수치로 추가 됩니다.
+      </div>
+    </div>
+  )
+}
+
+function EnhanceScrollInformation() {
+  return (
+    <div className="flex flex-col gap-[2px] text-[16px] mt-[20px]">
+      <div className="text-[20px]">
+        주문서 제련(아이템 레벨 31
+        <i className="fa-solid fa-arrow-up" />)
+      </div>
+      <div>재료 아이템 3개를 소모하여, 원본 아이템을 강화합니다.</div>
+      <div>
+        원본과 재료는 동일한 아이템 이어야하며, 소모된 아이템은 삭제됩니다.
+      </div>
+      <div>
+        강화 성공 시, 사용되는 주문서에 따라 무작위 기본 피해
+        속성(물리/화염/냉기/번개 중 하나)이 추가 됩니다.
+      </div>
+      <div className="text-red-500">
+        강화에 실패하더라도 스타포스가 +1 추가 됩니다.
+      </div>
+      <div className="flex flex-wrap items-center justify-start gap-[4px]">
+        <div>주문서 제련을 성공하면</div>
+        <div className="flex flex-wrap border border-blue-900 px-[3px] rounded items-center bg-blue-900 text-white gap-[4px]">
+          <div
+            className="bg-contain bg-no-repeat bg-center w-[20px] h-[20px]"
+            style={{
+              backgroundImage: `url('/images/black-smith/scroll.png')`,
+            }}
+          />
+          <div>스타포스 파워</div>
+        </div>
+        <div>가 주문서 수치에 따라 증가합니다.</div>
+      </div>
+      <div className="flex flex-wrap items-center justify-start gap-[4px]">
+        <div className="flex flex-wrap border border-blue-900 px-[3px] rounded items-center bg-blue-900 text-white gap-[4px]">
+          <div
+            className="bg-contain bg-no-repeat bg-center w-[20px] h-[20px]"
+            style={{
+              backgroundImage: `url('/images/black-smith/scroll.png')`,
+            }}
+          />
+          <div>스타포스 파워</div>
+        </div>
+        <div>+1 당 치명타 배율 +2%, 피해 +2%가 증가합니다.</div>
+      </div>
+      <div>
+        <img src="/images/black-smith/scroll-example.png" />
+      </div>
+    </div>
+  )
+}
+
+function EnhancePriceInformation({
+  enhanceData,
+  enhancePrice,
+}: {
+  enhanceData: any
+  enhancePrice: any
+}) {
+  return (
+    <div className="flex flex-col items-center gap-[2px]">
+      <div className="flex items-center gap-[2px]">
+        <div className="text-green-500">
+          성공률: {enhancePrice.successRate}%
+        </div>
+        <div className="flex items-center text-amber-600">
+          <div>{enhancePrice.price.toLocaleString()}</div>
+          <img src="/images/icon_currency.png" className="w-[30px]" />
+        </div>
+      </div>
+      {enhanceData && (
+        <div className="text-[16px] flex flex-col items-center justify-center text-center ff-score-all font-bold">
+          <div className="flex items-center">
+            <span className="text-[20px] bg-red-700 p-[4px] rounded text-white ff-ba">
+              1~
+              {parseInt(`${enhanceData.randomFlatDamageRange}`, 10)}
+            </span>
+            <span className="">중 무작위 수치가</span>
+          </div>
+          <span>무작위 속성(물리,화염,번개,냉기)으로 기본 속성에 추가됨.</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function EnhancePriceScrollInformation({
+  enhanceData,
+  enhancePrice,
+}: {
+  enhanceData: any
+  enhancePrice: any
+}) {
+  return (
+    <div className="flex flex-col items-center gap-[2px]">
+      <div className="flex items-center gap-[2px]">
+        <div className="text-green-500">
+          성공률: {enhancePrice.successRate}%
+        </div>
+        <div className="flex items-center text-amber-600">
+          <div>{enhancePrice.price.toLocaleString()}</div>
+          <img src="/images/icon_currency.png" className="w-[30px]" />
+        </div>
+      </div>
     </div>
   )
 }

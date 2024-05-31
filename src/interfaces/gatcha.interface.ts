@@ -8,7 +8,8 @@ export interface GatchaCard {
 }
 
 export interface CardOption {
-  name: 'AddedMp'
-  value: 20
-  level: 1
+  name: string
+  value: number
+  level: number
+  desc: string
 }

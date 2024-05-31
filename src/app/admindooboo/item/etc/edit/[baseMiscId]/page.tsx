@@ -180,7 +180,7 @@ export default function Page({
                   <div>설명</div>
                   <div className="w-full">
                     <textarea
-                      className="border w-full p-[5px]"
+                      className="border w-full p-[5px] min-h-[150px]"
                       value={baseMisc.desc}
                       onChange={(e) =>
                         setBaseMisc({ ...baseMisc, desc: e.target.value })

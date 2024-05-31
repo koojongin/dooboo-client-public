@@ -12,6 +12,7 @@ import {
   fetchReRollWeapon,
 } from '@/services/api-fetch'
 import toAPIHostURL from '@/services/image-name-parser'
+import { InventoryActionKind } from '@/components/item/item.interface'
 
 export default function BlackSmithRerollPage() {
   const [items, setItems] = useState<InnItem[]>([])
@@ -226,6 +227,7 @@ export default function BlackSmithRerollPage() {
                             className={`p-[2px] ${item?.isSelected ? 'bg-red-500' : ''}`}
                             item={item}
                             onShowTotalDamage
+                            actions={[InventoryActionKind.Share]}
                             actionCallback={() => {}}
                             onSelect={onSelectItem}
                           />

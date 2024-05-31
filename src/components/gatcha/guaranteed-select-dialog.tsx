@@ -28,15 +28,22 @@ function GuaranteedSelectDialog(
   const [open, setOpen] = useState(false)
   const [category, setCategory] = useState<CardSetCategory>()
   const [cards, setCards] = useState<GatchaCardExtended[]>([])
-  const handleOpen = async () => {
+  const handleOpen = async (cardSetCategory?: CardSetCategory) => {
     setOpen(!open)
+    await loadCards(cardSetCategory)
   }
 
-  const loadCards = useCallback(async () => {
-    if (!category) return
-    const result = await fetchGetGuarenteedPickUpCards(category)
-    setCards(result.cards)
-  }, [category])
+  const loadCards = useCallback(
+    async (cardSetCategory?: CardSetCategory) => {
+      setCards([])
+      if (!category) return
+      const result = await fetchGetGuarenteedPickUpCards(
+        cardSetCategory || category,
+      )
+      setCards(result.cards)
+    },
+    [category],
+  )
 
   const selectGuaranteedPickUp = async (cardName: string) => {
     setOpen(false)
@@ -53,14 +60,10 @@ function GuaranteedSelectDialog(
   useImperativeHandle(ref, () => ({
     open: async (cardSetCategory: CardSetCategory) => {
       setCategory(cardSetCategory)
-      await handleOpen()
+      await handleOpen(cardSetCategory)
     },
     refresh: () => {},
   }))
-
-  useEffect(() => {
-    loadCards()
-  }, [loadCards])
 
   return (
     <Dialog open={open} handler={handleOpen}>
@@ -73,6 +76,7 @@ function GuaranteedSelectDialog(
           </div>
         </div>
         <div className="flex flex-col gap-[4px]">
+          {cards.length === 0 && <div>Loading...</div>}
           {cards &&
             cards.map((card) => {
               return (

@@ -36,13 +36,15 @@ export function ProfileLeftBoxComponent({
         <div className="flex gap-[10px]">
           {character && (
             <>
-              <div className="w-[50px] h-[50px] min-w-[50px] min-h-[50px] border border-gray-600 rounded p-[1px] flex items-center justify-center">
-                <img
-                  className="w-full"
-                  src={character.thumbnail || DEFAULT_THUMBNAIL_URL}
+              <div className="w-[100px] h-[100px] min-w-[100px] min-h-[100px] border border-gray-600 rounded p-[1px] flex items-center justify-center">
+                <div
+                  className="w-full h-full bg-center bg-cover"
+                  style={{
+                    backgroundImage: `url('${character.thumbnail || DEFAULT_THUMBNAIL_URL}')`,
+                  }}
                 />
               </div>
-              <div className="w-full flex flex-col gap-[2px]">
+              <div className="w-full flex flex-col gap-[2px] min-w-[200px]">
                 <Tooltip
                   content={`[${translate(`job:${character.job ? character.job : 'novice'}`)}]${
                     character.nickname

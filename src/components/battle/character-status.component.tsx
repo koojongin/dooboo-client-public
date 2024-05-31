@@ -16,6 +16,7 @@ import { InventoryActionKind } from '@/components/item/item.interface'
 import CharacterStatusDeckListComponent from '@/components/battle/character-status-deck-list.component'
 import { fetchGetAllCardSet } from '@/services/api/api.card'
 import { GatchaCard } from '@/interfaces/gatcha.interface'
+import { ProfilePopover } from '@/components/popover/profile-popover'
 
 export default (function CharacterStatusComponent({
   character,
@@ -55,10 +56,27 @@ export default (function CharacterStatusComponent({
       <CardBody className="w-full">
         <div className="flex flex-col gap-1">
           <div className="flex gap-1">
-            <div className="w-[80px] h-[80px] min-w-[80px] min-h-[80px] border border-gray-600 rounded p-[1px] flex items-center justify-center">
-              {/* <img className="w-full" src="/images/ako.webp" /> */}
-              <img className="w-full" src={DEFAULT_THUMBNAIL_URL} />
-            </div>
+            <ProfilePopover
+              onSelect={async () => {
+                await refreshMe()
+              }}
+              child={
+                <div className="w-[80px] h-[80px] min-w-[80px] min-h-[80px] flex items-center justify-center border border-gray-300 rounded p-[2px]">
+                  {/* <img className="w-full" src="/images/ako.webp" /> */}
+                  {!character.thumbnail && (
+                    <img className="w-full" src={DEFAULT_THUMBNAIL_URL} />
+                  )}
+                  {character.thumbnail && (
+                    <div
+                      className="w-full h-full bg-cover bg-center"
+                      style={{
+                        backgroundImage: `url('${character.thumbnail}')`,
+                      }}
+                    />
+                  )}
+                </div>
+              }
+            />
             <div className="w-full flex flex-col gap-[2px]">
               <div className="flex w-full justify-between">
                 <div>Lv.{character.level}</div>

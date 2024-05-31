@@ -25,6 +25,12 @@ export function middleware(request: {
   })
 }
 
-export const config = {
+let dynamicConfig = {
   matcher: '/admindooboo/:path*',
 }
+if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
+  dynamicConfig = {
+    matcher: '/적용안함',
+  }
+}
+export const config = dynamicConfig

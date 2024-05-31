@@ -2,6 +2,7 @@ import {
   Popover,
   PopoverContent,
   PopoverHandler,
+  Tooltip,
 } from '@material-tailwind/react'
 import {
   Dispatch,
@@ -17,6 +18,7 @@ import { DbMap } from '@/interfaces/map.interface'
 import { fetchGetMapsName } from '@/services/api-fetch'
 import { MapType } from '@/components/battle/map.type'
 import { translate } from '@/services/util'
+import createKey from '@/services/key-generator'
 
 export function MapSelectComponent({
   activateBattle,
@@ -145,12 +147,12 @@ export function MapSelectPopoverComponent({
     setSelectedMap(mapName)
   }
   const onClickMapType = async (mapType: MapType) => {
-    if (mapType === MapType.Raid)
-      await Swal.fire({
-        title: '미지원',
-        text: '개발중',
-        icon: 'info',
-      })
+    // if (mapType === MapType.Raid)
+    //   await Swal.fire({
+    //     title: '미지원',
+    //     text: '개발중',
+    //     icon: 'info',
+    //   })
   }
 
   return (
@@ -193,17 +195,28 @@ export function MapSelectPopoverComponent({
                 <div className="flex flex-col">
                   {maps &&
                     maps.map((map) => {
+                      const { level } = map
+                      if (level <= 30) {
+                        return (
+                          <MapNameBox
+                            key={createKey()}
+                            map={map}
+                            onClick={() => selectMap(map.name)}
+                          />
+                        )
+                      }
                       return (
-                        <div
-                          key={`map_${map._id}`}
-                          className="py-[4px] flex items-center hover:bg-gray-100 cursor-pointer text-gray-800"
-                          onClick={() => selectMap(map.name)}
+                        <Tooltip
+                          content="지역 레벨이 31이상 부터는 착용 무기의 아이템 레벨이 지역 레벨보다 낮을 경우 피해가 75% 감소됩니다."
+                          key={createKey()}
                         >
-                          <div className="w-[50px] overflow-ellipsis truncate pr-[5px]">
-                            {map.level}
+                          <div>
+                            <MapNameBox
+                              map={map}
+                              onClick={() => selectMap(map.name)}
+                            />
                           </div>
-                          <div>{map.name}</div>
-                        </div>
+                        </Tooltip>
                       )
                     })}
                 </div>
@@ -213,5 +226,26 @@ export function MapSelectPopoverComponent({
         </div>
       </PopoverContent>
     </Popover>
+  )
+}
+
+function MapNameBox({
+  map,
+  onClick,
+}: {
+  map: DbMap
+  onClick: (mapName: string) => void
+}) {
+  return (
+    <div
+      key={`map_${map._id}`}
+      className="py-[4px] flex items-center hover:bg-gray-100 cursor-pointer text-gray-800"
+      onClick={() => onClick(map.name)}
+    >
+      <div className="w-[50px] overflow-ellipsis truncate pr-[5px]">
+        {map.level}
+      </div>
+      <div>{map.name}</div>
+    </div>
   )
 }

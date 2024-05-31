@@ -73,7 +73,7 @@ export default function MiscBoxDetailComponent({
     if (actionCallback) actionCallback(InventoryActionKind.Consume)
     const result = await fetchConsumptionItem(item._id)
 
-    const { earnedGold, systemLog } = result
+    const { earnedGold, systemLog, message } = result
     if (earnedGold) {
       withReactContent(Swal).fire({
         html: (
@@ -83,6 +83,13 @@ export default function MiscBoxDetailComponent({
           </div>
         ),
         confirmButtonText: '닫기',
+      })
+    }
+
+    if (message) {
+      await Swal.fire({
+        title: message || '아이템 사용됨.',
+        confirmButtonText: '확인',
       })
     }
 

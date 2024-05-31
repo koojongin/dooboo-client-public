@@ -15,9 +15,12 @@ export default function Register() {
   const [searchValidMessage, setSearchValidMessage] = useState('')
   const [isAvailableNickname, setIsAvailableNickname] = useState(false)
   const [accessToken, setAccessToken] = useState('')
+
+  const [nickNameValidaitonMessage, setNickNameValidaitonMessage] = useState('')
   const isDev = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
   const addHookString = '+webhook.incoming'
-  const loginUrl = `https://discord.com/oauth2/authorize?client_id=1219938115016458331&response_type=code&redirect_uri=https%3A%2F%2Fdooboo.online%3A3001%2Foauth2&scope=email+identify+guilds${isDev ? addHookString : ''}&&prompt=none`
+  // &&prompt=none
+  const loginUrl = `https://discord.com/oauth2/authorize?client_id=1219938115016458331&response_type=code&redirect_uri=https%3A%2F%2Fdooboo.online%3A3001%2Foauth2&scope=email+identify+guilds${isDev ? addHookString : ''}`
 
   const handleChange = (element: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(element.target.value)
@@ -32,6 +35,7 @@ export default function Register() {
     if (!isAvailable) setSearchValidMessage(message)
     else setSearchValidMessage('사용 가능한 닉네임입니다.')
 
+    setNickNameValidaitonMessage(message)
     setIsAvailableNickname(isAvailable)
   }
 
@@ -81,6 +85,14 @@ export default function Register() {
     }
   }
 
+  const logout = () => {
+    if (typeof window === 'undefined') return
+    localStorage.removeItem('token')
+    localStorage.removeItem('characterId')
+    localStorage.removeItem('nickname')
+    window.location.href = '/'
+  }
+
   return (
     <div className="flex justify-center">
       <div
@@ -89,7 +101,7 @@ export default function Register() {
         <ScaleLoader color="#36d7b7" />
       </div>
       <div className="min-w-[900px] bg-[url('/images/tofu.webp')] isolate relative bg-cover min-h-lvh flex flex-col items-center text-center text-black after:bg-white after:opacity-40 after:content-[''] after:absolute after:-z-10 after:inset-0">
-        <div className="full-center items-center flex flex-col">
+        <div className="w-full full-center items-center flex flex-col">
           <div className="py-10 w-full text-4xl">
             <div className="px-10 flex flex-col items-center">
               <div className="flex items-center pb-1">
@@ -104,13 +116,19 @@ export default function Register() {
                 />
               </div>
               <div
-                className={`text-2xl ${isAvailableNickname ? 'text-cyan-50' : 'text-red-800'}`}
+                className={`text-2xl ${isAvailableNickname ? 'bg-gray-800 text-cyan-400 p-[4px]' : 'bg-red-700 text-white p-[4px]'}`}
               >
                 {searchValidMessage}
               </div>
               <div className="text-xl text-red-800 text-red-800">
-                * 닉네임은 2~16자, 영어,한글만 가능합니다. (자음,모음 불가능)
+                * 닉네임은 2~16자, 영어,한글만 가능합니다. (자음,모음,영어
+                대문자 불가능)
               </div>
+              {nickNameValidaitonMessage && (
+                <div className="text-red-500 text-[16px]">
+                  {nickname}:{nickNameValidaitonMessage}
+                </div>
+              )}
             </div>
           </div>
           <button
@@ -119,6 +137,15 @@ export default function Register() {
           >
             가입하기
           </button>
+          <div className="w-full flex justify-end mr-[20px]">
+            <button
+              className="mt-[20px] flex flex-col text-[12px] border-2 justify-center items-center bg-red-700 text-white ff-score-all font-bold p-[10px]"
+              onClick={() => logout()}
+            >
+              <div>디스코드 로그인 상태</div>
+              <div>해제하고 로그아웃</div>
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -12,8 +12,12 @@ export function BaseMiscBoxTooltipComponent({ item }: { item: DropTableItem }) {
         <div>{selectedItem.iLevel}</div>
       </div>
       <div className="px-[12px] flex items-center justify-between">
+        <div>유형</div>
+        <div>{translate(`iType:${selectedItem.iType}`)}</div>
+      </div>
+      <div className="px-[12px] flex items-center justify-between">
         <div>카테고리</div>
-        <div>{selectedItem.category}</div>
+        <div>{translate(`iCategory:${selectedItem.category}`)}</div>
       </div>
       <div className="mt-[6px] border-b border-dashed border-dark-blue" />
       <div className="p-[12px] flex justify-between items-center bg-blue-gray-300 text-white">

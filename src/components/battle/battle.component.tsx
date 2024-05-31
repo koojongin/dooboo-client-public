@@ -1,6 +1,7 @@
 import { Card, Chip } from '@material-tailwind/react'
 import { useMemo, useRef, useState } from 'react'
 import _ from 'lodash'
+import Swal from 'sweetalert2'
 import { fetchBattle } from '@/services/api-fetch'
 import toAPIHostURL from '@/services/image-name-parser'
 import { Character } from '@/interfaces/user.interface'
@@ -57,6 +58,14 @@ export function Battle({ headCss, battleHandler, refreshInventory }: any) {
       if ([429, 600].includes(status)) {
         setBattleError({ status, message: data?.message })
         return
+      }
+      if ([601].includes(status)) {
+        Swal.fire({
+          title: error.message || '동일 아이피 에러',
+          icon: 'error',
+          confirmButtonText: '확인',
+        })
+        throw error
       }
     }
   }
@@ -117,13 +126,12 @@ export function Battle({ headCss, battleHandler, refreshInventory }: any) {
             {/* BattleLog Header Start */}
             <div className="w-full items-center gap-[50px] flex justify-center border-dotted border p-[4px] border-gray-700 mb-[10px] rounded">
               <div className="w-[350px] flex items-center gap-[4px] p-[10px] rounded border border-gray-300">
-                <div className="min-w-[100px] min-h-[100px] w-[100px] h-[100px] rounded overflow-hidden border border-gray-300">
-                  <img
-                    src={
-                      toAPIHostURL(character?.thumbnail) ||
-                      DEFAULT_THUMBNAIL_URL
-                    }
-                    className="w-full h-full rounded-lg"
+                <div className="min-w-[100px] min-h-[100px] w-[100px] h-[100px] rounded overflow-hidden border border-gray-300 p-[2px] overflow-hidden">
+                  <div
+                    className="w-full h-full bg-cover bg-center"
+                    style={{
+                      backgroundImage: `url('${character?.thumbnail || DEFAULT_THUMBNAIL_URL}')`,
+                    }}
                   />
                 </div>
                 <div className="flex flex-col gap-[2px] w-full text-[20px]">

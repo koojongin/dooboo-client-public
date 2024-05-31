@@ -125,7 +125,7 @@ export default function MessagePage() {
         <div>
           {pagination && (
             <div className="w-full flex justify-center mt-[15px]">
-              <div className="flex gap-[4px]">
+              <div className="flex gap-[4px] flex-wrap">
                 {new Array(pagination.totalPages)
                   .fill(1)
                   .map((value, index) => {

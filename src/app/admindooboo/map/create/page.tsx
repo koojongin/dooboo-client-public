@@ -5,9 +5,12 @@ import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/navigation'
-import { fetchGetMonsters, fetchPostMap } from '@/services/api-fetch'
+import { fetchPostMap } from '@/services/api-fetch'
 import { Monster } from '@/interfaces/monster.interface'
 import toAPIHostURL from '@/services/image-name-parser'
+import { fetchGetMonsters } from '@/services/api-admin-fetch'
+import { Pagination } from '@/interfaces/common.interface'
+import createKey from '@/services/key-generator'
 
 export default function MapCreatePage() {
   const {
@@ -26,6 +29,7 @@ export default function MapCreatePage() {
 
   const [monsters, setMonsters] = useState<Monster[]>([])
   const [selectedMonsters, setSelectedMonsters] = useState<Monster[]>([])
+  const [pagination, setPagination] = useState<Pagination>()
 
   const getValidationMessage = (data: any) => {
     let message = ''
@@ -56,9 +60,10 @@ export default function MapCreatePage() {
     router.push('/admindooboo/map')
   }
 
-  const loadMonsters = async () => {
-    const { monsters: rMonsters } = await fetchGetMonsters()
-    setMonsters(rMonsters)
+  const loadMonsters = async (selectedPage = 1) => {
+    const result = await fetchGetMonsters({}, { page: selectedPage })
+    setMonsters(result.monsters)
+    setPagination(result)
   }
 
   const removeMonster = (selectedMonster: Monster) => {
@@ -126,22 +131,48 @@ export default function MapCreatePage() {
                 </div>
               ))}
             </div>
-            <div className="flex flex-wrap border border-solid border-blue-gray-200 rounded mt-1">
-              {monsters &&
-                monsters.map((monster) => {
-                  return (
-                    <div
-                      key={monster._id}
-                      className="p-1 relative cursor-pointer min-w-20 min-h-20 max-w-32 border border-solid hover:font-bold hover:bg-gray-100"
-                      onClick={() => selectMonster(monster)}
-                    >
-                      <img className="" src={toAPIHostURL(monster.thumbnail)} />
-                      <div className="relative flex items-center justify-center">
-                        {monster.name}
+            <div>
+              <div className="flex flex-wrap border border-solid border-blue-gray-200 rounded mt-1">
+                {monsters &&
+                  monsters.map((monster) => {
+                    return (
+                      <div
+                        key={monster._id}
+                        className="p-1 relative cursor-pointer min-w-20 min-h-20 max-w-32 border border-solid hover:font-bold hover:bg-gray-100"
+                        onClick={() => selectMonster(monster)}
+                      >
+                        <img
+                          className=""
+                          src={toAPIHostURL(monster.thumbnail)}
+                        />
+                        <div className="relative flex items-center justify-center">
+                          {monster.name}
+                        </div>
                       </div>
+                    )
+                  })}
+              </div>
+              <div>
+                {pagination && (
+                  <div className="w-full flex justify-center mt-[15px]">
+                    <div className="flex gap-[4px] flex-wrap">
+                      {new Array(pagination.totalPages)
+                        .fill(1)
+                        .map((value, index) => {
+                          return (
+                            <div
+                              onClick={() => loadMonsters(index + 1)}
+                              className={`cursor-pointer flex justify-center items-center w-[24px] h-[24px] text-[14px] font-bold ${index + 1 === pagination.page ? 'border text-[#5795dd]' : ''} hover:text-[#5795dd] hover:border`}
+                              key={createKey()}
+                            >
+                              {index + 1}
+                            </div>
+                          )
+                        })}
                     </div>
-                  )
-                })}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex justify-center mt-5">
               <Button

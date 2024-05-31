@@ -1,9 +1,9 @@
 import { ForwardedRef, forwardRef, useImperativeHandle, useState } from 'react'
 import { Dialog, DialogBody, Tooltip } from '@material-tailwind/react'
 import { SelectItemDialogRef } from '@/interfaces/item.interface'
-import { fetchGetMonsters } from '@/services/api-fetch'
 import toAPIHostURL from '@/services/image-name-parser'
 import { Monster } from '@/interfaces/monster.interface'
+import { fetchGetMonsters } from '@/services/api-admin-fetch'
 
 function SelectMonsterDialog(
   { onSelectMonster }: any,

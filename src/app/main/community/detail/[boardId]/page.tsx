@@ -133,11 +133,13 @@ export default function BoardDetail({
           </div>
           <div className="flex p-[10px] border-b border-b-gray-400 gap-[4px]">
             <div className="w-[100px] h-[100px] border-b-gray-400 border p-[2px]">
-              <img
-                src={
-                  toAPIHostURL(board.character?.thumbnail) ||
-                  DEFAULT_THUMBNAIL_URL
-                }
+              <div
+                className="w-full h-full bg-cover bg-center"
+                style={{
+                  backgroundImage: `url('${
+                    board.character?.thumbnail || DEFAULT_THUMBNAIL_URL
+                  }')`,
+                }}
               />
             </div>
             <div className="flex flex-col gap-[4px] justify-center">

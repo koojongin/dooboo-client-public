@@ -14,7 +14,7 @@ export default function MonsterPage() {
   return (
     <Card>
       <CardBody>
-        <div className="grid justify-center grid-cols-10 gap-1">
+        <div className="flex flex-col">
           <MonsterListComponent customCss="col-span-7" ref={monsterListRef} />
           <Card className="col-span-3">
             <CardBody>

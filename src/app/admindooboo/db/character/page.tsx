@@ -15,7 +15,11 @@ export default function AdminCharacterListPage() {
   const loadCharacters = useCallback(async (selectedPage = 1) => {
     const result = await fetchGetCharacterList(
       {},
-      { sort: { lastBattledAt: -1 }, limit: 20, page: selectedPage },
+      {
+        sort: { lastBattledAt: -1, level: 1, nickname: 1 },
+        limit: 20,
+        page: selectedPage,
+      },
     )
 
     setCharacters(result.docs)
@@ -46,6 +50,8 @@ export default function AdminCharacterListPage() {
                 <div className="w-[30px]">{character.level}</div>
                 <div className="w-[100px]">{character.job}</div>
                 <div className="w-[120px]">{character.nickname}</div>
+                <div className="w-[50px]">{character.slots}</div>
+                <div className="w-[130px]">{character.ip}</div>
                 <div className="w-[120px]">
                   {character.gold.toLocaleString()}
                 </div>

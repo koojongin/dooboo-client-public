@@ -24,13 +24,14 @@ export const ON_PICKUP_LOG_MESSAGE_EVENT = 'share-pickup-log'
 
 export const MESSAGE_EVENT = 'message'
 
-export const MESSAGE_TYPE = {
-  SYSTEM: 'system',
-  NORMAL: 'normal',
-  ITEM_SHARE: 'item-share',
-  EMOJI: 'emoji',
-  NOTICE: 'notice',
-  ENHANCED_LOG: 'enhanced-log',
-  PICKUP_LOG: 'pickup-log',
-  GoldBoxResultShare: 'gold-box-result-share',
+export enum MessageType {
+  System = 'system',
+  Normal = 'normal',
+  ItemShare = 'item-share',
+  Emoji = 'emoji',
+  Notice = 'notice',
+  EnhancedLog = 'enhanced-log',
+  PickUpLog = 'pickup-log',
+  GoldBoxResultShare = 'gold-box-result-share',
+  RaidOpen = 'raid-open',
 }

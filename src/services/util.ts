@@ -62,6 +62,19 @@ export const toEmojiPath = (path: string) => {
 export const translate = (text: string) => {
   let parsedText = text
   switch (text) {
+    case 'card:option:ElementalTrinityOfLightning':
+      parsedText = '삼위일체 - 번개 피해 증가(%)'
+      break
+    case 'card:option:ElementalTrinityOfCold':
+      parsedText = '삼위일체 - 냉기 피해 증가(%)'
+      break
+    case 'card:option:ElementalTrinityOfFire':
+      parsedText = '삼위일체 - 화염 피해 증가(%)'
+      break
+    case 'card:option:ElementalTrinity':
+      parsedText = '삼위일체 - 원소 피해 증가(%)'
+      break
+
     case 'card:option:IncreasedAllDamage':
       parsedText = '피해 증가(%)'
       break
@@ -139,6 +152,57 @@ export const translate = (text: string) => {
       break
 
     /// ////////////////
+    case 'card:hanako-swimsuit':
+      parsedText = '수영복 하나코'
+      break
+    case 'card:chise-swimsuit':
+      parsedText = '수영복 치세'
+      break
+    case 'card:eimi-swimsuit':
+      parsedText = '수영복 에이미'
+      break
+    case 'card:azusa-swimsuit':
+      parsedText = '수영복 아즈사'
+      break
+
+    case 'card:chinatsu':
+      parsedText = '치나츠'
+      break
+    case 'card:atsuko':
+      parsedText = '아츠코'
+      break
+    case 'card:ako':
+      parsedText = '아코'
+      break
+    case 'card:akane':
+      parsedText = '아카네'
+      break
+    case 'card:asuna':
+      parsedText = '아스나'
+      break
+    case 'card:chihiro':
+      parsedText = '치히로'
+      break
+
+    case 'card:airi':
+      parsedText = '에이리'
+      break
+    case 'card:noa':
+      parsedText = '노아'
+      break
+    case 'card:minori':
+      parsedText = '미노리'
+      break
+    case 'card:saten-ruiko':
+      parsedText = '사텐 루이코'
+      break
+    case 'card:renge':
+      parsedText = '렌게'
+      break
+    case 'card:tsubaki':
+      parsedText = '츠바키'
+      break
+
     case 'card:mutsuki':
       parsedText = '무츠키'
       break
@@ -154,7 +218,6 @@ export const translate = (text: string) => {
     case 'card:kirino':
       parsedText = '키리노'
       break
-
     case 'card:izumi':
       parsedText = '이즈미'
       break
@@ -290,8 +353,34 @@ export const translate = (text: string) => {
       parsedText = '아카리'
       break
 
+    // convert
+    case 'convert:damageOfPhysical':
+      parsedText = '물리'
+      break
+    case 'convert:damageOfFire':
+      parsedText = '화염'
+      break
+    case 'convert:damageOfCold':
+      parsedText = '냉기'
+      break
+    case 'convert:damageOfLightning':
+      parsedText = '번개'
+      break
     /// //////////////////////////////////////////////
+    case 'iCategory:etc':
+      parsedText = '기타'
+      break
+    case 'iCategory:consume':
+      parsedText = '소비'
+      break
 
+    case 'iType:weapon':
+      parsedText = '무기'
+      break
+    case 'iType:misc':
+      parsedText = '기타'
+      break
+    /// ////////////////
     case 'menu:weapon':
       parsedText = '무기'
       break
