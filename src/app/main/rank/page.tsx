@@ -219,6 +219,46 @@ export default function CommunityPage() {
             (*전투지역의 허수아비를 공격시 갱신됩니다)
           </span>
         </div>
+        <div className="bg-blueGray-600/10 px-[10px] py-[4px]">
+          <div className="text-[14px] flex flex-col gap-[4px]">
+            <div className="flex items-center gap-[10px]">
+              <i className="text-[4px] fa-solid fa-circle" />
+              <div className="flex flex-wrap items-center gap-[4px]">
+                랭킹 1위 ~ 5위
+                <div className="flex items-center">
+                  <img
+                    src="/images/icon_diamond.webp"
+                    className="w-[18px] mr-[2px] mb-[2px]"
+                  />
+                  1,000개
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-[10px]">
+              <i className="text-[4px] fa-solid fa-circle" />
+              <div className="flex flex-wrap items-center gap-[4px]">
+                랭킹 6위 ~ 그 외 순위
+                <div className="flex items-center">
+                  <img
+                    src="/images/icon_diamond.webp"
+                    className="w-[18px] mr-[2px] mb-[2px]"
+                  />{' '}
+                  500개
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-[10px]">
+              <i className="text-[4px] fa-solid fa-circle" />
+              <div>매일 오후 1시, 7시에 초기화됩니다.</div>
+            </div>
+            <div className="flex items-center gap-[10px]">
+              <i className="text-[4px] fa-solid fa-circle" />
+              <div>
+                최소 1번 허수아비를 공격하여 참여해야 보상을 획득할 수 있습니다.
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="flex gap-1 px-[1px] py-[1px] bg-blue-gray-200 bg-dark-blue text-white">
           <div className="w-[40px] text-center">랭크</div>
           <div className="w-[40px] text-center">레벨</div>

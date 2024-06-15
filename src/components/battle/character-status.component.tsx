@@ -121,19 +121,19 @@ export default (function CharacterStatusComponent({
             </div>
           </div>
           <div className="w-full flex justify-between">
-            <div>물리 피해</div>
+            <div>기본 물리 피해</div>
             <div>{stat.damageOfPhysical}</div>
           </div>
           <div className="w-full flex justify-between">
-            <div>화염 피해</div>
+            <div>기본 화염 피해</div>
             <div>{stat.damageOfFire}</div>
           </div>
           <div className="w-full flex justify-between">
-            <div>냉기 피해</div>
+            <div>기본 냉기 피해</div>
             <div>{stat.damageOfCold}</div>
           </div>
           <div className="w-full flex justify-between">
-            <div>번개 피해</div>
+            <div>기본 번개 피해</div>
             <div>{stat.damageOfLightning}</div>
           </div>
 
@@ -144,6 +144,18 @@ export default (function CharacterStatusComponent({
           <div className="w-full flex justify-between">
             <div>치명타 배율</div>
             <div>+{stat.criticalMultiplier}%</div>
+          </div>
+          <div className="w-full flex justify-between">
+            <div>힘</div>
+            <div>+{stat.str}</div>
+          </div>
+          <div className="w-full flex justify-between">
+            <div>민첩</div>
+            <div>+{stat.dex}</div>
+          </div>
+          <div className="w-full flex justify-between">
+            <div>행운</div>
+            <div>+{stat.luk}</div>
           </div>
           <hr className="mb-1" />
           <div>

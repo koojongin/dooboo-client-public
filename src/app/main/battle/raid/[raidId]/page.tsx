@@ -71,7 +71,10 @@ export default function RaidDetailPage({
                 </div>
               </div>
             </div>
-
+            <div>
+              * 레이드 몬스터에게 입힐 수 있는 최대 피해량은 레이드 몬스터 최대
+              체력의 20%입니다.
+            </div>
             <div className="mt-[10px]">
               <div
                 className="w-full flex items-center justify-center bg-green-800 text-white h-[30px] cursor-pointer"
@@ -163,6 +166,9 @@ export function DropItemBox({
 
   if (isTopRank) {
     if (!['청휘석', '돈 주머니'].includes(item.name)) amount += 1
+    if (['돈 주머니'].includes(item.name)) {
+      amount *= 2
+    }
   }
 
   return (
@@ -239,7 +245,6 @@ function RaidLogListComponent({ raidLogs }: { raidLogs: RaidLog[] }) {
       }
     })
     .values()
-  console.log(test)
 
   const [openData, setOpenData] = useState<boolean[]>(
     new Array(mergedRaidLogs.length).fill(false),

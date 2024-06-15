@@ -20,11 +20,12 @@ import {
   fetchItemToStash,
   fetchMe,
   fetchMergeStackedItemInInventory,
+  fetchSalvageItems,
   fetchSellItems,
 } from '@/services/api-fetch'
 import { InnItem, ItemTypeKind } from '@/interfaces/item.interface'
 import createKey from '@/services/key-generator'
-import { getItemByType } from '@/services/util'
+import { formatNumber, getItemByType } from '@/services/util'
 import { MeResponse } from '@/interfaces/user.interface'
 import { InventoryActionKind } from '@/components/item/item.interface'
 import ItemBoxComponent from '@/components/item/item-box'
@@ -38,7 +39,7 @@ export default function StashPage() {
   const [isFulledInventory, setIsFulledInventory] = useState<boolean>()
   const [stashes, setStashes] = useState<Stash[]>([])
   const [selectedStash, setSelectedStash] = useState<Stash>()
-  const [currency, setCurrency] = useState<CurrencyResponse>()
+  const [currencyRes, setCurrencyRes] = useState<CurrencyResponse>()
 
   const refreshInventory = useCallback(async () => {
     const { items: rItems, slots, isFulled } = await fetchGetMyInventory()
@@ -57,7 +58,7 @@ export default function StashPage() {
 
   const loadMyCurrency = useCallback(async () => {
     const result = await fetchGetMyCurrency()
-    setCurrency(result)
+    setCurrencyRes(result)
   }, [])
 
   const loadStashes = useCallback(async () => {
@@ -77,13 +78,13 @@ export default function StashPage() {
   const syncData = useCallback(async () => {
     refreshInventory()
     refreshCharacterData()
-  }, [refreshCharacterData, refreshInventory])
+    loadMyCurrency()
+  }, [loadMyCurrency, refreshCharacterData, refreshInventory])
 
   useEffect(() => {
     syncData()
     loadStashes()
-    loadMyCurrency()
-  }, [loadMyCurrency, loadStashes, syncData])
+  }, [loadStashes, syncData])
 
   return (
     <div className="rounded w-full min-h-[500px]">
@@ -91,22 +92,43 @@ export default function StashPage() {
         <Card className="rounded shadow-none mb-[4px]">
           {!!characterData?.character && (
             <div className="flex items-center gap-[14px]">
-              <div className="flex items-center gap-[2px]">
-                <img src="/images/icon_currency.png" className="w-[30px]" />
-                <div className="text-[24px] ff-ba">
-                  {characterData.character.gold.toLocaleString()}
-                </div>
-              </div>
-              {currency && (
-                <div className="flex items-center gap-[2px]">
-                  <img
-                    src="/images/icon_diamond.webp"
-                    className="w-[22px] mr-[2px] mb-[2px]"
-                  />
-                  <div className="text-[24px] ff-ba">
-                    {currency.diamond.toLocaleString()}
+              <Tooltip content="골드">
+                <div className="flex items-center gap-[2px] cursor-pointer">
+                  <img src="/images/icon_currency.png" className="w-[30px]" />
+                  <div className="text-[20px] ff-ba">
+                    {characterData.character.gold.toLocaleString()}
                   </div>
                 </div>
+              </Tooltip>
+              {currencyRes && (
+                <>
+                  <Tooltip content="청휘석">
+                    <div className="flex items-center gap-[2px]">
+                      <img
+                        src="/images/icon_diamond.webp"
+                        className="w-[22px] mr-[2px] mb-[2px]"
+                      />
+
+                      <div className="text-[20px] ff-ba cursor-pointer">
+                        {formatNumber(currencyRes.currency.diamond)}
+                      </div>
+                    </div>
+                  </Tooltip>
+                  <Tooltip content="아이템 결정">
+                    <div className="flex items-center gap-[2px]">
+                      <div
+                        style={{
+                          backgroundImage: `url("/images/item/salvage_crystal_normal.png")`,
+                        }}
+                        className="w-[30px] h-[30px] bg-contain bg-no-repeat bg-center"
+                      />
+
+                      <div className="text-[20px] ff-ba cursor-pointer">
+                        {formatNumber(currencyRes.currency.itemCrystalOfNormal)}
+                      </div>
+                    </div>
+                  </Tooltip>
+                </>
               )}
             </div>
           )}
@@ -156,6 +178,40 @@ function InnInventory({
     await fetchMergeStackedItemInInventory()
     await syncData()
   }, [syncData])
+
+  const salvageSelectedItems = async () => {
+    const selectedItems = items.filter((item) => item.isSelected)
+    if (selectedItems.length === 0) return
+    if (
+      selectedItems.filter((item) => item.weapon).length !==
+      selectedItems.length
+    ) {
+      return Swal.fire({
+        title: `무기만 분해할 수 있습니다.`,
+        icon: 'warning',
+        confirmButtonText: '확인',
+      })
+    }
+    const { isConfirmed } = await Swal.fire({
+      title: `${selectedItems.length}개의 아이템을 분해 하시겠습니까?`,
+      icon: 'question',
+      confirmButtonText: '예',
+      denyButtonText: `닫기`,
+      showDenyButton: true,
+    })
+
+    if (isConfirmed) {
+      const itemIds = selectedItems.map((i) => i._id!).filter((data) => !!data)
+      const { currency, earned } = await fetchSalvageItems(itemIds)
+      Swal.fire({
+        title: `분해되었습니다. 아이템 결정 ${earned.itemCrystalOfNormal} 획득`,
+        icon: 'info',
+        confirmButtonText: '확인',
+      })
+      await syncData()
+    }
+  }
+
   const sellSelectedItems = async () => {
     const selectedItems = items.filter((item) => item.isSelected)
     const totalPrice = selectedItems.reduce((prev, next) => {
@@ -319,12 +375,22 @@ function InnInventory({
             >
               전체 선택
             </div>
-            <div
-              className="border py-[2px]  px-[5px] text-[16px] rounded text-white bg-red-400 cursor-pointer"
-              onClick={() => sellSelectedItems()}
-            >
-              선택된 아이템 판매
-            </div>
+            <Tooltip content="선택된 아이템을 판매합니다.">
+              <div
+                className="border py-[2px] px-[5px] text-[16px] rounded text-white bg-red-400 cursor-pointer"
+                onClick={() => sellSelectedItems()}
+              >
+                판매
+              </div>
+            </Tooltip>
+            <Tooltip content="선택된 아이템을 분해합니다. 무기만 분해 가능. 분해 시 아이템 결정을 얻습니다.">
+              <div
+                className="border py-[2px] px-[5px] text-[16px] rounded text-white bg-red-950 cursor-pointer"
+                onClick={() => salvageSelectedItems()}
+              >
+                분해
+              </div>
+            </Tooltip>
             <Tooltip content="중첩 가능한 아이템이 있는 경우 합칩니다.">
               <div
                 className="border py-[2px] px-[5px] text-[16px] rounded text-white bg-ruliweb cursor-pointer"

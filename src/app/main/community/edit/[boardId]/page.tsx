@@ -13,6 +13,7 @@ import { dataURLtoFile } from '@/services/util'
 import createKey from '@/services/key-generator'
 import 'react-quill/dist/quill.snow.css'
 import { QuillNoSSRWrapper } from '@/components/no-ssr-react-quill'
+import { ADMIN_CHARACTER_IDS } from '@/constants/constant'
 
 Quill.register('modules/ImageResize', ImageResize as any)
 export default function CommunityBoardEditPage({
@@ -25,6 +26,8 @@ export default function CommunityBoardEditPage({
   const [imageUrl, setImageUrl] = useState()
   const [content, setContent] = useState('')
   const [title, setTitle] = useState('')
+  const [category, setCategory] = useState('공지')
+  const [myCharacterId, setMyCharacterId] = useState<string>()
 
   const imageHandler = useCallback(() => {
     const quill = reactQuillRef.current?.getEditor()
@@ -179,6 +182,7 @@ export default function CommunityBoardEditPage({
     const result = await fetchPutBoard(params.boardId, {
       content,
       title,
+      category,
     })
 
     await Swal.fire({
@@ -200,6 +204,10 @@ export default function CommunityBoardEditPage({
     loadBoard()
   }, [loadBoard])
 
+  useEffect(() => {
+    setMyCharacterId(window.localStorage.getItem('characterId') || '')
+  }, [])
+
   return (
     <div className="ff-dodoom-all">
       <div className="mb-[4px]">
@@ -210,7 +218,30 @@ export default function CommunityBoardEditPage({
           placeholder="제목을 입력하세요"
         />
       </div>
-
+      {ADMIN_CHARACTER_IDS.includes(myCharacterId!) && (
+        <div className="border border-gray-300 p-[10px] mb-[4px]">
+          <div className="flex items-stretch h-[30px]">
+            <div className="flex items-center px-[10px] bg-blue-gray-400 text-white ff-wavve">
+              카테고리
+            </div>
+            <select
+              className="border border-blue-gray-400"
+              value={category}
+              onChange={(e) => {
+                setCategory(e.target.value)
+              }}
+            >
+              {['공지', '패치노트'].map((key) => {
+                return (
+                  <option key={createKey()} value={key}>
+                    {key}
+                  </option>
+                )
+              })}
+            </select>
+          </div>
+        </div>
+      )}
       <QuillNoSSRWrapper
         forwardedRef={reactQuillRef}
         // ref={reactQuillRef}

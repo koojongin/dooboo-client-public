@@ -22,8 +22,10 @@ import toAPIHostURL from '@/services/image-name-parser'
 import {
   EMIT_CHAT_MESSAGE_EVENT,
   EMIT_ENHANCED_LOG_MESSAGE_EVENT,
+  EMIT_PICKUP_LOG_MESSAGE_EVENT,
 } from '@/interfaces/chat.interface'
 import { socket } from '@/services/socket'
+import { GatchaCard } from '@/interfaces/gatcha.interface'
 
 enum SelectMenu {
   MessageLog,
@@ -37,19 +39,25 @@ export default function MessagePage() {
     SelectMenu.MessageLog,
   )
 
-  const loadMessages = useCallback(async (selectedPage = 1) => {
-    const result = await fetchGetMessageLogList(
-      {},
-      { limit: 20, page: selectedPage, sort: { createdAt: -1 } },
-    )
+  const [messageCondition, setMessageCondition] = useState({})
 
-    setMessageLogs(result.messageLogs)
-    setPagination({
-      page: result.page,
-      total: result.total,
-      totalPages: result.totalPages,
-    })
-  }, [])
+  const loadMessages = useCallback(
+    async (selectedPage = 1) => {
+      const result = await fetchGetMessageLogList(messageCondition, {
+        limit: 20,
+        page: selectedPage,
+        sort: { createdAt: -1 },
+      })
+
+      setMessageLogs(result.messageLogs)
+      setPagination({
+        page: result.page,
+        total: result.total,
+        totalPages: result.totalPages,
+      })
+    },
+    [messageCondition],
+  )
 
   const loadEnhancedLogs = useCallback(async (selectedPage = 1) => {
     const result = await fetchGetEnhancedLogList(
@@ -77,9 +85,7 @@ export default function MessagePage() {
   }
 
   useEffect(() => {
-    console.log(selectedMenu)
     if (selectedMenu === SelectMenu.MessageLog) {
-      console.log('?')
       loadMessages()
     }
     if (selectedMenu === SelectMenu.EnhancedLog) {
@@ -113,7 +119,10 @@ export default function MessagePage() {
         </div>
         <div className="flex flex-col border border-dashed border-gray-600 border-b-0">
           {selectedMenu === SelectMenu.MessageLog && (
-            <MessageLogList messageLogs={messageLogs} />
+            <MessageLogList
+              messageLogs={messageLogs}
+              setMessageCondition={setMessageCondition}
+            />
           )}
           {selectedMenu === SelectMenu.EnhancedLog && (
             <EnhancedLogList
@@ -220,9 +229,31 @@ function EnhancedLogList({
   )
 }
 
-function MessageLogList({ messageLogs }: { messageLogs: any[] }) {
+function MessageLogList({
+  messageLogs,
+  setMessageCondition,
+}: {
+  messageLogs: any[]
+  setMessageCondition: any
+}) {
   return (
     <>
+      <div className="flex flex-wrap gap-[4px] text-[20px] m-[4px]">
+        <div
+          className="px-[4px] py-[2px] border border-gray-500 ff-score font-bold cursor-pointer"
+          onClick={() => setMessageCondition({})}
+        >
+          전체
+        </div>
+        <div
+          className="px-[4px] py-[2px] border border-gray-500 ff-score font-bold cursor-pointer"
+          onClick={() =>
+            setMessageCondition({ category: MessageLogCategoryKind.PickupLog })
+          }
+        >
+          픽업기록
+        </div>
+      </div>
       {messageLogs.map((messageLog) => {
         return (
           <div key={createKey()}>
@@ -233,18 +264,82 @@ function MessageLogList({ messageLogs }: { messageLogs: any[] }) {
     </>
   )
 }
+
+function GatchaLogBox({
+  messageLog,
+}: {
+  messageLog: {
+    _id: string
+    snapshot: { category: string; pickedCards: GatchaCard[] }
+  }
+}) {
+  const { snapshot } = messageLog
+
+  const shareGatchaResult = () => {
+    if (!snapshot) return
+    socket.emit(EMIT_PICKUP_LOG_MESSAGE_EVENT, {
+      messageLogId: messageLog._id,
+      cards: snapshot.pickedCards,
+    })
+  }
+
+  return (
+    <>
+      <div className="flex flex-col gap-[4px] text-gray-800">
+        <div>
+          가챠 로그 {snapshot?.pickedCards?.length}회 모집 -{' '}
+          {snapshot.category ||
+            '알 수 없음(과거 픽업 카테고리 저장 없던 시절 기록)'}
+        </div>
+        <div className="flex flex-wrap gap-[2px]">
+          {snapshot.pickedCards.map((card) => {
+            return (
+              <Tooltip
+                key={createKey()}
+                content={translate(`card:${card.name}`)}
+                className="bg-gray-800/80"
+              >
+                <div className="border border-gray-500 rounded overflow-hidden cursor-pointer">
+                  <div
+                    className="w-[50px] h-[50px] bg-cover bg-no-repeat bg-center p-[2px] bg-clip-content"
+                    style={{ backgroundImage: `url(${card.thumbnail})` }}
+                  />
+                  <div>
+                    <div className="flex bg-white/90 items-center justify-center ff-ba text-[16px] pb-[3px]">
+                      {new Array(card.starForce).fill(1).map(() => (
+                        <img
+                          key={createKey()}
+                          className="w-[12px] h-[12px]"
+                          src="/images/star_on.png"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </Tooltip>
+            )
+          })}
+        </div>
+      </div>
+      <div className="ml-auto mr-[5px] flex items-center">
+        <div
+          className="ff-nbg text-[16px] bg-green-500 text-white flex items-center justify-center w-[50px] rounded cursor-pointer"
+          onClick={() => shareGatchaResult()}
+        >
+          공유
+        </div>
+      </div>
+    </>
+  )
+}
+
 function MessageLogTitleBox({ messageLog }: any) {
   return (
     <div className="flex border-b border-dashed border-b-gray-800">
       {messageLog.category === MessageLogCategoryKind.PickupLog && (
         <div className="flex items-center w-full px-[4px] py-[2px]">
           <div className="min-w-[100px]">{ago(messageLog.createdAt)}</div>
-          <div className="flex gap-[4px] text-gray-800">
-            <div>
-              가챠 로그 - {messageLog.snapshot?.pickedCards?.length} 모집
-            </div>
-            <div>(데이터 기록을 일단 남기고 추후에 연계 기능 들어갈 예정)</div>
-          </div>
+          <GatchaLogBox messageLog={messageLog} />
         </div>
       )}
       {messageLog.category === MessageLogCategoryKind.AuctionAdd && (

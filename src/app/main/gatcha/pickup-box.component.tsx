@@ -16,6 +16,8 @@ export function PickUpBox({
     if (categoryName === CardSetCategory.ShokuhouMisaki) return 4
     if (categoryName === CardSetCategory.Wakamo) return 5
     if (categoryName === CardSetCategory.AzusaSwimsuit) return 6
+    if (categoryName === CardSetCategory.FlatCardPickUp) return 7
+    if (categoryName === CardSetCategory.PhysicalPickUp) return 8
     return 0
   }
 

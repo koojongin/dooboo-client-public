@@ -36,9 +36,9 @@ function GuaranteedSelectDialog(
   const loadCards = useCallback(
     async (cardSetCategory?: CardSetCategory) => {
       setCards([])
-      if (!category) return
+      if (!category && !cardSetCategory) return
       const result = await fetchGetGuarenteedPickUpCards(
-        cardSetCategory || category,
+        (cardSetCategory || category)!,
       )
       setCards(result.cards)
     },

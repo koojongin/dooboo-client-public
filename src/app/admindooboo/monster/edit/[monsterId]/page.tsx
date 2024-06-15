@@ -239,6 +239,40 @@ export default function Page({
                 </div>
 
                 <div>
+                  <div>방어력</div>
+                  <div>
+                    <input
+                      className="border p-[4px]"
+                      type="number"
+                      value={monster.armor}
+                      onChange={(e) =>
+                        setMonster({
+                          ...monster,
+                          armor: parseInt(e.target.value, 10),
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div>저항</div>
+                  <div>
+                    <input
+                      className="border p-[4px]"
+                      type="number"
+                      value={monster.resist}
+                      onChange={(e) =>
+                        setMonster({
+                          ...monster,
+                          resist: parseInt(e.target.value, 10),
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div>
                   <div>inRaid</div>
                   <div>
                     <input

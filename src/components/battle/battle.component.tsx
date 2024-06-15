@@ -279,6 +279,14 @@ export function Battle({ headCss, battleHandler, refreshInventory }: any) {
                 <DropResultComponent battleResult={battleResult} />
               )}
             </div>
+            <div>
+              총 피해량 :{' '}
+              {formatNumber(
+                battleLogs.reduce((prev: number, next: any) => {
+                  return prev + next.damage
+                }, 0),
+              )}
+            </div>
           </div>
         )}
       </div>

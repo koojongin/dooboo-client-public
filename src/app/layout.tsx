@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import axios from 'axios'
+
 import { NoticeHeaderComponent } from '@/components/main/notice-header.component'
+import GoogleAnalyticsComponent from '@/components/ads/google-analytics'
 
 export const metadata: Metadata = {
   title: `두부 온라인 ${process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ? ' - 테스트' : ''}`,
@@ -32,6 +34,7 @@ export default async function RootLayout({
   // const { boards = [] } = await getNotice()
   // const notice = boards[0]
   const notice = undefined
+
   return (
     <html lang="en">
       <head>
@@ -60,11 +63,21 @@ export default async function RootLayout({
       <body
         className={` bg-[url('/images/bg001.jpg')] bg-contain min-h-[500px] min-w-[900px] wide:w-full`}
       >
+        <GoogleAnalyticsComponent />
         <NoticeHeaderComponent />
         <div className="px-3 min-w-fit">{children}</div>
         <div className="flex justify-center bg-gray-100 bg-opacity-65 w-full text-[14px] py-1">
           dev since 2024.03.26 ~
         </div>
+        <noscript>
+          {/* eslint-disable-next-line jsx-a11y/iframe-has-title */}
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-PBJR2QM7"
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
       </body>
     </html>
   )

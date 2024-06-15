@@ -1,0 +1,328 @@
+{
+    "anims": [
+        {
+            "key": "swingof",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 5,
+            "frames": [
+                {
+                    "key": "swing",
+                    "frame": "swingof_0"
+                },
+                {
+                    "key": "swing",
+                    "frame": "swingof_1"
+                },
+                {
+                    "key": "swing",
+                    "frame": "swingof_2"
+                },
+                {
+                    "key": "swing",
+                    "frame": "swingof_3"
+                },
+                {
+                    "key": "swing",
+                    "frame": "swingof_4"
+                }
+            ]
+        },
+        {
+            "key": "stabof",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 4,
+            "frames": [
+                {
+                    "key": "swing",
+                    "frame": "stabof_0"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stabof_1"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stabof_2"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stabof_3"
+                }
+            ]
+        },
+        {
+            "key": "stabt1",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 4,
+            "frames": [
+                {
+                    "key": "swing",
+                    "frame": "stabt1_0"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stabt1_1"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stabt1_2"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stabt1_3"
+                }
+            ]
+        },
+        {
+            "key": "swingo1",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 4,
+            "frames": [
+                {
+                    "key": "swing",
+                    "frame": "swingo1_0"
+                },
+                {
+                    "key": "swing",
+                    "frame": "swingo1_1"
+                },
+                {
+                    "key": "swing",
+                    "frame": "swingo1_2"
+                },
+                {
+                    "key": "swing",
+                    "frame": "swingo1_3"
+                }
+            ]
+        },
+        {
+            "key": "alert",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 4,
+            "frames": [
+                {
+                    "key": "swing",
+                    "frame": "alert_0"
+                },
+                {
+                    "key": "swing",
+                    "frame": "alert_1"
+                },
+                {
+                    "key": "swing",
+                    "frame": "alert_2"
+                },
+                {
+                    "key": "swing",
+                    "frame": "alert_3"
+                }
+            ]
+        },
+        {
+            "key": "walk2",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 5,
+            "frames": [
+                {
+                    "key": "swing",
+                    "frame": "walk2_0"
+                },
+                {
+                    "key": "swing",
+                    "frame": "walk2_1"
+                },
+                {
+                    "key": "swing",
+                    "frame": "walk2_2"
+                },
+                {
+                    "key": "swing",
+                    "frame": "walk2_3"
+                },
+                {
+                    "key": "swing",
+                    "frame": "walk2_4"
+                }
+            ]
+        },
+        {
+            "key": "swingp2",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 4,
+            "frames": [
+                {
+                    "key": "swing",
+                    "frame": "swingp2_0"
+                },
+                {
+                    "key": "swing",
+                    "frame": "swingp2_1"
+                },
+                {
+                    "key": "swing",
+                    "frame": "swingp2_2"
+                },
+                {
+                    "key": "swing",
+                    "frame": "swingp2_3"
+                }
+            ]
+        },
+        {
+            "key": "stand2",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 4,
+            "frames": [
+                {
+                    "key": "swing",
+                    "frame": "stand2_0"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stand2_1"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stand2_2"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stand2_3"
+                }
+            ]
+        },
+        {
+            "key": "stand1",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 4,
+            "frames": [
+                {
+                    "key": "swing",
+                    "frame": "stand1_0"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stand1_1"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stand1_2"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stand1_3"
+                }
+            ]
+        },
+        {
+            "key": "stabo2",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 3,
+            "frames": [
+                {
+                    "key": "swing",
+                    "frame": "stabo2_0"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stabo2_1"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stabo2_2"
+                }
+            ]
+        },
+        {
+            "key": "shootf",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 4,
+            "frames": [
+                {
+                    "key": "swing",
+                    "frame": "shoot1_0"
+                },
+                {
+                    "key": "swing",
+                    "frame": "shoot1_1"
+                },
+                {
+                    "key": "swing",
+                    "frame": "shoot1_2"
+                },
+                {
+                    "key": "swing",
+                    "frame": "shoot1_3"
+                }
+            ]
+        },
+        {
+            "key": "swingpf",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 5,
+            "frames": [
+                {
+                    "key": "swing",
+                    "frame": "swingpf_0"
+                },
+                {
+                    "key": "swing",
+                    "frame": "swingpf_1"
+                },
+                {
+                    "key": "swing",
+                    "frame": "swingpf_2"
+                },
+                {
+                    "key": "swing",
+                    "frame": "swingpf_3"
+                },
+                {
+                    "key": "swing",
+                    "frame": "swingpf_4"
+                }
+            ]
+        },
+        {
+            "key": "stabtf",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 5,
+            "frames": [
+                {
+                    "key": "swing",
+                    "frame": "stabtf_0"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stabtf_1"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stabtf_2"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stabtf_3"
+                },
+                {
+                    "key": "swing",
+                    "frame": "stabtf_4"
+                }
+            ]
+        }
+    ]
+}

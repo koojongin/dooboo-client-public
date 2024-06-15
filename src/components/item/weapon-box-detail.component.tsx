@@ -10,6 +10,7 @@ import createKey from '@/services/key-generator'
 import { toColorByGrade, toMMDDHHMMSS, translate } from '@/services/util'
 import { InventoryActionKind } from './item.interface'
 import { confirmSaleSetting } from '@/components/auction/add-to-auction-confirm'
+import { BA_COLOR } from '@/constants/constant'
 
 export default function WeaponBoxDetailComponent({
   item,
@@ -128,6 +129,32 @@ export default function WeaponBoxDetailComponent({
         </div>
       </div>
       <div className="border-b border-b-gray-400 border-dotted" />
+      {selectedItem?.injectedCard && (
+        <div
+          className={`p-[5px] border border-blue-950 rounded mx-[10px] mt-[10px] flex items-center justify-center text-[16px] bg-contain 
+          text-[${BA_COLOR}]`}
+          style={{
+            backgroundImage: `url('/images/pickup/background.png')`,
+          }}
+        >
+          <div className="ff-wavve flex flex-wrap items-center">
+            {selectedItem.card && (
+              <>
+                <div className="flex items-center justify-center ff-ba text-[16px] h-[22px]">
+                  {new Array(selectedItem.card.starForce).fill(1).map(() => (
+                    <img
+                      key={createKey()}
+                      className="w-[16px] h-[16px]"
+                      src="/images/star_on.png"
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+            {translate(`card:${selectedItem.injectedCard}`)} 효과 보유
+          </div>
+        </div>
+      )}
       <div className="px-[10px] pt-[2px] text-[14px]">
         <div className="mt-[6px]">
           기본 속성({selectedItem.totalFlatDamage?.toLocaleString()})
@@ -186,10 +213,20 @@ export default function WeaponBoxDetailComponent({
             (k) => k,
           ).map((key: string) => {
             const attributeValue = selectedItem.additionalAttributes[key]
+            const isEnchanted =
+              selectedItem.enchants?.fixedAttributeName === key
             return (
-              <div key={createKey()}>
+              <div
+                key={createKey()}
+                className={isEnchanted ? 'text-green-500' : ''}
+              >
                 <div className="flex justify-between">
-                  <div>{translate(key)}</div>
+                  <div className="flex items-center gap-[2px]">
+                    {isEnchanted && (
+                      <i className="fa-solid fa-wrench text-[12px]" />
+                    )}
+                    <div>{translate(key)}</div>
+                  </div>
                   <div>{attributeValue}</div>
                 </div>
               </div>

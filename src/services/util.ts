@@ -62,8 +62,29 @@ export const toEmojiPath = (path: string) => {
 export const translate = (text: string) => {
   let parsedText = text
   switch (text) {
+    case 'select:Exist':
+      parsedText = '예'
+      break
+    case 'select:NotExist':
+      parsedText = '아니오'
+      break
+    case 'select:All':
+      parsedText = '모두'
+      break
+    case 'card:option:ConvertRateStrToCriticalMultiplier':
+      parsedText = '힘 - 치명타 배율 전환(%)'
+      break
+    case 'card:option:ConvertRateDexToCriticalMultiplier':
+      parsedText = '민첩 - 치명타 배율 전환(%)'
+      break
+    case 'card:option:ConvertRateLukToCriticalMultiplier':
+      parsedText = '행운 - 치명타 배율 전환(%)'
+      break
     case 'card:option:ElementalTrinityOfLightning':
       parsedText = '삼위일체 - 번개 피해 증가(%)'
+      break
+    case 'card:option:ElementalTrinityOfPhysical':
+      parsedText = '삼위일체 - 물리 피해 증가(%)'
       break
     case 'card:option:ElementalTrinityOfCold':
       parsedText = '삼위일체 - 냉기 피해 증가(%)'
@@ -150,8 +171,26 @@ export const translate = (text: string) => {
     case 'card:option:AddedLuk':
       parsedText = '행운'
       break
+    case 'card:option:HalfDamageAndMultiplyTurn':
+      parsedText = '절반 활성화'
+      break
 
     /// ////////////////
+    case 'card:yukari':
+      parsedText = '유카리'
+      break
+    case 'card:ibuki':
+      parsedText = '이부키'
+      break
+    case 'card:hiyori':
+      parsedText = '히요리'
+      break
+    case 'card:alice':
+      parsedText = '엘리스'
+      break
+    case 'card:hinata':
+      parsedText = '히나타'
+      break
     case 'card:hanako-swimsuit':
       parsedText = '수영복 하나코'
       break
@@ -208,6 +247,9 @@ export const translate = (text: string) => {
       break
     case 'card:miyako':
       parsedText = '미야코'
+      break
+    case 'card:miyako-swimsuit':
+      parsedText = '수영복 미야코'
       break
     case 'card:sakurako':
       parsedText = '사쿠라코'
@@ -534,6 +576,15 @@ export const translate = (text: string) => {
       break
 
     /// /////////////////////////////////////////////////////
+    case 'ADDED_MANA':
+      parsedText = 'MP 추가(+)'
+      break
+    case 'REDUCTION_MANA_COST':
+      parsedText = '스킬의 MP 소모량 감소'
+      break
+    case 'REDUCTION_REQUIRED_EQUIPPED_LEVEL':
+      parsedText = '착용 레벨 감소'
+      break
     case 'INCREASED_DAMAGE':
       parsedText = '피해 증가(%)'
       break
@@ -710,12 +761,4 @@ export function getJobIconBgColor(job: string) {
 export function isExistLoginToken() {
   if (typeof window === 'undefined') return false
   return !!localStorage.getItem('token')
-}
-
-export const pickByRate = (rate: number) => {
-  const compensateValue = 10000
-  return (
-    Math.floor(Math.random() * ((100 + 1) * compensateValue)) <=
-    compensateValue * rate
-  )
 }

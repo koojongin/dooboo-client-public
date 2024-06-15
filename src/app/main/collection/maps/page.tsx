@@ -79,14 +79,14 @@ export default function CollectionMapsPage() {
         </div>
         {selectedMap && (
           <div className="flex flex-col mt-[10px]">
-            <div className="bg-gradient-to-r from-blue-gray-600/90 to-blue-gray-100/0 w-[800px] text-white px-[10px] py-[10px] text-[30px] flex items-center ff-gs-all">
+            <div className="bg-gradient-to-r from-blue-gray-600/90 to-blue-gray-100/0 min-w-[800px] text-white px-[10px] py-[10px] text-[30px] flex items-center ff-gs-all">
               <div className="">
                 {selectedMap.name}({selectedMap.level})
               </div>
             </div>
             {/* <div className="flex bg-indigo-400 text-white py-[8px]"> */}
-            <div className="mt-[10px] flex bg-gradient-to-r from-indigo-600/90 to-blue-gray-100/0 w-[800px] text-white px-[10px] py-[0px] ff-gs-all">
-              <div className="min-w-[200px]">
+            <div className="mt-[10px] flex bg-gradient-to-r from-indigo-600/90 to-blue-gray-100/0 text-white px-[10px] py-[0px] ff-gs-all">
+              <div className="min-w-[250px]">
                 <div>등장 몬스터</div>
               </div>
               <div>드랍 일람</div>
@@ -98,27 +98,35 @@ export default function CollectionMapsPage() {
                   className="flex border-b border-blue-gray-50 py-[6px]"
                 >
                   {/* MonsterDiv Start */}
-                  <div className="flex gap-[1px] flex-col justify-start items-start w-[200px]">
-                    <div className="flex gap-[10px] justify-center items-center">
-                      <img
-                        src={toAPIHostURL(monster.thumbnail)}
-                        className="w-[80px] h-[80px]"
+                  <div className="flex gap-[1px] flex-col justify-start items-start">
+                    <div className="flex gap-[10px] justify-center items-start min-w-[250px]">
+                      <div
+                        className="w-[80px] h-[80px] min-w-[80px] bg-cover bg-center border border-blue-950 rounded p-[4px] bg-clip-content shadow"
+                        style={{
+                          backgroundImage: `url('${toAPIHostURL(monster.thumbnail)}')`,
+                        }}
                       />
-                      <div className="min-w-[100px]">
-                        <div>{monster.name}</div>
-                        <div className="text-[10px]">
+                      <div className="text-[14px] w-full">
+                        <div className="text-[20px]">{monster.name}</div>
+                        <div className="">
                           {(
                             (monster.weight / selectedMap.totalWeight) *
                             100
                           ).toFixed(2)}
                           %({monster.weight})
                         </div>
-                        <div className="text-[10px] text-green-400">
+                        <div className="text-green-400">
                           +{monster.experience.toLocaleString()}exp, +
                           {monster.gold.toLocaleString()}g
                         </div>
-                        <div className="text-[10px] text-red-300">
+                        <div className="text-red-300">
                           {monster.hp.toLocaleString()}hp
+                        </div>
+                        <div className="text-blue-900">
+                          방어력:{monster.armor.toLocaleString()}
+                        </div>
+                        <div className="text-blue-900">
+                          저항:{monster.resist.toLocaleString()}%
                         </div>
                       </div>
                     </div>
@@ -126,7 +134,7 @@ export default function CollectionMapsPage() {
                   {/* MonsterDiv End */}
 
                   {/* ItemList Start */}
-                  <div className="flex flex-wrap gap-[5px] items-center max-w-[600px]">
+                  <div className="flex flex-wrap gap-[5px] items-center justify-start">
                     {monster.drop?.items.map((itemData) => {
                       const { item } = itemData
                       return (

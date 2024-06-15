@@ -10,6 +10,7 @@ import toAPIHostURL from '@/services/image-name-parser'
 import { ago, toColorByGrade, toMMDDHHMMSS, translate } from '@/services/util'
 import { Auction } from '@/interfaces/auction.interface'
 import {
+  ItemGradeKind,
   SimulateBattleDialogRef,
   WeaponType,
 } from '@/interfaces/item.interface'
@@ -22,17 +23,24 @@ import {
   fetchPurchaseAuctionItem,
   fetchRetrieveAuctionItem,
 } from '@/services/api/api.auction'
+import { BA_COLOR } from '@/constants/constant'
 
 const TradeSortType = {
   CREATED: 'trade-sort:created',
   PRICE: 'trade-sort:price',
-  GRADE: 'trade-sort:grade',
+  // GRADE: 'trade-sort:grade',
   ITEM_LEVEL: 'trade-sort:item-level',
 } as const
 
 enum ListingType {
   Normal = 'Normal',
   Simplify = 'Simplify',
+}
+
+enum EtcType {
+  All = 'All',
+  Exist = 'Exist',
+  NotExist = 'NotExist',
 }
 
 export default function TradeWeaponPage() {
@@ -45,6 +53,7 @@ export default function TradeWeaponPage() {
   const simulateBattleRef = useRef<SimulateBattleDialogRef>()
   const [isAllWeaponTypeChecked, setIsAllWeaponTypeChecked] =
     useState<boolean>(true)
+  const [isAllGradeChecked, setIsAllGradeChecked] = useState<boolean>(true)
   const [sortingType, setSortingType] = useState<
     (typeof SortingType)[keyof typeof SortingType]
   >(SortingType.Desc)
@@ -55,6 +64,28 @@ export default function TradeWeaponPage() {
       name: w,
       isSelected: true,
     })),
+  )
+
+  const [detailCondition, setDetailCondition] = useState<{
+    iLevelMin: number
+    iLevelMax: number
+    enchant: EtcType
+    injectedCard: EtcType
+  }>({
+    iLevelMin: 0,
+    iLevelMax: 0,
+    enchant: EtcType.All,
+    injectedCard: EtcType.All,
+  })
+
+  const [selectedGrades, setSelectedGrades] = useState<
+    { name: string; isSelected: boolean }[]
+  >(
+    Object.values(ItemGradeKind)
+      .filter(
+        (v) => ![ItemGradeKind.Legendary, ItemGradeKind.Unique].includes(v),
+      )
+      .map((w) => ({ name: w, isSelected: true })),
   )
 
   const [listingType, setListingType] = useState<ListingType>(
@@ -94,10 +125,66 @@ export default function TradeWeaponPage() {
           },
         }
       }
+
+      if (selectedGrades.length > 0) {
+        condition = {
+          ...condition,
+          'snapshot.iGrade': {
+            $in: selectedGrades.filter((i) => i.isSelected).map((i) => i.name),
+          },
+        }
+      }
       if (debouncedKeyword) {
         condition = {
           ...condition,
           'snapshot.name': { $regex: debouncedKeyword },
+        }
+      }
+
+      if (detailCondition.iLevelMax || detailCondition.iLevelMin) {
+        const andCondition = []
+        if (detailCondition.iLevelMin)
+          andCondition.push({
+            'snapshot.iLevel': { $gte: detailCondition.iLevelMin },
+          })
+        if (detailCondition.iLevelMax)
+          andCondition.push({
+            'snapshot.iLevel': { $lte: detailCondition.iLevelMax },
+          })
+
+        condition = {
+          ...condition,
+          $and: andCondition,
+        }
+      }
+
+      if (detailCondition.enchant) {
+        if (detailCondition.enchant === EtcType.Exist) {
+          condition = {
+            ...condition,
+            'snapshot.enchants.fixedAttributeName': { $exists: true },
+          }
+        }
+        if (detailCondition.enchant === EtcType.NotExist) {
+          condition = {
+            ...condition,
+            'snapshot.enchants.count': { $in: [0, null] },
+          }
+        }
+      }
+
+      if (detailCondition.injectedCard) {
+        if (detailCondition.injectedCard === EtcType.Exist) {
+          condition = {
+            ...condition,
+            'snapshot.injectedCard': { $exists: true },
+          }
+        }
+        if (detailCondition.injectedCard === EtcType.NotExist) {
+          condition = {
+            ...condition,
+            'snapshot.injectedCard': { $in: [null] },
+          }
         }
       }
 
@@ -108,11 +195,11 @@ export default function TradeWeaponPage() {
         case TradeSortType.PRICE:
           opts.sort = { gold: SortingType.Desc === sortingType ? 1 : -1 }
           break
-        case TradeSortType.GRADE:
-          opts.sort = {
-            'snapshot.iGrade': SortingType.Desc === sortingType ? -1 : 1,
-          }
-          break
+        // case TradeSortType.GRADE:
+        //   opts.sort = {
+        //     'snapshot.iGrade': SortingType.Desc === sortingType ? -1 : 1,
+        //   }
+        //   break
         case TradeSortType.ITEM_LEVEL:
           opts.sort = {
             'snapshot.iLevel': SortingType.Desc === sortingType ? 1 : -1,
@@ -136,7 +223,12 @@ export default function TradeWeaponPage() {
     [
       showOnlyMyItem,
       selectedWeaponTypes,
+      selectedGrades,
       debouncedKeyword,
+      detailCondition.iLevelMax,
+      detailCondition.iLevelMin,
+      detailCondition.enchant,
+      detailCondition.injectedCard,
       selectedSortType,
       characterId,
       sortingType,
@@ -157,10 +249,28 @@ export default function TradeWeaponPage() {
     ])
     setIsAllWeaponTypeChecked(!isAllWeaponTypeChecked)
   }
+
+  const onChangeAllGradeCheck = () => {
+    setSelectedGrades([
+      ...selectedGrades.map((w) => {
+        const nW = { ...w }
+        nW.isSelected = !isAllGradeChecked
+        return nW
+      }),
+    ])
+    setIsAllGradeChecked(!isAllGradeChecked)
+  }
+
   const onChangeWeaponType = (e: any, index: number) => {
     const newSelected = [...selectedWeaponTypes]
     newSelected[index].isSelected = e.target.checked
     setSelectedWeaponTypes(newSelected)
+  }
+
+  const onChangeGrade = (e: any, index: number) => {
+    const newSelected = [...selectedGrades]
+    newSelected[index].isSelected = e.target.checked
+    setSelectedGrades(newSelected)
   }
 
   const onChangeKeyword = (value: string) => {
@@ -298,8 +408,46 @@ export default function TradeWeaponPage() {
             />
           </div>
 
+          <div className="flex items-stretch gap-[4px]">
+            <div className="px-[8px] min-w-[50px] flex items-center justify-center bg-blue-gray-500 text-white cursor-pointer">
+              아이템 레벨
+            </div>
+            <div className="flex items-center">
+              <div className="flex items-center gap-[2px]">
+                <div>최소</div>
+                <input
+                  onChange={(e) => {
+                    setDetailCondition({
+                      ...detailCondition,
+                      iLevelMin: Math.floor(Number(e.target.value)),
+                    })
+                  }}
+                  className="w-[50px] border border-blue-gray-500 focus-visible:outline-0 ff-gs h-[26px] rounded-l-none rounded-[2px] text-[16px] pl-[4px]"
+                  type="number"
+                />
+              </div>
+              <div>~</div>
+              <div className="flex items-center gap-[2px]">
+                <div>최대</div>
+                <input
+                  onChange={(e) => {
+                    setDetailCondition({
+                      ...detailCondition,
+                      iLevelMax: Math.floor(Number(e.target.value)),
+                    })
+                  }}
+                  className="w-[50px] border border-blue-gray-500 focus-visible:outline-0 ff-gs h-[26px] rounded-l-none rounded-[2px] text-[16px] pl-[4px]"
+                  type="number"
+                />
+              </div>
+            </div>
+          </div>
+
           {/* WeaponType Group-----------------------------*/}
-          <div>
+          <div className="flex items-stretch gap-[4px] h-[24px]">
+            <div className="px-[8px] min-w-[50px] flex items-center justify-center bg-blue-gray-500 text-white cursor-pointer">
+              무기 유형
+            </div>
             {/* Item Type CheckBox Start */}
             <div className="flex items-center gap-[8px]">
               <label
@@ -330,6 +478,99 @@ export default function TradeWeaponPage() {
               })}
             </div>
             {/* Item Type CheckBox End */}
+          </div>
+
+          {/* ItemGradeKind Group-----------------------------*/}
+          <div className="flex items-stretch gap-[4px] h-[24px]">
+            <div className="px-[8px] min-w-[50px] flex items-center justify-center bg-blue-gray-500 text-white cursor-pointer">
+              등급
+            </div>
+            {/* Item Type CheckBox Start */}
+            <div className="flex items-center gap-[8px]">
+              <label
+                className="flex items-center cursor-pointer"
+                key={createKey()}
+              >
+                <input
+                  type="checkbox"
+                  defaultChecked={isAllGradeChecked}
+                  onChange={() => onChangeAllGradeCheck()}
+                />
+                전체
+              </label>
+              {selectedGrades.map((gradeType, index) => {
+                return (
+                  <label
+                    className="flex items-center cursor-pointer"
+                    key={createKey()}
+                  >
+                    <input
+                      type="checkbox"
+                      defaultChecked={gradeType.isSelected}
+                      onChange={(e) => onChangeGrade(e, index)}
+                    />
+                    {translate(gradeType.name)}
+                  </label>
+                )
+              })}
+            </div>
+            {/* Item Type CheckBox End */}
+          </div>
+
+          <div className="flex items-stretch gap-[4px]">
+            <div className="px-[8px] min-w-[50px] flex items-center justify-center bg-blue-gray-500 text-white cursor-pointer">
+              기타
+            </div>
+            <div className="flex items-center">
+              <div className="flex items-stretch">
+                <div className="ff-wavve px-[10px] border border-blue-gray-500 flex items-center bg-blue-gray-500 text-white justify-center border-r-0">
+                  마법 부여
+                </div>
+                <select
+                  className="w-[60px] border border-blue-gray-500 text-blue-gray-500 text-[16px] h-[26px] border-l-0"
+                  value={detailCondition.enchant}
+                  onChange={(e) => {
+                    setDetailCondition({
+                      ...detailCondition,
+                      enchant: e.target.value as EtcType,
+                    })
+                  }}
+                >
+                  {Object.keys(EtcType).map((key) => {
+                    return (
+                      <option key={createKey()} value={key}>
+                        {translate(`select:${key}`)}
+                      </option>
+                    )
+                  })}
+                </select>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <div className="flex items-stretch">
+                <div className="ff-wavve px-[10px] border border-blue-gray-500 flex items-center bg-blue-gray-500 text-white justify-center border-r-0">
+                  카드 주입
+                </div>
+                <select
+                  className="w-[60px] border border-blue-gray-500 text-blue-gray-500 text-[16px] h-[26px] border-l-0"
+                  value={detailCondition.injectedCard}
+                  onChange={(e) => {
+                    setDetailCondition({
+                      ...detailCondition,
+                      injectedCard: e.target.value as EtcType,
+                    })
+                  }}
+                >
+                  {Object.keys(EtcType).map((key) => {
+                    return (
+                      <option key={createKey()} value={key}>
+                        {translate(`select:${key}`)}
+                      </option>
+                    )
+                  })}
+                </select>
+              </div>
+            </div>
           </div>
           <div>
             <label
@@ -461,7 +702,7 @@ export default function TradeWeaponPage() {
                 return (
                   <div
                     key={createKey()}
-                    className="flex flex-col relative bg-[#555d62ed] text-[14px] border-2 border-gray-400 w-[300px] text-white rounded shadow-md group"
+                    className="flex flex-col relative bg-gray-800/70 text-[14px] border-2 border-gray-400 w-[300px] text-white rounded shadow-md group"
                     style={{ borderColor: toColorByGrade(weapon.iGrade) }}
                   >
                     <div className="p-[4px]">
@@ -536,6 +777,38 @@ export default function TradeWeaponPage() {
                             : ''}
                         </div>
                       </div>
+                      <div className="bg-gray-800/20 p-[2px] flex justify-center items-center gap-[5px]">
+                        <div
+                          className="bg-contain bg-no-repeat bg-center w-[20px] h-[20px]"
+                          style={{
+                            backgroundImage: `url('/images/black-smith/scroll.png')`,
+                          }}
+                        />
+                        <div className="ff-wavve">+{weapon.enhancedValue}</div>
+                      </div>
+                      {weapon.card && (
+                        <div
+                          className={`p-[5px] border border-blue-950 rounded mx-[10px] mt-[5px] flex items-center justify-center text-[16px] bg-contain text-[${BA_COLOR}]`}
+                          style={{
+                            backgroundImage: `url('/images/pickup/background.png')`,
+                          }}
+                        >
+                          <div className="ff-wavve flex flex-wrap items-center">
+                            <div className="flex items-center justify-center ff-ba text-[16px] h-[22px]">
+                              {new Array(weapon.card.starForce)
+                                .fill(1)
+                                .map(() => (
+                                  <img
+                                    key={createKey()}
+                                    className="w-[16px] h-[16px]"
+                                    src="/images/star_on.png"
+                                  />
+                                ))}
+                            </div>
+                            {translate(`card:${weapon.injectedCard}`)} 효과 보유
+                          </div>
+                        </div>
+                      )}
                       <div className="mt-[4px]">
                         <div className="flex items-center flex-wrap gap-[1px]">
                           {new Array(weapon.maxStarForce)
@@ -573,7 +846,7 @@ export default function TradeWeaponPage() {
                         </div>
                       </div>
                       <div className="mt-[5px]">
-                        <div className="flex justify-between mb-[2px] border-b border-b-gray-100 border-dashed mb-[4px]">
+                        <div className="flex justify-between border-b border-b-gray-100 border-dashed mb-[4px]">
                           <div>착용 레벨</div>
                           <div>{weapon.requiredEquipmentLevel}</div>
                         </div>
@@ -628,12 +901,19 @@ export default function TradeWeaponPage() {
                             (key: string) => {
                               if (!weapon.additionalAttributes) return
                               const value = weapon.additionalAttributes[key]
+                              const isEnchanted =
+                                weapon.enchants?.fixedAttributeName === key
                               return (
                                 <div
                                   key={createKey()}
-                                  className="flex justify-between"
+                                  className={`flex justify-between ${isEnchanted ? 'text-green-500' : ''}`}
                                 >
-                                  <div>{translate(key)}</div>
+                                  <div className="flex items-center gap-[2px]">
+                                    {isEnchanted && (
+                                      <i className="fa-solid fa-wrench text-[12px]" />
+                                    )}
+                                    <div>{translate(key)}</div>
+                                  </div>
                                   <div>{value}</div>
                                 </div>
                               )

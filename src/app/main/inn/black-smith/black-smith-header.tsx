@@ -18,6 +18,12 @@ export default function BlackSmithHeader() {
         <div className="ff-ba ff-skew">재설정</div>
       </Link>
       <Link
+        href="/main/inn/black-smith/initialize-star-force"
+        className="duration-300 cursor-pointer"
+      >
+        <div className="ff-ba ff-skew">스타포스 초기화</div>
+      </Link>
+      <Link
         href="/main/inn/black-smith/convert-attribute"
         className="duration-300 cursor-pointer"
       >
@@ -28,6 +34,18 @@ export default function BlackSmithHeader() {
         className="duration-300 cursor-pointer"
       >
         <div className="ff-ba ff-skew">속성 분할</div>
+      </Link>
+      <Link
+        href="/main/inn/black-smith/enchant"
+        className="duration-300 cursor-pointer"
+      >
+        <div className="ff-ba ff-skew">마법 부여</div>
+      </Link>
+      <Link
+        href="/main/inn/black-smith/card-inject"
+        className="duration-300 cursor-pointer"
+      >
+        <div className="ff-ba ff-skew">카드 주입</div>
       </Link>
     </div>
   )

@@ -19,3 +19,7 @@ export interface DropTableListResponseDto extends Pagination {
 export interface DropTableResponseDto extends Pagination {
   dropTable: DropTable
 }
+
+export enum BaseItemType {
+  'BaseWeapon' = 'BaseWeapon',
+}

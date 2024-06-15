@@ -6,7 +6,7 @@ import createKey from '@/services/key-generator'
 import { translate } from '@/services/util'
 import { GatchaCard } from '@/interfaces/gatcha.interface'
 
-export function GatchaRateBoxComponent({ cardSet }: { cardSet: any[] }) {
+export function GatchaRateBoxComponent({ cards }: { cards: any[] }) {
   const [selectedCard, setSelectedCard] = useState()
   const getColorByStarForce = (starForce: number) => {
     if (starForce === 3) return 'rgba(255,135,234,0.31)'
@@ -46,7 +46,7 @@ export function GatchaRateBoxComponent({ cardSet }: { cardSet: any[] }) {
             <div className="w-[80px]">등장수치</div>
           </div>
           <div>
-            {_.sortBy(cardSet, 'starForce')
+            {_.sortBy(cards, 'starForce')
               .reverse()
               .map((card, index) => {
                 return (

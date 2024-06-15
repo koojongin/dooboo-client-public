@@ -48,6 +48,12 @@ export interface Weapon extends MongooseDocument {
   additionalAttributes?: {
     [key: string]: number
   }
+  enchants: {
+    count: number
+    fixedAttributeName?: string
+  }
+  injectedCard: string
+  card: { name: string; thumbnail: string; starForce: number }
 }
 
 export interface BaseMisc extends MongooseDocument {

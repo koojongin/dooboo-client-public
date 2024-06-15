@@ -11,4 +11,5 @@ export interface Currency extends MongooseDocument {
     [key: string]: number
   }
   diamond: number
+  itemCrystalOfNormal: number
 }

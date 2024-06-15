@@ -43,8 +43,9 @@ function SimulateBattleDialog(
   }))
 
   useEffect(() => {
+    if (!open) return
     simulateBattle()
-  }, [simulateBattle])
+  }, [open, simulateBattle])
 
   return (
     <Dialog open={open} handler={handleOpen}>

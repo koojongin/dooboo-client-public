@@ -32,7 +32,7 @@ import {
   MyStashListResponse,
   MyStashResponse,
 } from '@/interfaces/stash.interface'
-import { CurrencyResponse } from '@/interfaces/currency.interface'
+import { Currency, CurrencyResponse } from '@/interfaces/currency.interface'
 import { Pagination } from '@/interfaces/common.interface'
 
 interface CreateMonsterResponse {
@@ -251,10 +251,14 @@ export async function fetchUnequipItem(id: string) {
   return response
 }
 
-export async function fetchSellItems(
-  itemIds: string[],
-): Promise<DropTableResponseDto> {
+export async function fetchSellItems(itemIds: string[]): Promise<any> {
   const { data: response } = await api.post(`/item/sell`, { itemIds })
+  return response
+}
+export async function fetchSalvageItems(
+  itemIds: string[],
+): Promise<{ currency: Currency; earned: { itemCrystalOfNormal: number } }> {
+  const { data: response } = await api.post(`/item/salvage`, { itemIds })
   return response
 }
 
@@ -281,7 +285,7 @@ export async function fetchGetEnhancePrice(
 
 export async function fetchEnhanceWeapon(
   id: string,
-  data: { itemIds: string[]; scrollPercent: number },
+  data: { scrollPercent: number },
 ): Promise<EnhancedResult> {
   const { data: response } = await api.post(`/item/enhance/${id}`, data)
   return response
@@ -289,6 +293,13 @@ export async function fetchEnhanceWeapon(
 
 export async function fetchReRollWeapon(id: string): Promise<any> {
   const { data: response } = await api.post(`/craft/reroll/${id}`)
+  return response
+}
+
+export async function fetchInitializeStarForce(id: string): Promise<any> {
+  const { data: response } = await api.post(
+    `/craft/initialize-star-force/${id}`,
+  )
   return response
 }
 
@@ -518,5 +529,10 @@ export async function fetchMergeStackedItemInInventory(): Promise<{
 
 export async function fetchSimulateBattle(auctionId: string): Promise<any> {
   const { data: response } = await api.get(`/simulate/battle/${auctionId}`)
+  return response
+}
+
+export async function fetchRecommendPost(boardId: string): Promise<any> {
+  const { data: response } = await api.post(`/board/recommend/${boardId}`)
   return response
 }

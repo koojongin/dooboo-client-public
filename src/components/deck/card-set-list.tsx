@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { translate } from '@/services/util'
 import createKey from '@/services/key-generator'
 import { GatchaCardExtended } from '@/app/main/inn/deck/deck.type'
+import { BA_COLOR } from '@/constants/constant'
 
 export function CardSetList({
   allCardSet,
@@ -20,7 +21,12 @@ export function CardSetList({
               interactive
               key={`card_frame_${card.name}`}
               content={
-                <div>
+                <div className="flex flex-col items-start">
+                  <div
+                    className={`ff-wavve text-[20px] text-white flex bg-[${BA_COLOR}] p-[4px] rounded mb-[4px] border border-white`}
+                  >
+                    {translate(`card:${card.name}`)}
+                  </div>
                   {card.options.map((option) => {
                     return (
                       <div key={createKey()} className="flex flex-col">

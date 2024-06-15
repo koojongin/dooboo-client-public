@@ -6,7 +6,8 @@ export interface Board extends MongooseDocument {
   characterId: string
   content: string
   reads: number
-  recommends: number
+  recommends: string[]
+  recommendCount: any
   title: string
   comments?: any[]
 }

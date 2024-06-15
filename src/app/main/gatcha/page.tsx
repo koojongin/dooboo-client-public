@@ -11,6 +11,7 @@ import { GatchaRateBoxComponent } from '@/app/main/gatcha/gatcha-rate-box.compon
 import {
   fetchGatchaPoints,
   fetchGetCardSet,
+  fetchGetGuarenteedPickUpCards,
   fetchPickUp,
 } from '@/services/api/api.card'
 import { CardSetCategory } from '@/constants/cards.enum'
@@ -21,6 +22,7 @@ import { fetchGetMyCurrency } from '@/services/api-fetch'
 import GuaranteedSelectDialog from '@/components/gatcha/guaranteed-select-dialog'
 import { GuaranteedSelectDialogRef } from '@/components/gatcha/gatcha.interface'
 import { CurrencyResponse } from '@/interfaces/currency.interface'
+import { translate } from '@/services/util'
 
 enum GatchaState {
   Init = 'Init',
@@ -59,7 +61,10 @@ export default function SkillPage() {
   const [gatchaState, setGatchaState] = useState<GatchaState>(GatchaState.Init)
   const videoRef = useRef<any>()
   const videoWaitSignRef = useRef<any>()
-  const [selectedCardSet, setSelectedCardSet] = useState<any[]>([])
+  const [selectedCardSet, setSelectedCardSet] = useState<{
+    cards: any[]
+    guaranteed: any[]
+  }>()
   const [cardSetCategory, setCardSetCategory] = useState<CardSetCategory>()
   const [lastestPickUpCards, setLastestPickUpCards] = useState<GatchaCard[]>([])
   const [currency, setCurrency] = useState<CurrencyResponse>()
@@ -67,8 +72,16 @@ export default function SkillPage() {
   const guaranteedSelectDialogRef = useRef<GuaranteedSelectDialogRef>()
 
   const loadCardSet = useCallback(async (categoryName: CardSetCategory) => {
-    const result = await fetchGetCardSet(categoryName)
-    setSelectedCardSet(result.cardSet)
+    const [result, resultOfGuaranteed] = await Promise.all([
+      fetchGetCardSet(categoryName),
+      categoryName !== 'All'
+        ? fetchGetGuarenteedPickUpCards(categoryName)
+        : { cards: [] },
+    ])
+    setSelectedCardSet({
+      cards: result.cardSet,
+      guaranteed: resultOfGuaranteed.cards,
+    })
     setCardSetCategory(categoryName)
   }, [])
 
@@ -152,7 +165,7 @@ export default function SkillPage() {
       />
       <Card className="rounded bg-white p-[10px] w-full flex flex-col select-none pb-[200px]">
         <div className="flex flex-col gap-[4px] items-start">
-          <div className="w-[1000px] flex gap-[4px]">
+          <div className="w-[1000px] flex flex-wrap gap-[4px]">
             {[
               CardSetCategory.All,
               CardSetCategory.HoshinoAndShiroko,
@@ -161,11 +174,13 @@ export default function SkillPage() {
               CardSetCategory.Wakamo,
               CardSetCategory.ShokuhouMisaki,
               CardSetCategory.AzusaSwimsuit,
+              CardSetCategory.FlatCardPickUp,
+              CardSetCategory.PhysicalPickUp,
             ].map((categoryName, index) => {
               return (
                 <div
                   key={createKey()}
-                  className="max-w-[150px]"
+                  className="max-w-[150px] min-w-[150px]"
                   onClick={() => loadCardSet(categoryName)}
                 >
                   <PickUpBox event={{ categoryName }} />
@@ -189,24 +204,94 @@ export default function SkillPage() {
                     </div>
                   )}
                   {cardSetCategory !== CardSetCategory.All && (
-                    <div className="ff-ba-all ff-skew text-[18px] text-red-500 flex flex-col gap-[4px] items-center">
-                      <div>1회 모집 시 모집 포인트를 1획득합니다.</div>
+                    <div className="ff-ba-all ff-skew text-[18px] text-cyan-950 flex flex-col gap-[8px] items-center">
                       <div>
-                        100포인트 누적시 해당 픽업의 3성 카드 1장을 확정 선택할
-                        수 있습니다.
+                        1회 모집 시{' '}
+                        <span className="p-[2px] ff-wavve bg-cyan-700 text-white rounded">
+                          모집 포인트를 1 획득
+                        </span>
+                        합니다.
                       </div>
-                      <div>픽업별로 모집 포인트는 별로도 누적됩니다.</div>
-                      <div className="text-[16px] text-gray-900">
-                        아래있는 <span className="text-red-500">확정 선택</span>{' '}
-                        클릭시 모집포인트로 선택하는 카드 확인 가능
+                      <div>
+                        <span className="p-[2px] ff-wavve bg-cyan-700 text-white rounded">
+                          100포인트
+                        </span>{' '}
+                        누적시 해당 픽업의{' '}
+                        <span className="p-[2px] ff-wavve bg-cyan-700 text-white rounded">
+                          3성 카드 1장을 확정 선택
+                        </span>{' '}
+                        할 수 있습니다.
                       </div>
+                      <div>픽업 별로 모집 포인트는 별로도 누적됩니다.</div>
                     </div>
                   )}
-                  <div className="bg-white ff-ba ff-skew text-[20px] rounded border-gray-300 border shadow-lg shadow-gray-400 w-[500px]">
-                    {!cardSetCategory && (
-                      <div className="bg-transparent">데이터 불러오는중...</div>
+                  <div className="flex gap-[10px]">
+                    <div className="bg-white ff-ba ff-skew text-[20px] rounded border-gray-300 border shadow-lg shadow-gray-400 w-[500px]">
+                      {!cardSetCategory && (
+                        <div className="bg-transparent">
+                          데이터 불러오는중...
+                        </div>
+                      )}
+                      <PickUpBox event={{ categoryName: cardSetCategory! }} />
+                    </div>
+                    {selectedCardSet && (
+                      <div className="flex flex-col bg-white ff-ba ff-skew text-[20px] rounded border-gray-300 border shadow-lg shadow-gray-400 p-[10px] max-w-[300px]">
+                        <div className="text-[14px]">
+                          해당 픽업으로 모집 시{' '}
+                          <span className="p-[2px] ff-wavve bg-cyan-700 text-white rounded">
+                            100 모집 포인트
+                          </span>
+                          로 아래 카드를{' '}
+                          <span className="p-[2px] ff-wavve bg-cyan-700 text-white rounded">
+                            확정 선택
+                          </span>{' '}
+                          가능
+                        </div>
+                        {selectedCardSet.guaranteed.length === 0 && (
+                          <div className="text-red-600 flex items-center gap-[10px] text-[16px]">
+                            <i className="text-[4px] fa-solid fa-circle" />
+                            <div className="">확정 선택 할 수 없는 픽업</div>
+                          </div>
+                        )}
+                        <div className="flex flex-col gap-[2px]">
+                          {selectedCardSet.guaranteed.map((card) => {
+                            return (
+                              <div
+                                key={createKey()}
+                                className="flex items-center gap-[10px] text-[16px]"
+                              >
+                                <i className="text-[4px] fa-solid fa-circle" />
+                                <div className="flex items-center gap-[4px]">
+                                  <div
+                                    className="w-[30px] h-[30px] bg-cover bg-center bg-no-repeat border border-gray-500 rounded bg-clip-content p-[1px]"
+                                    style={{
+                                      backgroundImage: `url('${card.thumbnail}')`,
+                                    }}
+                                  />
+                                  <div className="min-w-[30px] flex items-center justify-center gap-[2px]">
+                                    {new Array(card.starForce)
+                                      .fill(1)
+                                      .map(() => {
+                                        return (
+                                          <img
+                                            key={createKey()}
+                                            className="w-[10px] h-[10px]"
+                                            src="/images/star_on.png"
+                                          />
+                                        )
+                                      })}
+                                  </div>
+                                  <div>{translate(`card:${card.name}`)}</div>
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                        <div className="mt-auto text-[16px] flex justify-center items-center bg-cyan-700 text-white ff-wavve rounded py-[2px]">
+                          자세한 정보는 아래 리스트 확인
+                        </div>
+                      </div>
                     )}
-                    <PickUpBox event={{ categoryName: cardSetCategory! }} />
                   </div>
                   {cardSetCategory && gatchaPoint && currency && (
                     <div className="flex flex-col gap-[5px]">
@@ -331,9 +416,11 @@ export default function SkillPage() {
               </div>
             </div>
             {/* End Of Gatcha Video Area --------*/}
-            <div className="flex flex-col gap-[1px]">
-              <GatchaRateBoxComponent cardSet={selectedCardSet} />
-            </div>
+            {selectedCardSet && (
+              <div className="flex flex-col gap-[1px]">
+                <GatchaRateBoxComponent cards={selectedCardSet?.cards} />
+              </div>
+            )}
           </div>
         </div>
       </Card>

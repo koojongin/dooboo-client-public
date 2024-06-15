@@ -91,11 +91,11 @@
     font-family: 'GmarketSansMedium';
 }
 
-.ff-gs-all {
-    font-family: 'GmarketSansMedium';
+.ff-wavve {
+    font-family: 'Wavve';
 }
 
-.ff-wavve {
+.ff-wavve-all * {
     font-family: 'Wavve';
 }
 

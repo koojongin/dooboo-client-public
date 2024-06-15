@@ -96,7 +96,6 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
     const current = new URLSearchParams(Array.from(searchParams.entries()))
     _.chain(current)
       .map((a) => {
-        console.log(a)
         return a
       })
       .value()

@@ -9,6 +9,19 @@ export interface CharacterStat {
   damageOfFire: number // 10
   damageOfCold: number // 10
   damageOfLightning: number // 10
+
+  str: number
+  dex: number
+  luk: number
+
+  damage: number
+  damageEven: number
+  damageOdd: number
+
+  hp: number
+  mp: number
+
+  turn: number
 }
 
 export interface MeResponse {

@@ -6,4 +6,6 @@ export enum CardSetCategory {
   Wakamo = 'Wakamo',
   ShokuhouMisaki = 'ShokuhouMisaki',
   AzusaSwimsuit = 'AzusaSwimsuit',
+  FlatCardPickUp = 'FlatCardPickUp',
+  PhysicalPickUp = 'PhysicalPickUp',
 }

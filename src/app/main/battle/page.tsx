@@ -19,6 +19,11 @@ export default function BattlePage() {
           </div>
         </div>
       </Link>
+      <Link href="/main/battle/test">
+        <div className="bg-white p-[40px] cursor-pointer rounded">
+          테스트 on Debug
+        </div>
+      </Link>
     </div>
   )
 }

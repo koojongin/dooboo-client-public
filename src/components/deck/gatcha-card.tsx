@@ -11,7 +11,6 @@ export function GatchaCardComponent({
   isOwn?: boolean
   width?: number
 }) {
-  console.log(card)
   return (
     <div className="flex flex-col" style={{ width: `${width}px` }}>
       <div

@@ -36,7 +36,7 @@ api.interceptors.response.use(
     }
 
     await Swal.fire({
-      text: code,
+      // text: code,
       title: data?.message || message,
       icon: 'error',
       confirmButtonText: '확인',

@@ -131,7 +131,7 @@ export default function GradeInfoPage() {
         <div className="mt-[10px] overflow-y-scroll h-[400px] relative">
           <div className="text-[18px] ff-ba flex bg-gray-400 text-white [&_div]:border-r [&_div]:border-r-white [&_div]:py-[4px] [&_div]:pl-[4px] sticky top-0">
             <div className="min-w-[30px]" />
-            <div className="min-w-[150px]">추가 속성</div>
+            <div className="min-w-[200px]">추가 속성</div>
             <div className="min-w-[80px] flex justify-center">tier1</div>
             <div className="min-w-[80px] flex justify-center">tier2</div>
             <div className="min-w-[80px] flex justify-center">tier3</div>
@@ -153,17 +153,17 @@ export default function GradeInfoPage() {
                       <div className="min-w-[30px] flex items-center justify-center">
                         {index + 1}
                       </div>
-                      <div className="min-w-[150px] flex py-[2px] px-[4px]">
+                      <div className="min-w-[200px] flex py-[2px] px-[4px]">
                         {translate(attributeKey)}
                       </div>
                       <div className="flex justify-center items-center min-w-[80px]">
-                        {attribute.tier1.range.join('~')}
+                        {attribute.tier1?.range.join('~')}
                       </div>
                       <div className="flex justify-center items-center min-w-[80px]">
-                        {attribute.tier2.range.join('~')}
+                        {attribute.tier2?.range.join('~')}
                       </div>
                       <div className="flex justify-center items-center min-w-[80px]">
-                        {attribute.tier3.range.join('~')}
+                        {attribute.tier3?.range.join('~')}
                       </div>
                       <div className="flex justify-center items-center min-w-[80px]">
                         {attribute.tier4?.range.join('~')}

@@ -64,6 +64,11 @@ export default function SkillPage() {
     loadSkills()
   }
 
+  const decreaseSkill = async (skill: any) => {
+    await fetchLearnSkill(skill.name, -1)
+    loadSkills()
+  }
+
   useEffect(() => {
     loadSkills()
   }, [loadSkills])
@@ -86,16 +91,16 @@ export default function SkillPage() {
             </div>
             <div>
               <div className="text-red-500 text-[14px]">
-                <div className="flex flex-col items-start gap-[4px]">
-                  <div className="text-[20px] bg-red-600 text-white flex items-center justify-center">
-                    * 주의 : 추가 힘, 추가 민첩, 추가 행운은 현재 구현되지
-                    않았습니다.
-                  </div>
-                  <div className="text-[20px] bg-red-600 text-white flex items-center justify-center">
-                    * 주의 : 직업은 선택시 바꿀수 없으니 신중히 선택해주세요.
-                    (추후 아이템으로 변경할 수 있도록 업데이트 예정)
-                  </div>
-                </div>
+                {/* <div className="flex flex-col items-start gap-[4px]"> */}
+                {/*  <div className="text-[20px] bg-red-600 text-white flex items-center justify-center"> */}
+                {/*    * 주의 : 추가 힘, 추가 민첩, 추가 행운은 현재 구현되지 */}
+                {/*    않았습니다. */}
+                {/*  </div> */}
+                {/*  <div className="text-[20px] bg-red-600 text-white flex items-center justify-center"> */}
+                {/*    * 주의 : 직업은 선택시 바꿀수 없으니 신중히 선택해주세요. */}
+                {/*    (추후 아이템으로 변경할 수 있도록 업데이트 예정) */}
+                {/*  </div> */}
+                {/* </div> */}
                 <div>
                   * 주의 : 스킬 칸 우하단의 화살표 클릭 시 바로 습득 됩니다
                 </div>
@@ -156,13 +161,23 @@ export default function SkillPage() {
                                     <div className="ff-dodoom ">
                                       {skill.learn}/{skill.max}
                                     </div>
-                                    <div
-                                      className="ff-dodoom bg-gradient-to-t to-green-400 shadow-md from-light-green-100 text-white rounded overflow-hidden border border-gray-600 text-[11px] w-[18px] h-[18px] flex items-center justify-center"
-                                      onClick={() => {
-                                        learnSkill(skill)
-                                      }}
-                                    >
-                                      <i className="fa-solid fa-arrow-up cursor-pointer" />
+                                    <div className="flex items-center gap-[3px]">
+                                      <div
+                                        className="bg-gradient-to-b to-green-400 shadow-md from-green-400/80 text-white rounded overflow-hidden border border-gray-600 w-[18px] h-[18px] flex items-center justify-center"
+                                        onClick={() => {
+                                          learnSkill(skill)
+                                        }}
+                                      >
+                                        <i className="fa-solid fa-caret-up cursor-pointer" />
+                                      </div>
+                                      <div
+                                        className="bg-gradient-to-b to-red-400 from-red-400/80 shadow-md text-white rounded overflow-hidden border border-gray-600 w-[18px] h-[18px] flex items-center justify-center"
+                                        onClick={() => {
+                                          decreaseSkill(skill)
+                                        }}
+                                      >
+                                        <i className="fa-solid fa-caret-down cursor-pointer" />
+                                      </div>
                                     </div>
                                   </div>
                                 </div>

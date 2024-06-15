@@ -105,7 +105,6 @@ export function ChatComponent() {
 
   const addMessageEvent = (selectedSocket: Socket) => {
     selectedSocket.on(MESSAGE_EVENT, (eventName, data) => {
-      console.log(eventName, data)
       const localNickName = localStorage.getItem('nickname')
       const isMe = data?.message?.indexOf(`@${localNickName}`) >= 0 || false
       switch (eventName) {

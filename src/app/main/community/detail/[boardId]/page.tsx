@@ -9,6 +9,7 @@ import {
   fetchDeleteCommentOne,
   fetchGetBoardOne,
   fetchPostBoardComment,
+  fetchRecommendPost,
 } from '@/services/api-fetch'
 import { toYYYYMMDDHHMMSS } from '@/services/util'
 import toAPIHostURL from '@/services/image-name-parser'
@@ -41,12 +42,14 @@ export default function BoardDetail({
   }
 
   const recommend = async () => {
+    if (!board) return
+    await fetchRecommendPost(board._id!)
     await Swal.fire({
-      title: '미지원',
-      text: '관리자에게 문의하세요',
+      title: '추천되었습니다',
       icon: 'info',
       confirmButtonText: '확인',
     })
+    loadBoard()
   }
 
   const onSelectEmoji = async (src: string) => {
@@ -153,7 +156,7 @@ export default function BoardDetail({
               </div>
               <div className="flex items-center gap-[4px] text-[12px]">
                 <div>조회 {board.reads.toLocaleString()}</div>
-                <div>추천 {board.recommends.toLocaleString()}</div>
+                <div>추천 {board.recommendCount.toLocaleString()}</div>
               </div>
               <div className="text-[12px]">
                 작성일 {toYYYYMMDDHHMMSS(new Date(board.createdAt!))}
@@ -174,7 +177,7 @@ export default function BoardDetail({
               onClick={() => recommend()}
             >
               <div className="text-[12px] text-red-300 font-bold">
-                {board.recommends}
+                {board.recommendCount}
               </div>
               <i className="far fa-thumbs-up text-ruliweb" />
             </div>

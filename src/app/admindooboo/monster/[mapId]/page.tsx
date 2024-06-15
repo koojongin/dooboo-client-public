@@ -63,6 +63,9 @@ export default function AdminMonsterByMapPage({
                     'level',
                     'gold',
                     'exp',
+                    'armor',
+                    'resist',
+                    'drop',
                   ].map((head) => {
                     return <th key={createKey()}>{head}</th>
                   })}
@@ -93,6 +96,9 @@ export default function AdminMonsterByMapPage({
                       <td>{monster.level}</td>
                       <td>{monster.gold}</td>
                       <td>{monster.experience}</td>
+                      <td>{monster.armor}</td>
+                      <td>{monster.resist}</td>
+                      <td>{monster.drop ? monster.drop.items.length : ''}</td>
                     </tr>
                   )
                 })}

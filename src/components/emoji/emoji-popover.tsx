@@ -12,6 +12,7 @@ export enum EmoticonKind {
   Mangu = 'Mangu',
   Nike = 'Nike',
   Genshin = 'Genshin',
+  StarSeed = 'StarSeed',
 }
 export function EmojiPopOver({ onSelect }: any) {
   const [openPopover, setOpenPopover] = useState<boolean>(false)
@@ -102,6 +103,18 @@ export function EmojiPopOver({ onSelect }: any) {
           {selectedEmoticonGroup === EmoticonKind.Genshin &&
             new Array(29).fill(1).map((v, index) => {
               const src = `/images/emoji/genshin_${`${index + 1}`.padStart(3, '0')}.webp`
+              return (
+                <img
+                  key={createKey()}
+                  src={src}
+                  onClick={() => selectEmoji(src)}
+                  className="w-[80px] h-[80px] cursor-pointer"
+                />
+              )
+            })}
+          {selectedEmoticonGroup === EmoticonKind.StarSeed &&
+            new Array(22).fill(1).map((v, index) => {
+              const src = `/images/emoji/star_seed_${`${index}`.padStart(3, '0')}.webp`
               return (
                 <img
                   key={createKey()}

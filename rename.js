@@ -1,17 +1,24 @@
 const fs = require('fs')
 const path = require('path')
-const dir = 'C:\\Users\\koo\\Downloads\\cc'
-// fs.readdirSync(dir).forEach((filename, index) => {
-//   const filePath = path.resolve(dir, filename)
-//   const lowerName = filePath
-//     .toLowerCase()
-//     .split('/')
-//     .pop()
-//     .replace('.png', '.webp')
-//     .replace('_icon', '')
-//   fs.rename(filePath, lowerName, () => {})
-// })
+// const dir = 'C:\\Users\\koo\\Downloads\\cc'
+const dir = 'C:\\Users\\koo\\Downloads\\네이버 OGQ마켓'
+fs.readdirSync(dir).forEach((filename, index) => {
+  const filePath = path.resolve(dir, filename)
+  let lowerName = filePath
+    .toLowerCase()
+    .split('/')
+    .pop()
+    .replace('.crdownload', '')
+    .replace('_icon', '')
+  lowerName = path.resolve(
+    dir,
+    `star_seed_${(index + '').padStart(3, '0')}.webp`,
+  )
+  console.log(lowerName)
+  fs.rename(filePath, lowerName, () => {})
+})
 
+/*
 console.log(path.resolve())
 const folderPath = path.resolve('public', 'images', 'pickup', 'unit')
 fs.readdirSync(folderPath).forEach((filename) => {
@@ -31,3 +38,4 @@ fs.readdirSync(folderPath).forEach((filename) => {
   console.log(fixedFileName)
   // fs.rename(fullFilePath, path.resolve(folderPath, fixedFileName), () => {})
 })
+*/

@@ -163,7 +163,7 @@ export default function CommunityBoardPage() {
                 {board.reads.toLocaleString()}
               </div>
               <div className="min-w-[50px] justify-center">
-                {board.recommends.toLocaleString()}
+                {board.recommendCount.toLocaleString()}
               </div>
 
               <div className="min-w-[120px] justify-center">
