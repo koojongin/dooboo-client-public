@@ -1,15 +1,24 @@
 import _ from 'lodash'
 import { OnCollisionSprite } from '@/game/scenes/interfaces/onCollision'
 import { Monster } from '@/interfaces/monster.interface'
+// eslint-disable-next-line import/no-cycle
 import { FightScene } from '@/game/scenes/interfaces/scene.interface'
-import { pickByRate, pickByRoll } from '@/game/util'
-import { BA_COLOR, BA_FAMILY } from '@/constants/constant'
-import { formatNumber } from '@/services/util'
+// eslint-disable-next-line import/no-cycle
+import { pickByRoll } from '@/game/util'
+import { EventBus } from '@/game/EventBus'
+import { GameEvent, SoundKey } from '@/game/scenes/enums/enum'
+// eslint-disable-next-line import/no-cycle
+import { GameWeapon } from '@/game/scenes/objects/GameWeapon'
+import createKey from '@/services/key-generator'
 
 export class GameMonster
   extends Phaser.Physics.Arcade.Sprite
   implements OnCollisionSprite
 {
+  tag = 'GameMonster'
+
+  id!: string
+
   scene!: FightScene
 
   group!: Phaser.GameObjects.Group
@@ -41,7 +50,6 @@ export class GameMonster
     this.mData = mData
     this.setDisplaySize(24, 24)
     this.setActive(true)
-
     // this.maskGraphics = this.scene.add.graphics()
     // this.maskGraphics.fillStyle(0xffffff) // White color
     // this.maskGraphics.fillCircle(this.x, this.y, this.displayWidth / 2)
@@ -52,10 +60,11 @@ export class GameMonster
   }
 
   init() {
+    this.id = createKey()
     this.setCollideWorldBounds(true)
     // this.setVelocity(-this.speed, 0)
     this.setBounce(10, 10)
-    // this.setImmovable(false)
+    this.setImmovable(true)
     this.currentHp = this.mData.hp
     this.maxHp = this.mData.hp
     this.scene.physics.moveToObject(this, this.scene.player, this.speed * 5)
@@ -103,78 +112,44 @@ export class GameMonster
     this.mask = this.maskGraphics.createGeometryMask() */
   }
 
-  onDamaged(target: OnCollisionSprite) {
-    const { stat } = this.scene.resultOfMe
-    const { damage, turn } = stat
-    const data = {
-      repeated: 0,
-    }
-    this.scene.time.addEvent({
-      delay: 50, // 1초 주기
-      callback: () => {
-        if (!this.scene) return
-        this.attack(target, data)
-      },
-      callbackScope: this,
-      repeat: turn - 1, // 5회 반복 (0부터 시작하므로 4)
-    })
-    this.attack.call(this, target, data)
-  }
-
-  attack(
-    target: OnCollisionSprite,
-    data: { repeated: number } = { repeated: 0 },
-  ) {
-    const { stat } = this.scene.resultOfMe
-    const { damage, turn } = stat
-    const { criticalMultiplier, criticalRate } = stat
-    const isCritical = pickByRate(criticalRate)
-    let totalDamage = damage
-    if (isCritical) {
-      totalDamage += damage * (criticalMultiplier / 100)
-    }
-    const collisionText = this.scene.add.text(
-      (this.x + target.x) / 2,
-      (this.y + target.y) / 2 - target.displayHeight / 2 - data.repeated * 15,
-      `${formatNumber(totalDamage)}`,
-      {
-        fontFamily: BA_FAMILY,
-        fontSize: isCritical ? '16px' : '10px',
-        color: isCritical ? '#ef1134' : BA_COLOR,
-        strokeThickness: 1,
-        stroke: '#ffffff',
-      },
-    )
-
-    // 텍스트 애니메이션 설정
-    this.scene.tweens.add({
-      targets: collisionText,
-      y: collisionText.y - 50, // Y축으로 50px 위로 이동
-      alpha: 0, // 투명도 0으로 설정
-      duration: 2000, // 애니메이션 지속 시간 2초
-      ease: 'Power1',
-      onComplete() {
-        collisionText.destroy() // 애니메이션 완료 후 텍스트 제거
-      },
-    })
-
-    this.currentHp -= totalDamage
-    // eslint-disable-next-line no-param-reassign
-    data.repeated += 1
-    if (this.currentHp <= 0) this.dead()
+  onDamaged(target: GameWeapon) {
+    target.onCollisionWithMonster(this)
   }
 
   dead() {
-    if ((this.mData.drop?.items || []).length > 0) {
-      const [dropItem] = _.shuffle(this.mData.drop?.items)
+    if (!this.active) return
+    const isExistDropCondition = (this.mData.drop?.items || []).length > 0
+    if (isExistDropCondition && !this.scene.isFulledInventory) {
+      const [dropItem] = _.shuffle(
+        this.mData.drop?.items, // .filter((i) => i.iType === BaseItemType.BaseMisc),
+      )
       const isPicked = pickByRoll(dropItem.roll)
       if (isPicked) {
-        const { item } = dropItem
-        this.scene.add.sprite(this.x, this.y, `item-${item._id}`)
+        this.scene.player.queue.items.push(dropItem)
+        this.scene.soundManager.play(SoundKey.WeaponDrop)
       }
     }
     // this.maskGraphics.clear()
     // this.clearMask(true)
+    const { hpRecoveryOnKill, mpRecoveryOnKill } = this.scene.resultOfMe.stat
+    if (hpRecoveryOnKill) {
+      this.scene.player.currentHp = Math.min(
+        this.scene.player.currentHp + hpRecoveryOnKill,
+        this.scene.player.maxHp,
+      )
+      this.scene.statusBox.hpBar.update()
+    }
+    if (mpRecoveryOnKill) {
+      this.scene.player.currentMp = Math.min(
+        this.scene.player.currentMp + mpRecoveryOnKill,
+        this.scene.player.maxMp,
+      )
+      this.scene.statusBox.mpBar.update()
+    }
+    this.scene.player.queue.experience += this.mData.experience
+    this.scene.player.queue.gold += this.mData.gold
+    this.scene.statusBox.expBar.update()
+    EventBus.emit(GameEvent.MonsterDead)
     this.destroy()
   }
 }

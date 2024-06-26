@@ -34,6 +34,7 @@ import {
 } from '@/interfaces/stash.interface'
 import { Currency, CurrencyResponse } from '@/interfaces/currency.interface'
 import { Pagination } from '@/interfaces/common.interface'
+import { AllSkillResponse, JobKind } from '@/interfaces/job.interface'
 
 interface CreateMonsterResponse {
   monster: {
@@ -414,7 +415,7 @@ export async function fetchLearnSkill(
   return response
 }
 
-export async function fetchGetSkills(): Promise<any> {
+export async function fetchGetSkills(): Promise<AllSkillResponse> {
   const { data: response } = await api.get(`/skill/all`)
   return response
 }

@@ -162,7 +162,7 @@ export function MapSelectPopoverComponent({
       placement="bottom-end"
     >
       <PopoverHandler>
-        <div className="ff-ba ff-skew border cursor-pointer pl-[10px] h-[30px] flex items-center text-blue-gray-700 border-gray-400 border-r-0 rounded-l">
+        <div className="ff-ba ff-skew border cursor-pointer pl-[10px] h-[30px] flex items-center text-blue-gray-700 border-gray-400 rounded">
           {selectedMap || '사냥터 선택하기'}
         </div>
       </PopoverHandler>

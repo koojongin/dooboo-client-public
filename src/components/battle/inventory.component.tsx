@@ -38,7 +38,7 @@ function InventoryComponent(
   }, [])
 
   const goToInn = () => {
-    router.push('/main/inn')
+    router.push('/main/inn/stash')
   }
   useEffect(() => {
     loadInventory()

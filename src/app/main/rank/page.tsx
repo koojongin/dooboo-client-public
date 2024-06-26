@@ -77,7 +77,7 @@ export default function CommunityPage() {
 
   return (
     <div className="flex flex-wrap gap-[10px]">
-      <div className="w-[500px]">
+      <div className="w-[600px]">
         <div className="bg-blue-gray-500 text-white py-[4px] px-[10px] ff-gs text-[20px]">
           레벨 랭크
         </div>
@@ -154,7 +154,7 @@ export default function CommunityPage() {
                         }
                       >
                         <div
-                          className="border-2 rounded border-gray-800"
+                          className="border-2 rounded border-gray-800 min-w-[44px]"
                           style={{
                             borderColor: toColorByGrade(
                               character.equip.weapon.iGrade,
@@ -170,7 +170,7 @@ export default function CommunityPage() {
                           />
                         </div>
                       </Tooltip>
-                      <div>
+                      <div className="max-w-[165px] overflow-ellipsis truncate">
                         [{character.equip.weapon.name}
                         {character.equip.weapon.starForce > 0
                           ? `+${character.equip.weapon.starForce}`
@@ -179,12 +179,29 @@ export default function CommunityPage() {
                       </div>
                     </div>
                   )}
-                  <Tooltip content={toYYYYMMDDHHMMSS(character.lastBattledAt!)}>
-                    <div className="ml-auto">
-                      {character.lastBattledAt
-                        ? ago(new Date(character.lastBattledAt))
-                        : ''}
-                    </div>
+                  <Tooltip
+                    content={
+                      <div>
+                        <div className="flex items-center justify-start">
+                          <div className="min-w-[70px]">일반</div>
+                          <div>
+                            {toYYYYMMDDHHMMSS(character.lastBattledAt!)} [
+                            {ago(character.lastBattledAt!)}]
+                          </div>
+                        </div>
+                        {character.lastEarnedAt && (
+                          <div className="flex items-center justify-start">
+                            <div className="min-w-[70px]">v2</div>
+                            <div>
+                              {toYYYYMMDDHHMMSS(character.lastEarnedAt!)} [
+                              {ago(character.lastEarnedAt!)}]
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    }
+                  >
+                    <div className="ml-auto min-w-[50px] w-[50px]">자세히</div>
                   </Tooltip>
                 </div>
               )

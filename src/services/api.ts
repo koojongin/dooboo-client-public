@@ -11,6 +11,8 @@ api.interceptors.request.use(
     const token = localStorage.getItem('token')
     // eslint-disable-next-line no-param-reassign
     config.headers.Authorization = token
+    // eslint-disable-next-line no-param-reassign
+    config.headers.GameKey = localStorage.getItem('gameKey')
     return config
   },
   (error) => {
@@ -32,6 +34,16 @@ api.interceptors.response.use(
     }
 
     if ([600, 429, 601].includes(status)) {
+      return Promise.reject(error)
+    }
+
+    if ([510].includes(status)) {
+      Swal.fire({
+        // text: code,
+        title: data?.message || message,
+        icon: 'error',
+        confirmButtonText: '확인',
+      })
       return Promise.reject(error)
     }
 

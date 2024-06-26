@@ -15,13 +15,40 @@ export interface CharacterStat {
   luk: number
 
   damage: number
-  damageEven: number
-  damageOdd: number
+  // damageEven: number
+  // damageOdd: number
 
   hp: number
   mp: number
 
   turn: number
+
+  powerStrike: {
+    mpConsumption: number // -10
+    damage: number // 50
+    rate: number // 0
+  }
+
+  hpRecoveryOnKill: number
+  mpRecoveryOnKill: number
+  mpRegenerate: number
+  attackSpeed: number
+  pierce: number
+  moreProjectiles: number
+  lessProjectileDamage: number
+  moreAreaOfEffect: number
+  mpConsumption: number
+
+  activeSkills: {
+    name: string // 'power-strike'
+    src: string // '/images/skills/swordman/power-strike.png'
+    desc: string // 'MP를 소비하여 장착한 무기로 적에게 일격을 가한다.'
+    learn: number // 20
+    max: number // 20
+    mp: number // 90
+    rate: number // 50
+    value: number // 80
+  }[]
 }
 
 export interface MeResponse {
@@ -53,9 +80,11 @@ export interface Character {
   user?: User
   equip?: Item
   lastBattledAt: string
+  lastEarnedAt: string
   thumbnail?: string
   nickname: string
   job: string
+  gameKey: string
 }
 
 export interface RankLog extends MongooseDocument {

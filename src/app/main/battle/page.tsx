@@ -21,7 +21,7 @@ export default function BattlePage() {
       </Link>
       <Link href="/main/battle/test">
         <div className="bg-white p-[40px] cursor-pointer rounded">
-          테스트 on Debug
+          일반전투v2 (테스트 끝나면 기존일반전투는 삭제예정)
         </div>
       </Link>
     </div>

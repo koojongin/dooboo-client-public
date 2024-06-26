@@ -114,7 +114,9 @@ export default function StashPage() {
                       </div>
                     </div>
                   </Tooltip>
-                  <Tooltip content="아이템 결정">
+                  <Tooltip
+                    content={`아이템 결정 ${currencyRes.currency.itemCrystalOfNormal.toLocaleString()}`}
+                  >
                     <div className="flex items-center gap-[2px]">
                       <div
                         style={{

@@ -1,9 +1,9 @@
 import { MongooseDocument, Pagination } from '@/interfaces/common.interface'
-import { BaseWeapon } from '@/interfaces/item.interface'
+import { BaseMisc, BaseWeapon } from '@/interfaces/item.interface'
 
 export interface DropTableItem extends MongooseDocument {
   itemId?: string
-  item?: BaseWeapon | any
+  item?: BaseWeapon | BaseMisc | any
   iType: 'BaseWeapon' | string
   roll: number
   amount: number
@@ -22,4 +22,5 @@ export interface DropTableResponseDto extends Pagination {
 
 export enum BaseItemType {
   'BaseWeapon' = 'BaseWeapon',
+  'BaseMisc' = 'BaseMisc',
 }

@@ -16,18 +16,21 @@ export interface SkillMeResponse {
   tree: {
     [key: string]: ISkill
   }
+  activeSkill: SkillKind
 }
-export const SkillKind = {
-  SwordMastery: 'sword-mastery',
-  SpearMastery: 'spear-mastery',
-  AxeMastery: 'axe-mastery',
-  BluntMastery: 'blunt-mastery',
-  AddStr: 'add-str',
-  AddDex: 'add-dex',
-  AddLuk: 'add-luk',
-  AddCriticalRate: 'add-critical-rate',
-  AddCriticalMultiplier: 'add-critical-multiplier',
-  PowerStrike: 'power-strike',
+export enum SkillKind {
+  SwordMastery = 'sword-mastery',
+  SpearMastery = 'spear-mastery',
+  AxeMastery = 'axe-mastery',
+  BluntMastery = 'blunt-mastery',
+  AddStr = 'add-str',
+  AddDex = 'add-dex',
+  AddLuk = 'add-luk',
+  AddCriticalRate = 'add-critical-rate',
+  AddCriticalMultiplier = 'add-critical-multiplier',
+  PowerStrike = 'power-strike',
+  ThrowWeapon = 'throw-weapon',
+  Strike = 'strike',
 }
 
 export const SKILL_ROGUE = [

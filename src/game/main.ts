@@ -15,6 +15,10 @@ const config: Phaser.Types.Core.GameConfig = {
   backgroundColor: '#028af8',
   pixelArt: true,
   scene: [Boot, Preloader, MainMenu, MainGame, GameOver],
+  fps: {
+    target: 60, // Target frame rate
+    forceSetTimeOut: true, // Force use of setTimeout to maintain FPS in background
+  },
   physics: {
     default: 'arcade', // 'matter',
     arcade: {

@@ -28,6 +28,7 @@ export const WeaponType = {
 }
 
 export interface Weapon extends MongooseDocument {
+  attackSpeed: number
   criticalMultiplier: number //
   criticalRate: number //
   damageOfCold: number

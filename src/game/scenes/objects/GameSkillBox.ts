@@ -8,7 +8,7 @@ export class GameSkillBox {
 
   cooldownElapsed!: number
 
-  skillCooldown = 2000
+  skillCooldown!: number
 
   x!: number
 
@@ -43,6 +43,8 @@ export class GameSkillBox {
     //   .setOrigin(0.5)
 
     // 초기 쿨타임 설정
+    this.skillCooldown = 1000 / this.scene.resultOfMe.stat.attackSpeed
+
     this.cooldownElapsed = this.skillCooldown
   }
 

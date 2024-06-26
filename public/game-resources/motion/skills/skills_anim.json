@@ -1,0 +1,32 @@
+{
+    "anims": [
+        {
+            "key": "power-strike",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 60,
+            "frames": [
+                {
+                    "key": "skills",
+                    "frame": "power-strike_0"
+                },
+                {
+                    "key": "skills",
+                    "frame": "power-strike_1"
+                },
+                {
+                    "key": "skills",
+                    "frame": "power-strike_2"
+                },
+                {
+                    "key": "skills",
+                    "frame": "power-strike_3"
+                },
+                {
+                    "key": "skills",
+                    "frame": "power-strike_4"
+                }
+            ]
+        }
+    ]
+}

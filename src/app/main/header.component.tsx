@@ -15,7 +15,7 @@ export default function MainHeader() {
   }
 
   return (
-    <div className="flex items-center justify-start w-full mb-2 gap-1 [&>*>img]:h-[80px] [&>a]:flex">
+    <div className="flex items-stretch justify-start w-full mb-2 gap-1 [&>*>img]:h-[80px] [&>a]:flex">
       <Link href="/main/battle" className=" duration-300 cursor-pointer">
         <img src="/images/icon_001_battle.png" />
       </Link>
@@ -46,8 +46,17 @@ export default function MainHeader() {
       >
         <img src="/images/icon_010_message.png" />
       </Link>
+      <Link
+        target="_blank"
+        href="https://discord.gg/PPzN9SWxJQ"
+        className="ml-auto duration-300 cursor-pointer relative"
+      >
+        <div className="flex items-center justify-center w-20 max-h-20 bg-white shadow-md hover:drop-shadow-lg rounded-full h-full duration-300">
+          디스 코드
+        </div>
+      </Link>
       <button
-        className="ml-auto w-20 max-h-20 bg-white shadow-md hover:drop-shadow-lg rounded-full h-full duration-300"
+        className="w-20 max-h-20 bg-white shadow-md hover:drop-shadow-lg rounded-full h-full duration-300"
         onClick={() => logout()}
       >
         로그아웃

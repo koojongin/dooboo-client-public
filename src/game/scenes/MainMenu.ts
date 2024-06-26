@@ -1,15 +1,14 @@
 import { GameObjects, Scene } from 'phaser'
 
 import { EventBus } from '../EventBus'
+import { GetMapResponse } from '@/interfaces/map.interface'
 
 export class MainMenu extends Scene {
   background!: GameObjects.Image
 
-  logo!: GameObjects.Image
-
   title!: GameObjects.Text
 
-  logoTween!: Phaser.Tweens.Tween | null
+  resultOfMap?: GetMapResponse
 
   constructor() {
     super('MainMenu')
@@ -44,15 +43,30 @@ export class MainMenu extends Scene {
         this.changeScene()
       })
 
+    this.add
+      .text(
+        this.sys.game.canvas.width / 2,
+        this.sys.game.canvas.height / 2 + 60,
+        '전투중 사망시 체력을 모두 회복하며 부활하고,\n모든 필드 몬스터가 초기화됩니다.',
+        {
+          fontFamily: 'BlueArchive',
+          fontSize: 18,
+          fontStyle: 'bold',
+          color: '#cb2759',
+          stroke: '#fff',
+          strokeThickness: 4,
+          align: 'center',
+        },
+      )
+      .setOrigin(0.5)
+      .setDepth(100)
     EventBus.emit('current-scene-ready', this)
   }
 
   changeScene() {
-    if (this.logoTween) {
-      this.logoTween.stop()
-      this.logoTween = null
+    if (!this.resultOfMap) {
+      return
     }
-
-    this.scene.start('Game')
+    this.scene.start('Game', { resultOfMap: this.resultOfMap })
   }
 }

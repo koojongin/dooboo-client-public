@@ -155,7 +155,7 @@ export default function ShopPage() {
   )
 }
 
-function InventoryBox({
+export function InventoryBox({
   onRefresh = async () => {},
   items,
   slots,

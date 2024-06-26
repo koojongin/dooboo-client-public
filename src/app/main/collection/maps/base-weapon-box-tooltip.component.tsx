@@ -31,6 +31,10 @@ export function BaseWeaponBoxTooltipComponent({
       <div className="border-b border-dashed border-dark-blue" />
       <div className="flex flex-col gap-[1px]">
         <div className="flex justify-between">
+          <div>초당 공격 속도</div>
+          <div>{selectedItem.attackSpeed}</div>
+        </div>
+        <div className="flex justify-between">
           <div>물리 피해</div>
           <div>
             {selectedItem.damageOfPhysical[0]} ~{' '}

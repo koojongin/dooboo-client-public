@@ -3,6 +3,10 @@ import 'moment/locale/ko'
 import parse from 'html-react-parser'
 import { Item } from '@/interfaces/item.interface'
 import { JobKind } from '@/interfaces/job.interface'
+import { skillTranslate } from '@/services/skill/skill.translate'
+import { cardTranslate } from '@/services/card/card.translate'
+import { cardOptionTranslate } from '@/services/card/card.option.translate'
+import { skillTagTranslate } from '@/services/skill/skill.tag.translate'
 
 export const toRangeString = (range: number[]) => {
   const [start, end] = range
@@ -70,329 +74,6 @@ export const translate = (text: string) => {
       break
     case 'select:All':
       parsedText = '모두'
-      break
-    case 'card:option:ConvertRateStrToCriticalMultiplier':
-      parsedText = '힘 - 치명타 배율 전환(%)'
-      break
-    case 'card:option:ConvertRateDexToCriticalMultiplier':
-      parsedText = '민첩 - 치명타 배율 전환(%)'
-      break
-    case 'card:option:ConvertRateLukToCriticalMultiplier':
-      parsedText = '행운 - 치명타 배율 전환(%)'
-      break
-    case 'card:option:ElementalTrinityOfLightning':
-      parsedText = '삼위일체 - 번개 피해 증가(%)'
-      break
-    case 'card:option:ElementalTrinityOfPhysical':
-      parsedText = '삼위일체 - 물리 피해 증가(%)'
-      break
-    case 'card:option:ElementalTrinityOfCold':
-      parsedText = '삼위일체 - 냉기 피해 증가(%)'
-      break
-    case 'card:option:ElementalTrinityOfFire':
-      parsedText = '삼위일체 - 화염 피해 증가(%)'
-      break
-    case 'card:option:ElementalTrinity':
-      parsedText = '삼위일체 - 원소 피해 증가(%)'
-      break
-
-    case 'card:option:IncreasedAllDamage':
-      parsedText = '피해 증가(%)'
-      break
-    case 'card:option:IncreasedLightningDamage':
-      parsedText = '번개 피해 증가(%)'
-      break
-    case 'card:option:IncreasedColdDamage':
-      parsedText = '냉기 피해 증가(%)'
-      break
-    case 'card:option:IncreasedFireDamage':
-      parsedText = '화염 피해 증가(%)'
-      break
-    case 'card:option:IncreasedPhysicalDamage':
-      parsedText = '물리 피해 증가(%)'
-      break
-    case 'card:option:IncreasedBowmanDamage':
-      parsedText = '궁수 피해 증가(%)'
-      break
-    case 'card:option:IncreasedWarriorDamage':
-      parsedText = '전사 피해 증가(%)'
-      break
-    case 'card:option:IncreasedRogueDamage':
-      parsedText = '도적 피해 증가(%)'
-      break
-    case 'card:option:IncreasedPowerStrikeDamage':
-      parsedText = '파워 스트라이크 피해 증가(%)'
-      break
-    case 'card:option:IncreasedPowerStrikeActivationRate':
-      parsedText = '파워 스트라이크 발동 확률 증가(%)'
-      break
-    case 'card:option:AddedPowerStrikeMpConsumption':
-      parsedText = '파워 스트라이크 마나 소모량'
-      break
-    case 'card:option:IncreasedCriticalRate':
-      parsedText = '치명타 확률(%)'
-      break
-    case 'card:option:IncreasedCriticalMultiplier':
-      parsedText = '치명타 배율(%)'
-      break
-    case 'card:option:IncreasedOddTurnDamage':
-      parsedText = '홀수 턴 피해 증가(%)'
-      break
-    case 'card:option:IncreasedEvenTurnDamage':
-      parsedText = '짝수 턴 피해 증가(%)'
-      break
-    case 'card:option:AddedLightningDamage':
-      parsedText = '번개 피해 추가(+)'
-      break
-    case 'card:option:AddedColdDamage':
-      parsedText = '냉기 피해 추가(+)'
-      break
-    case 'card:option:AddedFireDamage':
-      parsedText = '화염 피해 추가(+)'
-      break
-    case 'card:option:AddedPhysicalDamage':
-      parsedText = '물리 피해 추가(+)'
-      break
-    case 'card:option:AddedMp':
-      parsedText = 'Mp 추가'
-      break
-    case 'card:option:AddedHp':
-      parsedText = 'Hp 추가'
-      break
-    case 'card:option:AddedTurn':
-      parsedText = '추가 공격'
-      break
-    case 'card:option:AddedStr':
-      parsedText = '힘'
-      break
-    case 'card:option:AddedDex':
-      parsedText = '민첩'
-      break
-    case 'card:option:AddedLuk':
-      parsedText = '행운'
-      break
-    case 'card:option:HalfDamageAndMultiplyTurn':
-      parsedText = '절반 활성화'
-      break
-
-    /// ////////////////
-    case 'card:yukari':
-      parsedText = '유카리'
-      break
-    case 'card:ibuki':
-      parsedText = '이부키'
-      break
-    case 'card:hiyori':
-      parsedText = '히요리'
-      break
-    case 'card:alice':
-      parsedText = '엘리스'
-      break
-    case 'card:hinata':
-      parsedText = '히나타'
-      break
-    case 'card:hanako-swimsuit':
-      parsedText = '수영복 하나코'
-      break
-    case 'card:chise-swimsuit':
-      parsedText = '수영복 치세'
-      break
-    case 'card:eimi-swimsuit':
-      parsedText = '수영복 에이미'
-      break
-    case 'card:azusa-swimsuit':
-      parsedText = '수영복 아즈사'
-      break
-
-    case 'card:chinatsu':
-      parsedText = '치나츠'
-      break
-    case 'card:atsuko':
-      parsedText = '아츠코'
-      break
-    case 'card:ako':
-      parsedText = '아코'
-      break
-    case 'card:akane':
-      parsedText = '아카네'
-      break
-    case 'card:asuna':
-      parsedText = '아스나'
-      break
-    case 'card:chihiro':
-      parsedText = '치히로'
-      break
-
-    case 'card:airi':
-      parsedText = '에이리'
-      break
-    case 'card:noa':
-      parsedText = '노아'
-      break
-    case 'card:minori':
-      parsedText = '미노리'
-      break
-    case 'card:saten-ruiko':
-      parsedText = '사텐 루이코'
-      break
-    case 'card:renge':
-      parsedText = '렌게'
-      break
-    case 'card:tsubaki':
-      parsedText = '츠바키'
-      break
-
-    case 'card:mutsuki':
-      parsedText = '무츠키'
-      break
-    case 'card:miyako':
-      parsedText = '미야코'
-      break
-    case 'card:miyako-swimsuit':
-      parsedText = '수영복 미야코'
-      break
-    case 'card:sakurako':
-      parsedText = '사쿠라코'
-      break
-    case 'card:haruna':
-      parsedText = '하루나'
-      break
-    case 'card:kirino':
-      parsedText = '키리노'
-      break
-    case 'card:izumi':
-      parsedText = '이즈미'
-      break
-    case 'card:sena':
-      parsedText = '세나'
-      break
-    case 'card:neru':
-      parsedText = '네루'
-      break
-    case 'card:koyuki':
-      parsedText = '코유키'
-      break
-    case 'card:kikyou':
-      parsedText = '키쿄우'
-      break
-    case 'card:tsukuyo':
-      parsedText = '츠쿠요'
-      break
-    case 'card:saori':
-      parsedText = '사오리'
-      break
-    case 'card:shimiko':
-      parsedText = '시미코'
-      break
-    case 'card:marina':
-      parsedText = '마리나'
-      break
-    case 'card:mari':
-      parsedText = '마리'
-      break
-    case 'card:aru':
-      parsedText = '아루'
-      break
-
-    case 'card:wakamo':
-      parsedText = '와카모'
-      break
-
-    case 'card:shokuhou-misaki':
-      parsedText = '쇼쿠호 미사키'
-      break
-
-    case 'card:shiroko':
-      parsedText = '시로코'
-      break
-
-    case 'card:hoshino':
-      parsedText = '호시노'
-      break
-
-    case 'card:mashiro':
-      parsedText = '마시로'
-      break
-
-    case 'card:misaka-mikoto':
-      parsedText = '미사카 미코토'
-      break
-
-    case 'card:miku':
-      parsedText = '미쿠'
-      break
-
-    case 'card:kaho':
-      parsedText = '카호'
-      break
-
-    case 'card:kayoko':
-      parsedText = '카요코'
-      break
-
-    case 'card:megu':
-      parsedText = '메구'
-      break
-
-    case 'card:kaede':
-      parsedText = '카에데'
-      break
-
-    case 'card:iroha':
-      parsedText = '이로하'
-      break
-
-    case 'card:kotama':
-      parsedText = '코타마'
-      break
-
-    case 'card:saki':
-      parsedText = '사키'
-      break
-
-    case 'card:yuzu':
-      parsedText = '유즈'
-      break
-
-    case 'card:chise':
-      parsedText = '치세'
-      break
-
-    case 'card:hare':
-      parsedText = '하레'
-      break
-
-    case 'card:haruka':
-      parsedText = '하루카'
-      break
-
-    case 'card:tsurugi':
-      parsedText = '츠루기'
-      break
-
-    case 'card:serina':
-      parsedText = '세리나'
-      break
-
-    case 'card:serika':
-      parsedText = '세리카'
-      break
-
-    case 'card:nodoka':
-      parsedText = '노도카'
-      break
-
-    case 'card:tomoe':
-      parsedText = '토모에'
-      break
-    case 'card:kotori':
-      parsedText = '코토리'
-      break
-    case 'card:yoshimi':
-      parsedText = '요시미'
-      break
-    case 'card:akari':
-      parsedText = '아카리'
       break
 
     // convert
@@ -576,6 +257,18 @@ export const translate = (text: string) => {
       break
 
     /// /////////////////////////////////////////////////////
+    case 'INCREASED_ATTACK_SPEED':
+      parsedText = '공격 속도 증가(%)'
+      break
+    case 'REGENERATE_MANA':
+      parsedText = '초당 마나회복(+)'
+      break
+    case 'ADDED_MANA_ON_KILL':
+      parsedText = '처치시 MP 회복(+)'
+      break
+    case 'ADDED_LIFE_ON_KILL':
+      parsedText = '처치 시 HP 회복(+)'
+      break
     case 'ADDED_MANA':
       parsedText = 'MP 추가(+)'
       break
@@ -678,7 +371,10 @@ export const translate = (text: string) => {
     default:
       break
   }
-
+  parsedText = cardTranslate(parsedText)
+  parsedText = cardOptionTranslate(parsedText)
+  parsedText = skillTranslate(parsedText)
+  parsedText = skillTagTranslate(parsedText)
   return parsedText
 }
 

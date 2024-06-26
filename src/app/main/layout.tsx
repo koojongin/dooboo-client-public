@@ -21,9 +21,9 @@ export default function RootLayout({
           <ChatComponent />
         </div>
       </div>
-      <div className="fixed bottom-0 left-0 w-full">
+      {/* <div className="fixed bottom-0 left-0 w-full">
         <AudioPlayBar />
-      </div>
+      </div> */}
     </div>
   )
 }

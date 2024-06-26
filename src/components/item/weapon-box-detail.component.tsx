@@ -162,6 +162,10 @@ export default function WeaponBoxDetailComponent({
         <div className="border-b border-b-gray-400" />
       </div>
       <div className="px-[10px]">
+        <div className="flex justify-between">
+          <div className="">초당 공격 속도</div>
+          <div>{selectedItem.attackSpeed}</div>
+        </div>
         {selectedItem.damageOfPhysical > 0 && (
           <div className="flex justify-between">
             <div className="">물리 피해</div>
