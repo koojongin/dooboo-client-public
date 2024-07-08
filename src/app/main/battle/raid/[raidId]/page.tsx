@@ -114,11 +114,13 @@ export default function RaidDetailPage({
                 >
                   <div className="w-[100px] text-[20px]">6위 ~</div>
                   <div className="p-[5px] border-dotted min-w-[300px] flex gap-[4px]">
-                    {dropItems.map((dropItem) => {
-                      return (
-                        <DropItemBox key={createKey()} dropItem={dropItem} />
-                      )
-                    })}
+                    {dropItems
+                      .filter((dropItem) => !dropItem.isTopRankReward)
+                      .map((dropItem) => {
+                        return (
+                          <DropItemBox key={createKey()} dropItem={dropItem} />
+                        )
+                      })}
                   </div>
                 </div>
               </div>
@@ -162,15 +164,9 @@ export function DropItemBox({
   dropItem: DropTableItem
 }) {
   const { item, amount: originAmount } = dropItem
-  let amount = originAmount
+  const amount = originAmount
 
-  if (isTopRank) {
-    if (!['청휘석', '돈 주머니'].includes(item.name)) amount += 1
-    if (['돈 주머니'].includes(item.name)) {
-      amount *= 2
-    }
-  }
-
+  if (dropItem.isTopRankReward && !isTopRank) return <></>
   return (
     <div
       className={`${isDarkMode ? 'bg-white' : ''} relative flex items-center skew-x-[-10deg] border border-gray-400 rounded-md bg-top bg-no-repeat bg-cover w-[50px] h-[50px] justify-center`}

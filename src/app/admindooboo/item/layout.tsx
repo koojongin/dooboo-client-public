@@ -39,6 +39,19 @@ export default function RootLayout({
               생성
             </div>
           </Breadcrumbs>
+
+          <Breadcrumbs>
+            <div onClick={() => navigate('/admindooboo/item/defence-gear')}>
+              방어구 목록
+            </div>
+            <div
+              onClick={() =>
+                navigate('/admindooboo/item/defence-gear/edit/create')
+              }
+            >
+              생성
+            </div>
+          </Breadcrumbs>
         </div>
         {children}
       </CardBody>

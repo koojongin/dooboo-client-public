@@ -237,7 +237,7 @@ export function Battle({ headCss, battleHandler, refreshInventory }: any) {
                       {/* TAGS-----------*/}
                       {battleLog.skills?.length > 0 && (
                         <div className="ff-wavve rounded-[4px] bg-blue-gray-500 text-white text-[16px] py-[2px] px-[8px] flex items-center justify-center">
-                          {translate(battleLog.skills[0])}
+                          {translate(`skill:${battleLog.skills[0]}`)}
                         </div>
                       )}
                       {battleLog.isCriticalHit && (

@@ -18,8 +18,27 @@ export const pickByRoll = (roll: number) => {
   return result
 }
 
-export const createSignedPacket = (data: DataQueue, gameKey: string) => {
+export interface SignedPacket {
+  encryptedPayload: string
+  signature: string
+}
+export const createSignedPacket = (
+  data: DataQueue,
+  gameKey: string,
+): SignedPacket => {
   const payload = { ...data, gameKey, timestamp: new Date().getTime() }
+  const encryptedPayload = AES.encrypt(
+    JSON.stringify(payload),
+    ENCRYPTION_KEY,
+  ).toString()
+  const signature = createHmac('sha256', SECRET_KEY)
+    .update(encryptedPayload)
+    .digest('hex')
+  return { encryptedPayload, signature }
+}
+
+export const createRankDataPacket = (data: any): SignedPacket => {
+  const payload = { ...data, timestamp: new Date().getTime() }
   const encryptedPayload = AES.encrypt(
     JSON.stringify(payload),
     ENCRYPTION_KEY,

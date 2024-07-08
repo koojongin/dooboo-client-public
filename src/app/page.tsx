@@ -18,7 +18,7 @@ export default function Home() {
     if (token) {
       router.push('/main/community')
     }
-  }, [])
+  }, [accessToken, router])
 
   return (
     <div className="full-center flex justify-center ">

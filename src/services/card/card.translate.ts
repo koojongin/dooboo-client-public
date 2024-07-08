@@ -67,6 +67,17 @@ export const cardTranslate = (text: string) => {
   if (text === `${keyName}:akari`) return '아카리'
   if (text === `${keyName}:fubuki`) return '후부키'
   if (text === `${keyName}:ayane`) return '아야네'
+  if (text === `${keyName}:fuuka`) return '후우카'
+  if (text === `${keyName}:hanae`) return '하나에'
+  if (text === `${keyName}:himari`) return '히마리'
+  if (text === `${keyName}:hina`) return '히나'
+  if (text === `${keyName}:suzumi`) return '스즈미'
+  if (text === `${keyName}:toki`) return '토키'
+  if (text === `${keyName}:junko`) return '준코'
+  if (text === `${keyName}:maki`) return '마키'
+  if (text === `${keyName}:kazusa`) return '카즈사'
+  if (text === `${keyName}:karin`) return '카린'
+  if (text === `${keyName}:nonomi`) return '노노미'
 
   return text
 }

@@ -1,30 +1,78 @@
 {
     "anims": [
         {
-            "key": "power-strike",
+            "key": "fire-wall",
             "type": "frames",
             "repeat": -1,
-            "frameRate": 60,
+            "frameRate": 12,
             "frames": [
                 {
                     "key": "skills",
-                    "frame": "power-strike_0"
+                    "frame": "tile000"
                 },
                 {
                     "key": "skills",
-                    "frame": "power-strike_1"
+                    "frame": "tile001"
                 },
                 {
                     "key": "skills",
-                    "frame": "power-strike_2"
+                    "frame": "tile002"
                 },
                 {
                     "key": "skills",
-                    "frame": "power-strike_3"
+                    "frame": "tile003"
                 },
                 {
                     "key": "skills",
-                    "frame": "power-strike_4"
+                    "frame": "tile004"
+                },
+                {
+                    "key": "skills",
+                    "frame": "tile005"
+                },
+                {
+                    "key": "skills",
+                    "frame": "tile006"
+                },
+                {
+                    "key": "skills",
+                    "frame": "tile007"
+                },
+                {
+                    "key": "skills",
+                    "frame": "tile008"
+                },
+                {
+                    "key": "skills",
+                    "frame": "tile009"
+                },
+                {
+                    "key": "skills",
+                    "frame": "tile010"
+                }
+            ]
+        },
+        {
+            "key": "strike",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 20,
+            "frames": [
+                {
+                    "key": "skills",
+                    "frame": "strike_001"
+                },
+                {
+                    "key": "skills",
+                    "frame": "strike_002"
+                },
+                {
+                    "key": "skills",
+                    "frame": "strike_003"
+                },
+                {
+                    "key": "skills",
+                    "frame": "strike_004"
                 }
             ]
         }

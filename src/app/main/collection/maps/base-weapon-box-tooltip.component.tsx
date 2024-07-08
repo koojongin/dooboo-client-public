@@ -1,5 +1,6 @@
 import { DropTableItem } from '@/interfaces/drop-table.interface'
 import { translate } from '@/services/util'
+import { BaseWeapon } from '@/interfaces/item.interface'
 
 export function BaseWeaponBoxTooltipComponent({
   item,
@@ -7,6 +8,15 @@ export function BaseWeaponBoxTooltipComponent({
   item: DropTableItem
 }) {
   const selectedItem = item.item
+  return <BaseWeaponBoxComponent baseWeapon={selectedItem} />
+}
+
+export function BaseWeaponBoxComponent({
+  baseWeapon,
+}: {
+  baseWeapon: BaseWeapon
+}) {
+  const selectedItem = baseWeapon
   return (
     <div className="flex flex-col gap-[2px] bg-white rounded p-[12px] border border-gray-300 text-[#34343a] min-w-[300px] shadow-md drop-shadow-lg">
       <div className="text-[20px]">{selectedItem?.name}</div>

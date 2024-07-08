@@ -15,7 +15,13 @@ export default function BlackSmithHeader() {
         href="/main/inn/black-smith/reroll"
         className="duration-300 cursor-pointer"
       >
-        <div className="ff-ba ff-skew">재설정</div>
+        <div className="ff-ba ff-skew">기본 속성 재설정</div>
+      </Link>
+      <Link
+        href="/main/inn/black-smith/reroll-additional"
+        className="duration-300 cursor-pointer"
+      >
+        <div className="ff-ba ff-skew">추가 속성 재설정</div>
       </Link>
       <Link
         href="/main/inn/black-smith/initialize-star-force"

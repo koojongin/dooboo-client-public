@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 // const dir = 'C:\\Users\\koo\\Downloads\\cc'
-const dir = 'C:\\Users\\koo\\Downloads\\네이버 OGQ마켓'
+const dir = 'C:\\Users\\koo\\Downloads\\새 폴더 (6)'
 fs.readdirSync(dir).forEach((filename, index) => {
   const filePath = path.resolve(dir, filename)
   let lowerName = filePath
@@ -12,7 +12,7 @@ fs.readdirSync(dir).forEach((filename, index) => {
     .replace('_icon', '')
   lowerName = path.resolve(
     dir,
-    `star_seed_${(index + '').padStart(3, '0')}.webp`,
+    `qwak-cheol_${(index + '').padStart(3, '0')}.webp`,
   )
   console.log(lowerName)
   fs.rename(filePath, lowerName, () => {})

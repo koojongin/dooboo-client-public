@@ -1,52 +1,66 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import createKey from '@/services/key-generator'
 
+const staticMenus = [
+  {
+    name: '보관함',
+    url: '/main/inn/stash',
+    thumbnail: '/images/icon_stash.webp',
+  },
+  {
+    name: '대장장이',
+    url: '/main/inn/black-smith',
+    thumbnail: '/images/icon_black_smith.webp',
+  },
+  {
+    name: '상점',
+    url: '/main/inn/shop',
+    thumbnail: '/images/icon_shop.png',
+  },
+  {
+    name: '퀘스트',
+    url: '/main/inn/quest',
+    thumbnail: '/images/icon_quest.webp',
+  },
+  {
+    name: '거래소',
+    url: '/main/inn/trade',
+    thumbnail: '/images/icon_trade.webp',
+  },
+  {
+    name: '카드',
+    url: '/main/inn/deck',
+    thumbnail: '/images/icon_deck.webp',
+  },
+  {
+    name: '업적',
+    url: '/main/inn/archievement',
+    thumbnail: '/images/icon_deck.webp',
+  },
+]
 export default function InnHeader() {
   const pathname = usePathname()
   const router = useRouter()
+  const [menus, setMenus] = useState<any[]>([])
 
-  const menus = [
-    {
-      name: '보관함',
-      url: '/main/inn/stash',
-      thumbnail: '/images/icon_stash.webp',
-    },
-    {
-      name: '대장장이',
-      url: '/main/inn/black-smith',
-      thumbnail: '/images/icon_black_smith.webp',
-    },
-    {
-      name: '상점',
-      url: '/main/inn/shop',
-      thumbnail: '/images/icon_shop.png',
-    },
-    {
-      name: '퀘스트',
-      url: '/main/inn/quest',
-      thumbnail: '/images/icon_quest.webp',
-    },
-    {
-      name: '거래소',
-      url: '/main/inn/trade',
-      thumbnail: '/images/icon_trade.webp',
-    },
-    {
-      name: '카드',
-      url: '/main/inn/deck',
-      thumbnail: '/images/icon_deck.webp',
-    },
-    {
-      name: '업적',
-      url: '/main/inn/archievement',
-      thumbnail: '/images/icon_deck.webp',
-    },
-  ]
   const goToRoute = (path: string) => {
     router.push(path)
   }
+
+  useEffect(() => {
+    if (menus.length === 0)
+      setMenus([
+        {
+          name: '프로필',
+          url: `/main/profile/${window?.localStorage?.getItem('characterId')}`,
+          thumbnail: '/images/icon_deck.webp',
+        },
+        ...staticMenus,
+      ])
+  }, [menus])
 
   return (
     <div>

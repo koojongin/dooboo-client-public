@@ -3,9 +3,10 @@
 import { Tooltip } from '@material-tailwind/react'
 import { toHHMM } from '@/services/util'
 import { ItemTypeKind } from '@/interfaces/item.interface'
-import WeaponBoxDetailComponent from '@/components/item/weapon-box-detail.component'
-import MiscBoxDetailComponent from '@/components/item/misc-box-detail.component'
+import WeaponBoxDetailComponent from '@/components/item/item-box/weapon-box-detail.component'
+import MiscBoxDetailComponent from '@/components/item/item-box/misc-box-detail.component'
 import ShareItemBoxComponent from '@/components/chat/share-item-box.component'
+import DefenceGearBoxDetailComponent from '@/components/item/item-box/defence-gear-box-detail.component'
 
 export function ChatItemShareComponent({ chatMessage }: { chatMessage: any }) {
   return (
@@ -22,6 +23,9 @@ export function ChatItemShareComponent({ chatMessage }: { chatMessage: any }) {
             )}
             {chatMessage.item.iType === ItemTypeKind.Misc && (
               <MiscBoxDetailComponent item={chatMessage.item} />
+            )}
+            {chatMessage.item.iType === ItemTypeKind.DefenceGear && (
+              <DefenceGearBoxDetailComponent item={chatMessage.item} />
             )}
           </>
         }

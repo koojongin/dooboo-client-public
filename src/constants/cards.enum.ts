@@ -8,4 +8,5 @@ export enum CardSetCategory {
   AzusaSwimsuit = 'AzusaSwimsuit',
   FlatCardPickUp = 'FlatCardPickUp',
   PhysicalPickUp = 'PhysicalPickUp',
+  FubukiPickUp = 'FubukiPickUp',
 }

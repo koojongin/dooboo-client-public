@@ -12,12 +12,21 @@ import { OnCollisionSprite } from '@/game/scenes/interfaces/onCollision'
 import { MeResponse } from '@/interfaces/user.interface'
 import { GamePlayer } from '@/game/scenes/objects/GamePlayer'
 import { GameStatusBox } from '@/game/scenes/objects/GameStatus'
-import { GameConfig, Resource, SoundKey } from '@/game/scenes/enums/enum'
+import {
+  GameConfig,
+  GameEvent,
+  Resource,
+  SoundKey,
+} from '@/game/scenes/enums/enum'
 import { GameSoundManager } from '@/game/scenes/objects/GameSoundManager'
 import { fetchApplyEarnedData, fetchGameLogin } from '@/services/api/api.game'
 import { createSignedPacket } from '@/game/util'
 import { SkillMeResponse } from '@/interfaces/skill.interface'
 
+const CROW_START_POINT = {
+  x: 800,
+  y: 400,
+}
 export class Game extends Scene implements FightScene {
   camera!: Phaser.Cameras.Scene2D.Camera
 
@@ -51,6 +60,10 @@ export class Game extends Scene implements FightScene {
 
   maxMonsterPool = 100
 
+  isScareCrowMode = false
+
+  elapsedTime = 0
+
   constructor() {
     super({
       key: 'Game',
@@ -73,6 +86,9 @@ export class Game extends Scene implements FightScene {
   }
 
   async preload() {
+    this.isScareCrowMode = !!this.resultOfMap.monsters.find(
+      (monster) => monster.name === '허수아비',
+    )
     const loader: any = this.plugins.get('rexawaitloaderplugin')
     loader.addToScene(this)
     const loadRex: Phaser.Loader.LoaderPlugin & { rexAwait: any } = this
@@ -80,7 +96,7 @@ export class Game extends Scene implements FightScene {
     loadRex.rexAwait(async (resolve: any, reject: any) => {
       const [result, resultOfLogin, resultOfSkill] = await Promise.all([
         fetchMe(),
-        fetchGameLogin(),
+        fetchGameLogin(this.isScareCrowMode),
         fetchGetMySkill(),
       ])
       const { character: gameCharacter } = resultOfLogin
@@ -91,7 +107,6 @@ export class Game extends Scene implements FightScene {
       this.gameKey = gameCharacter.gameKey
       this.resultOfMe = result!
       this.resultOfSkill = resultOfSkill!
-      const { monsters } = this.resultOfMap
       const { character, equippedItems } = result
       const [item] = equippedItems || []
       let thumbnailUrl = character?.thumbnail
@@ -143,24 +158,7 @@ export class Game extends Scene implements FightScene {
     this.load.start()
   }
 
-  handleVisibilityChange() {
-    if (document.hidden) {
-      // 백그라운드 상태로 전환되면 일정한 주기로 update를 호출
-      this.backgroundUpdateInterval = setInterval(() => {
-        this.update(Date.now(), 1000 / 60) // 60fps 가정
-      }, 1000 / 60)
-    } else {
-      // 포어그라운드 상태로 전환되면 setInterval을 멈춤
-      clearInterval(this.backgroundUpdateInterval)
-      this.backgroundUpdateInterval = null
-    }
-  }
-
   create() {
-    document.addEventListener(
-      'visibilitychange',
-      this.handleVisibilityChange.bind(this),
-    )
     this.camera = this.cameras.main
     this.camera.setBackgroundColor(0x285264ff)
     this.weaponGroup = this.physics.add.group()
@@ -189,7 +187,7 @@ export class Game extends Scene implements FightScene {
     )
     this.physics.add.collider(this.monsterGroup, this.monsterGroup)
     // this.physics.add.collider(this.weaponGroup, this.weaponGroup)
-    this.physics.add.collider(
+    this.physics.add.overlap(
       this.monsterGroup,
       this.weaponGroup,
       (a: any, b: any) => {
@@ -219,15 +217,19 @@ export class Game extends Scene implements FightScene {
   }
 
   startSpawnTimer() {
+    let startingPoint: any
+    if (this.isScareCrowMode) {
+      startingPoint = CROW_START_POINT
+    }
     this.time.addEvent({
       delay: 500,
       callback: () => {
-        _.range(3).forEach(() => this.spawnMonster())
+        _.range(3).forEach(() => this.spawnMonster(startingPoint))
       },
       callbackScope: this,
       repeat: -1,
     })
-    _.range(3).forEach(() => this.spawnMonster())
+    _.range(3).forEach(() => this.spawnMonster(startingPoint))
   }
 
   startQueueResolver() {
@@ -251,6 +253,7 @@ export class Game extends Scene implements FightScene {
       try {
         const { updated, character } = await fetchApplyEarnedData(
           createSignedPacket(this.player.queue, this.gameKey),
+          { version: GameConfig.Version },
         )
         if (!updated) {
           return
@@ -258,6 +261,7 @@ export class Game extends Scene implements FightScene {
         this.player.queue.experience -= snapshot.experience
         this.player.queue.gold -= snapshot.gold
         this.player.queue.items = []
+        this.player.queue.damaged = 0
         this.resultOfMe.character = character
         this.statusBox.expBar.update()
         EventBus.emit('event', { eventName: 'refresh' })
@@ -273,6 +277,14 @@ export class Game extends Scene implements FightScene {
   }
 
   update(time: number, delta: number) {
+    if (this.isScareCrowMode) {
+      if (this.elapsedTime >= GameConfig.CROW_PRESERVE_TIME) {
+        this.scene.stop()
+        EventBus.emit(GameEvent.OnGameStop)
+      }
+    }
+
+    this.elapsedTime += delta
     if (!this.weaponGroup) return
 
     this.player.update(time, delta)
@@ -289,17 +301,36 @@ export class Game extends Scene implements FightScene {
   }
 
   resetMonster() {
+    if (!this.scene) return
     if (this.monsterGroup) this.monsterGroup.clear(true, true)
     if (this.weaponGroup) this.weaponGroup.clear(true, true)
   }
 
-  spawnMonster(x = 250, y = 250) {
+  spawnMonster(position?: { x: number; y: number }) {
     if (this.monsterGroup!.getLength() < this.maxMonsterPool) {
-      const [randomId] = _.shuffle(this.resultOfMap.monsters.map((m) => m._id))
+      const [randomMonster] = _.shuffle(this.resultOfMap.monsters.map((m) => m))
+      const randomId = randomMonster._id
+      if (randomMonster.name === '허수아비') {
+        if (this.monsterGroup.getLength() > 0) return
+      }
+
+      if (this.resultOfMap.map.name === 'TEST') {
+        if (this.monsterGroup.getLength() > 0) return
+      }
+
+      let startingPoint = {
+        x: Math.random() * this.sys.game.canvas.width,
+        y: Math.random() * this.sys.game.canvas.height,
+      }
+
+      if (position) {
+        startingPoint = position
+      }
+
       const monster = new GameMonster(
         this,
-        Math.random() * this.sys.game.canvas.width,
-        Math.random() * this.sys.game.canvas.height,
+        startingPoint.x,
+        startingPoint.y,
         `monster-${randomId}`,
         this.monsterGroup!,
         this.resultOfMap.monsters.find((m) => m._id === randomId)!,
@@ -311,5 +342,6 @@ export class Game extends Scene implements FightScene {
     this.player.queue.experience = 0
     this.player.queue.gold = 0
     this.player.queue.items = []
+    this.player.queue.damaged = 0
   }
 }

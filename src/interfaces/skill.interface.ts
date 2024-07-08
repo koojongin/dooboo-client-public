@@ -1,3 +1,5 @@
+import { ActiveSkill } from '@/services/skill/skill'
+
 export interface ISkill {
   desc: string
   learn?: number
@@ -17,6 +19,7 @@ export interface SkillMeResponse {
     [key: string]: ISkill
   }
   activeSkill: SkillKind
+  activeSkills: ActiveSkill[]
 }
 export enum SkillKind {
   SwordMastery = 'sword-mastery',
@@ -31,6 +34,8 @@ export enum SkillKind {
   PowerStrike = 'power-strike',
   ThrowWeapon = 'throw-weapon',
   Strike = 'strike',
+  IceShuriken = 'ice-shuriken',
+  FireWall = 'fire-wall',
 }
 
 export const SKILL_ROGUE = [

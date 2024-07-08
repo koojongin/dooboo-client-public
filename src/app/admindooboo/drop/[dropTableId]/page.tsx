@@ -6,8 +6,11 @@ import Swal from 'sweetalert2'
 import { useRouter } from 'next/navigation'
 import _ from 'lodash'
 import {
+  BaseDefenceGear,
   BaseMisc,
   BaseWeapon,
+  DefenceGearType,
+  ItemTypeKind,
   SelectItemDialogRef,
   SelectMonsterDialogRef,
 } from '@/interfaces/item.interface'
@@ -22,7 +25,7 @@ import SelectItemDialog from '@/app/admindooboo/drop/select-item-dialog'
 import SelectMonsterDialog from '@/app/admindooboo/drop/select-monster-dialog'
 import { Monster } from '@/interfaces/monster.interface'
 import { toYYYYMMDDHHMMSS } from '@/services/util'
-import { DropTable } from '@/interfaces/drop-table.interface'
+import { BaseItemType, DropTable } from '@/interfaces/drop-table.interface'
 
 function DropTableMonsterComponent({
   dropTable,
@@ -34,16 +37,21 @@ function DropTableMonsterComponent({
   const selectItemDialogRef = useRef<SelectItemDialogRef>(null)
   const selectMonsterDialogRef = useRef<SelectMonsterDialogRef>(null)
 
-  const getItemType = (iType: string) => {
-    if (iType === 'weapon') return 'BaseWeapon'
-    if (iType === 'misc') return 'BaseMisc'
+  const getItemType = (item: BaseWeapon | BaseMisc | BaseDefenceGear) => {
+    const selectedItem: any = item
+    const { iType, gearType } = selectedItem
+    if (iType === 'weapon') return BaseItemType.BaseWeapon
+    if (iType === 'misc') return BaseItemType.BaseMisc
+    if (Object.values(DefenceGearType).includes(gearType))
+      return BaseItemType.BaseDefenceGear
     throw new Error('UnknownType')
   }
-  const onSelectItem = (item: BaseWeapon | BaseMisc, selectedIndex: number) => {
-    // if (item.iType === 'weapon') {
-    // }
+  const onSelectItem = (
+    item: BaseWeapon | BaseMisc | BaseDefenceGear,
+    selectedIndex: number,
+  ) => {
     const newDropTable = { ...dropTable }
-    newDropTable.items[selectedIndex].iType = getItemType(item.iType)
+    newDropTable.items[selectedIndex].iType = getItemType(item)
     newDropTable.items[selectedIndex].itemId = item._id
     newDropTable.items[selectedIndex].item = {
       ...newDropTable.items[selectedIndex].item,
@@ -80,6 +88,7 @@ function DropTableMonsterComponent({
       iType: 'BaseWeapon',
       roll: 0,
       amount: 1,
+      isTopRankReward: false,
     })
     setDropTable({ ...newDropTable })
   }
@@ -213,6 +222,21 @@ function DropTableMonsterComponent({
                       value={dropItem.amount}
                     />
                   </div>
+
+                  <label className="flex items-center border border-gray-600 cursor-pointer select-none">
+                    <div>랭커보상</div>
+                    <input
+                      type="checkbox"
+                      checked={dropItem.isTopRankReward}
+                      className="flex border-2 rounded-md border-blue-200"
+                      onChange={(e) => {
+                        const newDropTable = { ...dropTable }
+                        newDropTable.items[index as number].isTopRankReward =
+                          e.target.checked
+                        setDropTable(newDropTable)
+                      }}
+                    />
+                  </label>
                 </div>
               )
             })}

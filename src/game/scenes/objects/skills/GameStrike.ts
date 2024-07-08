@@ -11,6 +11,8 @@ export class GameStrike extends Phaser.Physics.Arcade.Sprite {
 
   radius = 2
 
+  maxHitCount = 5
+
   collidedMonsters: string[] = []
 
   constructor(scene: FightScene, x: number, y: number) {
@@ -21,6 +23,7 @@ export class GameStrike extends Phaser.Physics.Arcade.Sprite {
   }
 
   init() {
+    this.maxHitCount += this.scene.resultOfMe.stat.moreHitCount
     this.setScale(
       this.radius + this.scene.resultOfMe.stat.moreAreaOfEffect / 100,
     )
@@ -38,19 +41,18 @@ export class GameStrike extends Phaser.Physics.Arcade.Sprite {
   }
 
   attack(monsters: GameMonster[]) {
-    if (monsters.length === 0) return
-    monsters.forEach((monster) => {
-      this.attackToMonster(monster)
-    })
     this.scene.player.currentMp -= this.scene.resultOfMe.stat.mpConsumption
     this.scene.statusBox.mpBar.update()
+    monsters.slice(0, this.maxHitCount).forEach((monster) => {
+      this.attackToMonster(monster)
+    })
   }
 
   attackToMonster(monster: GameMonster) {
     if (!monster || !monster?.active) return
     const { stat } = this.scene.resultOfMe
-    const { damage, turn, activeSkills } = stat
-    const { powerStrike, criticalMultiplier, criticalRate } = stat
+    const { damage, turn } = stat
+    const { criticalMultiplier, criticalRate } = stat
     const isCritical = pickByRate(criticalRate)
 
     let totalDamage = damage
@@ -76,7 +78,7 @@ export class GameStrike extends Phaser.Physics.Arcade.Sprite {
       0,
     )
 
-    totalDamage *= 10
+    // totalDamage *= 10
     // eslint-disable-next-line no-param-reassign
     monsterData.currentHp -= totalDamage
 

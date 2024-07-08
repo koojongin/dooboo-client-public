@@ -4,6 +4,7 @@ import { Card } from '@material-tailwind/react'
 import { useCallback, useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import _ from 'lodash'
+import { useRouter } from 'next/navigation'
 import createKey from '@/services/key-generator'
 import {
   fetchGetRaidRewardAll,
@@ -16,6 +17,7 @@ import { formatNumber, toHHMMSS, toYYYYMMDDHHMMSS } from '@/services/util'
 import { DropItemBox } from '@/app/main/battle/raid/[raidId]/page'
 
 export default function BattleRaidRewardsPage() {
+  const router = useRouter()
   const [raidRewards, setRaidRewards] = useState<RaidReward[]>([])
   const [pagination, setPagination] = useState<Pagination>()
   const loadRaidRewards = useCallback(async (selectedPage = 1) => {
@@ -33,6 +35,9 @@ export default function BattleRaidRewardsPage() {
     loadRaidRewards()
   }, [loadRaidRewards])
 
+  const goToRaidDetail = (raidId: string) => {
+    router.push(`/main/battle/raid/${raidId}`)
+  }
   useEffect(() => {
     loadRaidRewards()
   }, [loadRaidRewards])
@@ -86,6 +91,14 @@ export default function BattleRaidRewardsPage() {
                     </div>
                     <div className="min-w-[120px]">
                       {isEnded ? '종료된 레이드' : '진행중'}
+                      {isEnded && (
+                        <div
+                          className="bg-green-500 text-white ff-score font-bold flex justify-center items-center rounded cursor-pointer border border-green-800 shadow"
+                          onClick={() => goToRaidDetail(raidReward.raidId)}
+                        >
+                          레이드 기록보기
+                        </div>
+                      )}
                     </div>
                     {!isEnded && (
                       <div className="ml-auto min-w-[120px] text-right " />
@@ -127,17 +140,18 @@ export default function BattleRaidRewardsPage() {
                         <div>랭커 데이터 집계없음</div>
                       </div>
                     )}
-                    <div className="p-[5px] border-dotted min-w-[300px] flex gap-[4px]">
-                      {_.sortBy(dropItems, 'item.name').map((dropItem) => {
-                        return (
-                          <DropItemBox
-                            key={createKey()}
-                            dropItem={dropItem}
-                            isTopRank={raidReward.isTopRanked}
-                            isDarkMode={isEnded}
-                          />
-                        )
-                      })}
+                    <div className="p-[5px] border-dotted min-w-[300px] flex gap-[4px] min-h-[50px]">
+                      {isEnded &&
+                        _.sortBy(dropItems, 'item.name').map((dropItem) => {
+                          return (
+                            <DropItemBox
+                              key={createKey()}
+                              dropItem={dropItem}
+                              isTopRank={raidReward.isTopRanked}
+                              isDarkMode={isEnded}
+                            />
+                          )
+                        })}
                     </div>
                   </div>
                 </div>
@@ -148,8 +162,8 @@ export default function BattleRaidRewardsPage() {
         <div>
           {pagination && (
             <div className="w-full flex justify-center mt-[15px]">
-              <div className="flex gap-[4px]">
-                {new Array(pagination.totalPages)
+              <div className="flex gap-[4px] flex-wrap">
+                {new Array(Math.min(pagination.totalPages, 30))
                   .fill(1)
                   .map((value, index) => {
                     return (

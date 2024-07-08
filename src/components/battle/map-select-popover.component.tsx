@@ -136,10 +136,12 @@ export function MapSelectPopoverComponent({
   maps,
   selectedMap,
   setSelectedMap,
+  readonly,
 }: {
   maps: any[]
   selectedMap: string | undefined
   setSelectedMap: Dispatch<SetStateAction<string | undefined>>
+  readonly?: boolean
 }) {
   const [isOpenedMapList, setIsOpenedMapList] = useState<boolean>(false)
   const selectMap = (mapName: string) => {

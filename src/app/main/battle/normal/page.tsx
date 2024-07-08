@@ -69,6 +69,7 @@ export default function Main() {
     inventoryRef?.current?.refresh()
   }
   useEffect(() => {
+    console.log('왜안옴?')
     refreshMe()
   }, [refreshMe])
 
@@ -76,7 +77,7 @@ export default function Main() {
     <div className="w-full">
       <div className="items-center flex flex-col w-full">
         <div className="w-full min-h-80 grid grid-cols-8 justify-center items-center mb-2">
-          {user && (
+          {character && (
             <Battle
               headCss="col-span-8 h-full rounded w-full"
               battleHandler={battleHandler}
@@ -85,7 +86,7 @@ export default function Main() {
           )}
         </div>
         <div className="justify-between items-start w-full flex gap-1">
-          {user && (
+          {character && (
             <CharacterStatusComponent
               character={character!}
               nextExp={nextExp}
@@ -96,7 +97,7 @@ export default function Main() {
               meResponse={meResponse!}
             />
           )}
-          {user && (
+          {character && (
             <InventoryComponent
               ref={inventoryRef}
               refreshInventory={refreshInventory}

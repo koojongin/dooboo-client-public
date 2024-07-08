@@ -71,7 +71,7 @@ export default function Page({
 
   const loadWeapon = useCallback(
     async (weaponId: string) => {
-      const { weapon: rWeapon } = await fetchGetBaseWeapon(weaponId)
+      const { baseWeapon: rWeapon } = await fetchGetBaseWeapon(weaponId)
       if (!rWeapon) {
         return Swal.fire({
           title: '아이템을 찾을 수 없습니다.',

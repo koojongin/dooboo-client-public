@@ -1,6 +1,11 @@
 import api from '@/services/api'
 import { Pagination } from '@/interfaces/common.interface'
-import { BaseMisc, BaseMiscListResponseDto } from '@/interfaces/item.interface'
+import {
+  BaseDefenceGear,
+  BaseDefenceGearListResponseDto,
+  BaseMisc,
+  BaseMiscListResponseDto,
+} from '@/interfaces/item.interface'
 import { GetMapResponse } from '@/interfaces/map.interface'
 import { GatchaCard } from '@/interfaces/gatcha.interface'
 import { ShopItem } from '@/interfaces/shop.interface'
@@ -69,6 +74,38 @@ export async function fetchPutBaseMisc(misc: BaseMisc): Promise<any> {
   return response
 }
 
+export async function fetchGetBaseDefenceGearList(
+  condition = {},
+  opts = {},
+): Promise<BaseDefenceGearListResponseDto> {
+  const { data: response } = await api.post('/base-defence-gear/list', {
+    condition,
+    opts,
+  })
+  return response
+}
+
+export async function fetchGetBaseDefenceGearOne(
+  id: string,
+): Promise<{ baseDefenceGear: BaseDefenceGear }> {
+  const { data: response } = await api.get(`/base-defence-gear/${id}`)
+  return response
+}
+
+export async function fetchPostBaseDefenceGear(
+  defenceGear: BaseDefenceGear,
+): Promise<any> {
+  const { data: response } = await api.post(`/base-defence-gear/`, defenceGear)
+  return response
+}
+
+export async function fetchPutBaseDefenceGear(
+  defenceGear: BaseDefenceGear,
+): Promise<any> {
+  const { data: response } = await api.put(`/base-defence-gear/`, defenceGear)
+  return response
+}
+
 export async function fetchCreateShopItem(
   shopItem: ShopItem,
 ): Promise<{ shopItem: ShopItem }> {
@@ -90,5 +127,9 @@ export async function fetchGetMonsters(condition = {}, opts = {}) {
 
 export async function fetchGetMonstersByMap(condition = {}, opts = {}) {
   const { data } = await api.post('/monster/map/list', { condition, opts })
+  return data
+}
+export async function fetchRewardDamageRank() {
+  const { data } = await api.post('/rank/reward-damage-rank')
   return data
 }

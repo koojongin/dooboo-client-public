@@ -11,6 +11,7 @@ import React, {
 } from 'react'
 import Swal from 'sweetalert2'
 import _ from 'lodash'
+import withReactContent from 'sweetalert2-react-content'
 import {
   fetchGetMyCurrency,
   fetchGetMyInventory,
@@ -20,6 +21,7 @@ import {
   fetchItemToStash,
   fetchMe,
   fetchMergeStackedItemInInventory,
+  fetchMergeStackedItemInStash,
   fetchSalvageItems,
   fetchSellItems,
 } from '@/services/api-fetch'
@@ -31,6 +33,14 @@ import { InventoryActionKind } from '@/components/item/item.interface'
 import ItemBoxComponent from '@/components/item/item-box'
 import { Stash } from '@/interfaces/stash.interface'
 import { CurrencyResponse } from '@/interfaces/currency.interface'
+import { ItemEquipmentBoxComponent } from '@/app/main/inn/stash/item-equipment-box.component'
+import { CharacterStatBoxComponent } from '@/app/main/inn/stash/character-stat-box.component'
+import CharacterStatusDeckListComponent from '@/components/battle/character-status-deck-list.component'
+import { fetchGetAllCardSet } from '@/services/api/api.card'
+import { GatchaCard } from '@/interfaces/gatcha.interface'
+import { fetchPostAddToAuction } from '@/services/api/api.auction'
+import { DivideItemDialogComponent } from '@/app/main/inn/stash/divide-item-dialog.component'
+import { fetchDivideItem } from '@/services/api/api.item'
 
 export default function StashPage() {
   const [items, setItems] = useState<InnItem[]>([])
@@ -79,12 +89,22 @@ export default function StashPage() {
     refreshInventory()
     refreshCharacterData()
     loadMyCurrency()
-  }, [loadMyCurrency, refreshCharacterData, refreshInventory])
+    loadStashes()
+  }, [loadMyCurrency, loadStashes, refreshCharacterData, refreshInventory])
+
+  const loadAllCardSet = useCallback(async () => {
+    const result = await fetchGetAllCardSet()
+    setAllCardSet(result.cardSet)
+  }, [])
+
+  const [allCardSet, setAllCardSet] = useState<GatchaCard[]>()
+  useEffect(() => {
+    loadAllCardSet()
+  }, [loadAllCardSet])
 
   useEffect(() => {
     syncData()
-    loadStashes()
-  }, [loadStashes, syncData])
+  }, [syncData])
 
   return (
     <div className="rounded w-full min-h-[500px]">
@@ -135,6 +155,35 @@ export default function StashPage() {
             </div>
           )}
         </Card>
+        {characterData && (
+          <div className="flex flex-wrap gap-[10px]">
+            <CharacterStatBoxComponent
+              meResponse={characterData}
+              refresh={syncData}
+            />
+            <div className="flex flex-col gap-[4px]">
+              <div className="flex items-center gap-[4px]">
+                <div className="text-[16px] ff-score font-bold">
+                  사용중인 덱
+                </div>
+              </div>
+              <div>
+                {characterData.deck && (
+                  <CharacterStatusDeckListComponent
+                    deck={characterData.deck}
+                    allCardSet={allCardSet || []}
+                  />
+                )}
+              </div>
+              <hr className="my-[4px]" />
+              <ItemEquipmentBoxComponent
+                meResponse={characterData}
+                refresh={syncData}
+              />
+            </div>
+          </div>
+        )}
+        <hr className="my-[4px]" />
         <InnInventory
           items={items}
           setItems={setItems}
@@ -173,13 +222,102 @@ function InnInventory({
   isFulledInventory?: boolean
 }) {
   const [maxInventorySize] = useState(new Array(100).fill(1))
-  const sellItem = (item: InnItem) => {}
   const leftInventoryRef = useRef<any>()
 
   const mergeStackableItems = useCallback(async () => {
     await fetchMergeStackedItemInInventory()
     await syncData()
   }, [syncData])
+
+  const mergeStackableItemsInStash = useCallback(async () => {
+    if (!selectedStash) {
+      return Swal.fire({
+        // text: code,
+        title: '선택된 창고가 없습니다.',
+        icon: 'error',
+        confirmButtonText: '확인',
+      })
+    }
+
+    await fetchMergeStackedItemInStash(selectedStash._id!)
+    await syncData()
+  }, [selectedStash, syncData])
+
+  const [divideAmount, setDivideAmount] = useState<number>(1)
+
+  const divideStackableItems = useCallback(
+    async (stashId?: string) => {
+      const selectedItems = (
+        !stashId ? items : selectedStash?.items || []
+      ).filter((item) => item.isSelected)
+      console.log(selectedItems, selectedStash)
+      if (selectedItems.length !== 1) {
+        return Swal.fire({
+          title: `나눌 아이템을 한개만 선택해주세요. 중첩형 아이템만 가능합니다.`,
+          icon: 'warning',
+          confirmButtonText: '확인',
+        })
+      }
+
+      const [selectedItem] = selectedItems
+      if ((selectedItem?.misc?.stack || 0) <= 1) {
+        return Swal.fire({
+          title: `나눌 수 없는 아이템입니다.(1개 이거나 중첩형 아이템이 아님)`,
+          icon: 'warning',
+          confirmButtonText: '확인',
+        })
+      }
+
+      withReactContent(Swal).fire({
+        title: `나눌 수량을 설정하세요`,
+        input: 'number',
+        html: (
+          <DivideItemDialogComponent
+            item={selectedItem}
+            setAmount={setDivideAmount}
+          />
+        ),
+        inputAttributes: {
+          autocapitalize: 'off',
+        },
+        showCancelButton: true,
+        confirmButtonText: '등록하기',
+        cancelButtonText: '취소',
+        showLoaderOnConfirm: true,
+        preConfirm: async (amount: string) => {
+          const willDivideAmount = parseInt(amount, 10)
+          if (!willDivideAmount) return
+          const minAmount = 1
+          const maxAmount = selectedItem.misc.stack
+          if (willDivideAmount < minAmount) {
+            return Swal.showValidationMessage(
+              `최소 나누기 제한
+            ${minAmount.toLocaleString()}`,
+            )
+          }
+          if (willDivideAmount > maxAmount) {
+            return Swal.showValidationMessage(
+              `최대 나누기 제한
+            ${maxAmount.toLocaleString()}`,
+            )
+          }
+          try {
+            await fetchDivideItem(selectedItem._id!, {
+              amount: willDivideAmount,
+              stashId,
+            })
+            await syncData()
+          } catch (error) {
+            Swal.showValidationMessage(`
+        Request failed: ${error}
+      `)
+          }
+        },
+        allowOutsideClick: () => !Swal.isLoading(),
+      })
+    },
+    [items, selectedStash, syncData],
+  )
 
   const salvageSelectedItems = async () => {
     const selectedItems = items.filter((item) => item.isSelected)
@@ -401,17 +539,25 @@ function InnInventory({
                 합치기
               </div>
             </Tooltip>
+            <Tooltip content="중첩 아이템이고, 나눌수있는 경우 아이템을 두개로 원하는 수량만큼 나눕니다.">
+              <div
+                className="border py-[2px] px-[5px] text-[16px] rounded text-white bg-ruliweb cursor-pointer"
+                onClick={() => divideStackableItems()}
+              >
+                나누기
+              </div>
+            </Tooltip>
           </div>
           <div className="flex justify-between ff-ba mt-[5px]">
             <div className="text-blue-gray-600 border-blue-gray-900 border-b-0 border min-w-[60px] flex items-center justify-center ff-ba text-[18px] h-[27px] px-[4px]">
               인벤토리
             </div>
-            <div className="flex">
-              <input className="border border-dark-blue border-b-0 rounded-bl-none rounded rounded-r-none focus-visible:outline-0 ff-wavve text-[16px] p-[2px]" />
-              <div className="border-dark-blue border border-l-0 border-b-0 rounded-br-none rounded rounded-l-none ff-wavve text-[16px] flex items-center justify-center p-[2px]">
-                선택
-              </div>
-            </div>
+            {/* <div className="flex"> */}
+            {/*  <input className="border border-dark-blue border-b-0 rounded-bl-none rounded rounded-r-none focus-visible:outline-0 ff-wavve text-[16px] p-[2px]" /> */}
+            {/*  <div className="border-dark-blue border border-l-0 border-b-0 rounded-br-none rounded rounded-l-none ff-wavve text-[16px] flex items-center justify-center p-[2px]"> */}
+            {/*    선택 */}
+            {/*  </div> */}
+            {/* </div> */}
           </div>
           <div ref={leftInventoryRef}>
             <div className="w-full flex justify-center bg-gray-100 border-gray-600 py-[4px] border rounded-b">
@@ -444,6 +590,7 @@ function InnInventory({
                             InventoryActionKind.Share,
                             InventoryActionKind.AddToAuction,
                             InventoryActionKind.Consume,
+                            InventoryActionKind.Equip,
                           ]}
                           onShowTotalDamage
                           actionCallback={syncData}
@@ -494,6 +641,22 @@ function InnInventory({
             >
               전체 선택
             </div>
+            <Tooltip content="중첩 가능한 아이템이 있는 경우 합칩니다.">
+              <div
+                className="border py-[2px] px-[5px] text-[16px] rounded text-white bg-ruliweb cursor-pointer"
+                onClick={() => mergeStackableItemsInStash()}
+              >
+                합치기
+              </div>
+            </Tooltip>
+            <Tooltip content="중첩 아이템이고, 나눌수있는 경우 아이템을 두개로 원하는 수량만큼 나눕니다.">
+              <div
+                className="border py-[2px] px-[5px] text-[16px] rounded text-white bg-ruliweb cursor-pointer"
+                onClick={() => divideStackableItems(selectedStash?._id)}
+              >
+                나누기
+              </div>
+            </Tooltip>
           </div>
           <div className="flex mt-[5px] border-b border-b-blue-gray-900 border-dashed">
             {stashes.length === 0 && (

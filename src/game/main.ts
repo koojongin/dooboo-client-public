@@ -1,12 +1,12 @@
-import { AUTO, Game } from 'phaser'
-import PhaserMatterCollisionPlugin from 'phaser-matter-collision-plugin'
+import { Game } from 'phaser'
+// eslint-disable-next-line import/extensions
+import VirtualJoystickPlugin from 'phaser3-rex-plugins/plugins/virtualjoystick-plugin.js'
 import { Boot } from './scenes/Boot'
 import { GameOver } from './scenes/GameOver'
 import { Game as MainGame } from './scenes/Game'
 import { MainMenu } from './scenes/MainMenu'
 import { Preloader } from './scenes/Preloader'
-//  Find out more information about the Game Config at:
-//  https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
+
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.WEBGL,
   width: 1080,
@@ -29,6 +29,16 @@ const config: Phaser.Types.Core.GameConfig = {
         y: 0,
       },
     },
+  },
+  plugins: {
+    global: [
+      {
+        key: 'rexVirtualJoystick',
+        plugin: VirtualJoystickPlugin,
+        start: true,
+      },
+      // ...
+    ],
   },
   /* plugins: {
     scene: [

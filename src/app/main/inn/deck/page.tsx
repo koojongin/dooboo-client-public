@@ -4,6 +4,7 @@ import { Card, Tooltip } from '@material-tailwind/react'
 import { useCallback, useEffect, useState } from 'react'
 import _ from 'lodash'
 import Swal from 'sweetalert2'
+import { useRouter } from 'next/navigation'
 import {
   fetchGetAllCardSet,
   fetchGetMyCardSet,
@@ -15,16 +16,22 @@ import createKey from '@/services/key-generator'
 import { GatchaCardExtended } from '@/app/main/inn/deck/deck.type'
 import { SummpedCardOptions } from '@/components/deck/summped-card-options'
 import { GatchaCardComponent } from '@/components/deck/gatcha-card'
+import { fetchPurchaseCard } from '@/services/api/api.item'
+import { CardDeck } from '@/interfaces/gatcha.interface'
+import { DeckBoxListComponent } from '@/app/main/inn/deck/deck-box.component'
 
 export default function DeckPage() {
-  const [allCardSet, setAllCardSet] = useState<Array<GatchaCardExtended>>([])
+  const router = useRouter()
 
+  const [allCardSet, setAllCardSet] = useState<Array<GatchaCardExtended>>([])
   const [deckCardSet, setDeckCardSet] = useState<Array<GatchaCardExtended>>([])
   const [summedCardOptions, setSummedCardOptions] = useState<any[]>([])
+  const [decks, setDecks] = useState<CardDeck[]>([])
 
   const loadMyCards = useCallback(async () => {
     const result = await fetchGetMyDeck()
     setDeckCardSet(result.cards)
+    setDecks(_.orderBy(result.decks, ['index'], ['asc']))
   }, [])
 
   const loadAllCardSet = useCallback(async () => {
@@ -52,8 +59,21 @@ export default function DeckPage() {
     })
   }
 
-  const onClickCard = (card: GatchaCardExtended) => {
-    if ((card.stack || 0) === 0) return
+  const onClickCard = async (card: GatchaCardExtended) => {
+    if ((card.stack || 0) === 0) {
+      const { isConfirmed } = await Swal.fire({
+        text: `[${translate(`card:${card.name}`)}] 청휘석 50,000개를 사용하여 구매하시겠습니까?`,
+        icon: 'question',
+        confirmButtonText: '예',
+        denyButtonText: `닫기`,
+        showDenyButton: true,
+      })
+      if (isConfirmed) {
+        await fetchPurchaseCard(card.name)
+        await refresh()
+      }
+      return
+    }
     if (deckCardSet.length === 5) return
     if (deckCardSet.map((deckCard) => deckCard.name).includes(card.name)) return
     const updatedCardSet = [...deckCardSet, card]
@@ -66,10 +86,17 @@ export default function DeckPage() {
     setDeckCardSet([...deckCardSet])
   }
 
-  useEffect(() => {
-    loadAllCardSet()
-    loadMyCards()
+  const refresh = useCallback(async () => {
+    await Promise.all([loadAllCardSet(), loadMyCards()])
   }, [loadAllCardSet, loadMyCards])
+
+  const goToRoute = (path: string) => {
+    router.push(path)
+  }
+
+  useEffect(() => {
+    refresh()
+  }, [loadAllCardSet, loadMyCards, refresh])
 
   useEffect(() => {
     if (allCardSet.length === 0) {
@@ -104,15 +131,21 @@ export default function DeckPage() {
     <div>
       <Card className="rounded p-[10px] select-none">
         <div>
-          <div className="flex items-center gap-[5px]  mb-[5px]">
-            <div className="ff-score font-bold text-[20px]">현재 덱</div>
+          <div className="flex justify-start items-stretch gap-[5px] mb-[5px] text-[16px] h-[28px]">
             <div
-              className="bg-green-600 text-white text-[16px] ff-ba flex items-center justify-center w-[65px] h-[28px] cursor-pointer hover:bg-green-500"
+              className="bg-green-600 text-white px-[10px] cursor-pointer hover:bg-green-500 flex items-center justify-center"
               onClick={() => saveDeck()}
             >
-              저장
+              선택된 덱 저장
+            </div>
+            <div
+              className="bg-red-400 text-white flex items-center justify-center p-[10px]"
+              onClick={() => goToRoute('/main/inn/deck/management')}
+            >
+              관리
             </div>
           </div>
+          {decks && <DeckBoxListComponent decks={decks} refresh={refresh} />}
           <div className="flex gap-[10px]">
             <div>
               <div className="flex flex-wrap gap-[10px]">
@@ -186,15 +219,16 @@ export default function DeckPage() {
                           </Tooltip>
                         )}
                       </div>
-                      {/* {baseCard && <GatchaCardComponent card={baseCard} />} */}
                     </div>
                   )
                 })}
               </div>
             </div>
-            <div className="border border-gray-600 p-[4px] flex flex-col gap-[4px]">
-              <SummpedCardOptions options={summedCardOptions} />
-            </div>
+            {summedCardOptions.length > 0 && (
+              <div className="border border-gray-600 p-[4px] flex flex-col gap-[4px]">
+                <SummpedCardOptions options={summedCardOptions} />
+              </div>
+            )}
           </div>
         </div>
 

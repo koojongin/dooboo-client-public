@@ -1,8 +1,7 @@
 import { Tooltip } from '@material-tailwind/react'
-import { CardDeck } from '@/interfaces/user.interface'
 import createKey from '@/services/key-generator'
 import { translate } from '@/services/util'
-import { GatchaCard } from '@/interfaces/gatcha.interface'
+import { CardDeck, GatchaCard } from '@/interfaces/gatcha.interface'
 import { GatchaCardComponent } from '@/components/deck/gatcha-card'
 
 export default function CharacterStatusDeckListComponent({

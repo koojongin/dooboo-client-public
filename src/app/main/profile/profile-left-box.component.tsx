@@ -22,6 +22,9 @@ export function ProfileLeftBoxComponent({
     setCharacter(result.character)
   }, [])
   const goToSubRoute = (url: string) => {
+    if (url === '') {
+      return router.push(`/main/profile/${characterId}`)
+    }
     if (pathname.indexOf(url) >= 0) return
     router.push(`/main/profile/${characterId}/${url}`)
   }
@@ -75,6 +78,12 @@ export function ProfileLeftBoxComponent({
           )}
         </div>
         <div className="flex flex-col gap-[7px] mt-[4px]">
+          <div
+            className="bg-cyan-900 text-white flex items-center justify-center min-w-[120px] min-h-[30px] rounded shadow-md shadow-cyan-950/50 cursor-pointer"
+            onClick={() => goToSubRoute('')}
+          >
+            홈으로
+          </div>
           <div
             className="bg-cyan-900 text-white flex items-center justify-center min-w-[120px] min-h-[30px] rounded shadow-md shadow-cyan-950/50 cursor-pointer"
             onClick={() => goToSubRoute('skill')}

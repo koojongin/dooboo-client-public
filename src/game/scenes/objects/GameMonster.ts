@@ -61,10 +61,9 @@ export class GameMonster
 
   init() {
     this.id = createKey()
+    this.speed = this.mData.speed
     this.setCollideWorldBounds(true)
-    // this.setVelocity(-this.speed, 0)
     this.setBounce(10, 10)
-    this.setImmovable(true)
     this.currentHp = this.mData.hp
     this.maxHp = this.mData.hp
     this.scene.physics.moveToObject(this, this.scene.player, this.speed * 5)
@@ -92,7 +91,7 @@ export class GameMonster
     // 스프라이트의 속도 설정 (옵션)
     const bounceSpeed = 10
     this.setVelocity(destinationX * bounceSpeed, destinationY * bounceSpeed)
-    this.scene.player.onDamaged(10)
+    this.scene.player.onDamaged(this.mData.collisionDamage)
   }
 
   update() {
@@ -150,6 +149,11 @@ export class GameMonster
     this.scene.player.queue.gold += this.mData.gold
     this.scene.statusBox.expBar.update()
     EventBus.emit(GameEvent.MonsterDead)
+
+    if (this.mData.name === '허수아비') return
+    if (this.scene.resultOfMap.map.name === 'TEST') {
+      this.scene.applyStackedQueue()
+    }
     this.destroy()
   }
 }

@@ -36,7 +36,10 @@ export default function CommunityBoardPage() {
       }
     }
 
-    const result = await fetchGetBoardList(condition, { page: pageNumber })
+    const result = await fetchGetBoardList(condition, {
+      page: pageNumber,
+      limit: 15,
+    })
     setBoards(result.boards)
     setPage(result.page)
     setTotalPages(result.totalPages)
@@ -147,14 +150,14 @@ export default function CommunityBoardPage() {
                   router.push(`/main/profile/${board.character._id}`)
                 }
               >
-                <div className="flex items-center justify-between min-w-[40px] min-h-[40px] w-[40px] h-[40px] rounded border border-gray-200 overflow-hidden p-[2px] bg-white">
-                  <div
-                    className="w-full h-full bg-cover bg-center"
-                    style={{
-                      backgroundImage: `url('${board.character.thumbnail || DEFAULT_THUMBNAIL_URL}')`,
-                    }}
-                  />
-                </div>
+                {/* <div className="flex items-center justify-between min-w-[40px] min-h-[40px] w-[40px] h-[40px] rounded border border-gray-200 overflow-hidden p-[2px] bg-white"> */}
+                {/*  <div */}
+                {/*    className="w-full h-full bg-cover bg-center" */}
+                {/*    style={{ */}
+                {/*      backgroundImage: `url('${board.character.thumbnail || DEFAULT_THUMBNAIL_URL}')`, */}
+                {/*    }} */}
+                {/*  /> */}
+                {/* </div> */}
                 <div className="min-w-[100px] max-w-[100px] truncate">
                   {board.character.nickname}
                 </div>

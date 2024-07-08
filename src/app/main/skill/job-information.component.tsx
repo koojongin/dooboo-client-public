@@ -45,11 +45,21 @@ export function JobInformationComponent({
       </div>
       <div className="mt-[5px] flex flex-col gap-[4px]">
         <div>
-          1차 전직은 레벨5 이후로 가능합니다. 전직은 5레벨 이 후에 하더라도,
-          스킬포인트를 정상적으로 받을 수 있습니다.
+          1차 전직은 <span className="font-bold text-red-400">1레벨부터</span>{' '}
+          가능합니다.
         </div>
-        <div>전직은 레벨당 3포인트를 얻을 수 있습니다.</div>
-        <div>1차 전직은 30레벨 이전까지 포인트를 획득합니다.</div>
+        <div>
+          1차 전직된 캐릭터는{' '}
+          <span className="font-bold text-red-400">5레벨부터 30레벨 이전</span>
+          까지 스킬포인트를 획득합니다.
+        </div>
+        <div>
+          포인트 획득 구간에서는{' '}
+          <span className="font-bold text-red-400">
+            레벨 당 3개의 스킬 포인트
+          </span>
+          를 획득합니다.
+        </div>
       </div>
       <div>
         <div className="flex items-center gap-[4px]">
@@ -102,10 +112,10 @@ export function JobInformationComponent({
                   </div>
                   <div className="w-full border border-l-gray-600 text-[14px] flex flex-col justify-between bg-gray-100 text-gray-700">
                     <div className="ff-dodoom  px-[2px] h-[20px] flex items-center">
-                      {translate(skill?.name)}
+                      {translate(`skill:${skill?.name}`)}
                     </div>
                     <div className="border-b border-dashed border-b-gray-400 w-full" />
-                    <div className="flex items-center justify-between px-[2px] h-[20px] flex items-center">
+                    <div className="flex items-center justify-between px-[2px] h-[20px]">
                       <div className="ff-dodoom ">최대 {skill.max}포인트</div>
                     </div>
                   </div>
@@ -128,7 +138,7 @@ export function SkillDetailComponent({
   selectedSkill: SkillData
 }) {
   return (
-    <div className="mt-[10px] text-[16px] ff-dodoom-all flex items-start">
+    <div className="mt-[10px] text-[16px] ff-dodoom-all flex items-start bg-white/80 p-[4px] rounded">
       <div className="border border-gray-400 p-[8px] border-r-0 flex gap-[4px] flex-col w-[300px]">
         <div className="flex items-center gap-[4px]">
           <div className="flex items-center justify-center">
@@ -136,7 +146,7 @@ export function SkillDetailComponent({
               <img className="w-full h-full" src={selectedSkill?.src} />
             </div>
           </div>
-          <div>{translate(selectedSkill.name)}</div>
+          <div>{translate(`skill:${selectedSkill.name}`)}</div>
         </div>
         <div>{selectedSkill.desc}</div>
       </div>

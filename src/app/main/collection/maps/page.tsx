@@ -13,6 +13,7 @@ import { BaseItemTypeKind } from '@/interfaces/item.interface'
 import { BaseMiscBoxTooltipComponent } from './base-misc-box-tooltip.component'
 import { BaseWeaponBoxTooltipComponent } from './base-weapon-box-tooltip.component'
 import { fetchGetMap } from '@/services/api-admin-fetch'
+import { BaseDefenceGearBoxTooltipComponent } from '@/app/main/collection/maps/base-defence-gear-box-tooltip.component'
 
 type SelectableDbMap = DbMap & { isSelected?: boolean }
 type MixedDbMap = DbMap & { monsters: Monster[]; totalWeight: number }
@@ -128,6 +129,12 @@ export default function CollectionMapsPage() {
                         <div className="text-blue-900">
                           저항:{monster.resist.toLocaleString()}%
                         </div>
+                        <div className="text-blue-900">
+                          충돌 피해:{monster.collisionDamage.toLocaleString()}
+                        </div>
+                        <div className="text-blue-900">
+                          이동속도:{monster.speed}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -211,6 +218,57 @@ export default function CollectionMapsPage() {
                                   </div>
                                   <div className="ff-ba ff-skew text-center text-[10px]">
                                     iLv{item.iLevel}
+                                  </div>
+                                  <div className="text-center text-[10px] mt-auto">
+                                    {((1 / (itemData.roll || 0)) * 100).toFixed(
+                                      2,
+                                    )}
+                                    %
+                                  </div>
+                                </div>
+                              </div>
+                            </Tooltip>
+                          )}
+
+                          {itemData.iType ===
+                            BaseItemTypeKind.BaseDefenceGear && (
+                            <Tooltip
+                              className="rounded-none bg-transparent"
+                              interactive
+                              placement="right"
+                              content={
+                                <BaseDefenceGearBoxTooltipComponent
+                                  item={itemData}
+                                />
+                              }
+                            >
+                              <div className="flex flex-col border border-gray-300 cursor-pointer">
+                                <div className="flex items-center justify-center border-b bg-gray-200 min-w-[60px] min-h-[60px]">
+                                  <img
+                                    className="p-[4px] w-[42px] h-[42px]"
+                                    src={toAPIHostURL(item.thumbnail)}
+                                  />
+                                </div>
+                                <div className="mt-[2px] flex flex-col gap-[2px] min-h-[65px]">
+                                  <div className="ff-ba ff-skew text-center text-[10px]">
+                                    {item.name}
+                                  </div>
+                                  <div className="ff-ba ff-skew text-center text-[10px]">
+                                    {translate(item.gearType)}
+                                  </div>
+                                  <div className="ff-ba ff-skew text-center text-[10px]">
+                                    iLv{item.iLevel}
+                                  </div>
+                                  <div className="text-center text-[10px]">
+                                    <div className="flex items-center justify-center">
+                                      <img
+                                        className="w-[10px] mb-[1px]"
+                                        src="/images/star_on.png"
+                                      />
+                                      <div className="ff-ba text-[12px]">
+                                        x{item.maxStarForce}
+                                      </div>
+                                    </div>
                                   </div>
                                   <div className="text-center text-[10px] mt-auto">
                                     {((1 / (itemData.roll || 0)) * 100).toFixed(

@@ -1,6 +1,6 @@
 import api from '@/services/api'
 import { CardSetCategory } from '@/constants/cards.enum'
-import { GatchaCard } from '@/interfaces/gatcha.interface'
+import { CardDeck, GatchaCard } from '@/interfaces/gatcha.interface'
 
 export async function fetchGetCardSet(
   category: CardSetCategory,
@@ -37,22 +37,46 @@ export async function fetchSaveDeck(
   return response
 }
 
-export async function fetchGetMyDeck(): Promise<{ cards: GatchaCard[] }> {
+export async function fetchGetMyDeck(): Promise<{
+  cards: GatchaCard[]
+  decks: CardDeck[]
+}> {
   const { data: response } = await api.get(`/card/my-deck`)
+  return response
+}
+
+export async function fetchGetCardsByCharacterId(
+  characterId: string,
+): Promise<{ cardSet: GatchaCard[]; decks: CardDeck[] }> {
+  const { data: response } = await api.get(`/card/character/${characterId}`)
+  return response
+}
+
+export async function fetchPutDeckName(
+  deckId: string,
+  deckName: string,
+): Promise<any> {
+  const { data: response } = await api.put(`/card/deck/name`, {
+    id: deckId,
+    name: deckName,
+  })
+  return response
+}
+
+export async function fetchCreateDeck(index: number): Promise<any> {
+  const { data: response } = await api.get(`/card/create/deck/${index}`)
+  return response
+}
+
+export async function fetchPutActiveDeck(index: number): Promise<any> {
+  const { data: response } = await api.put(`/card/change-active/deck/${index}`)
   return response
 }
 
 export async function fetchGetDeckByCharacter(
   characterId: string,
-): Promise<{ cards: GatchaCard[] }> {
+): Promise<{ cards: GatchaCard[]; decks: CardDeck[]; deck: CardDeck }> {
   const { data: response } = await api.get(`/card/deck/${characterId}`)
-  return response
-}
-
-export async function fetchCardSet(
-  characterId: string,
-): Promise<{ cardSet: GatchaCard[] }> {
-  const { data: response } = await api.get(`/card/character/${characterId}`)
   return response
 }
 

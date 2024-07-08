@@ -1,6 +1,8 @@
 import { Item } from './item.interface'
 import { MongooseDocument, Pagination } from '@/interfaces/common.interface'
-import { GatchaCard } from '@/interfaces/gatcha.interface'
+import { CardDeck, GatchaCard } from '@/interfaces/gatcha.interface'
+import { ActiveSkill } from '@/services/skill/skill'
+import { CharacterSkill } from '@/interfaces/skill.interface'
 
 export interface CharacterStat {
   criticalMultiplier: number // 10
@@ -10,45 +12,49 @@ export interface CharacterStat {
   damageOfCold: number // 10
   damageOfLightning: number // 10
 
+  totalIncreasedPhysical: number
+  totalIncreasedFire: number
+  totalIncreasedCold: number
+  totalIncreasedLightning: number
+
+  addedHp: number
+  totalIncreasedHp: number
+
   str: number
   dex: number
   luk: number
 
-  damage: number
-  // damageEven: number
-  // damageOdd: number
+  speed: number
 
+  damage: number
   hp: number
   mp: number
 
-  turn: number
-
-  powerStrike: {
-    mpConsumption: number // -10
-    damage: number // 50
-    rate: number // 0
-  }
+  armor: number
 
   hpRecoveryOnKill: number
   mpRecoveryOnKill: number
   mpRegenerate: number
+  hpRegenerate: number
+
   attackSpeed: number
   pierce: number
-  moreProjectiles: number
   lessProjectileDamage: number
+
+  moreProjectiles: number
   moreAreaOfEffect: number
+  moreHitCount: number
+  moreDuration: number
   mpConsumption: number
 
-  activeSkills: {
-    name: string // 'power-strike'
-    src: string // '/images/skills/swordman/power-strike.png'
-    desc: string // 'MP를 소비하여 장착한 무기로 적에게 일격을 가한다.'
-    learn: number // 20
-    max: number // 20
-    mp: number // 90
-    rate: number // 50
-    value: number // 80
-  }[]
+  damageOfPhysicalWithSkill: number
+  damageOfColdWithSkill: number
+  damageOfLightningWithSkill: number
+  damageOfFireWithSkill: number
+  damageOfAttackWithSkill: number
+  damageOfSpellWithSkill: number
+
+  characterSkill: { activeSkill: string }
 }
 
 export interface MeResponse {
@@ -58,11 +64,6 @@ export interface MeResponse {
   stat: CharacterStat
   equippedItems: Item[]
   deck: CardDeck
-}
-
-export interface CardDeck {
-  cards: GatchaCard[]
-  cardNames: string[]
 }
 
 export interface User {
@@ -90,16 +91,15 @@ export interface Character {
 export interface RankLog extends MongooseDocument {
   owner: any
   snapshot: {
-    battleLogs: any[]
     totalDamage: number
-    averageDamage: number
     weapon?: any
+    activeSkill: ActiveSkill
   }
 }
 
 export interface RankListResponse extends Pagination {
-  characters: Character[]
+  characters: Array<Character & { activeSkill?: ActiveSkill }>
 }
 export interface RankOfDamageListResponse extends Pagination {
-  ranks: RankLog[]
+  ranks: Array<RankLog & { activeSkill?: ActiveSkill }>
 }

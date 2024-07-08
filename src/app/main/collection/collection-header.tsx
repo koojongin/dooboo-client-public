@@ -19,7 +19,7 @@ export default function CollectionHeader() {
     },
     {
       name: '등급 정보',
-      url: '/main/collection/grade-info',
+      url: '/main/collection/grade-info?iType=weapon',
       thumbnail: '/images/icon_items.webp',
     },
   ]

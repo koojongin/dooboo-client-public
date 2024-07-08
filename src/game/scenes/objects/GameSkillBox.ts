@@ -49,6 +49,7 @@ export class GameSkillBox {
   }
 
   update(time: number, delta: number) {
+    if (this.scene.player.onReadyAttack && this.cooldownElapsed === 0) return
     this.cooldownElapsed += delta
 
     // 쿨타임 텍스트 업데이트 (옵셔널)

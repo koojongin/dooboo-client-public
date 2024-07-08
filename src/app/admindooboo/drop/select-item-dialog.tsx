@@ -7,6 +7,7 @@ import {
 } from 'react'
 import { Dialog, DialogBody, Tooltip } from '@material-tailwind/react'
 import {
+  BaseDefenceGear,
   BaseMisc,
   BaseWeapon,
   SelectItemDialogRef,
@@ -15,7 +16,10 @@ import { fetchGetBaseWeaponList } from '@/services/api-fetch'
 import toAPIHostURL from '@/services/image-name-parser'
 import { Pagination } from '@/interfaces/common.interface'
 import createKey from '@/services/key-generator'
-import { fetchGetBaseMiscList } from '@/services/api-admin-fetch'
+import {
+  fetchGetBaseDefenceGearList,
+  fetchGetBaseMiscList,
+} from '@/services/api-admin-fetch'
 
 function SelectItemDialog(
   {
@@ -31,9 +35,13 @@ function SelectItemDialog(
   const [open, setOpen] = useState(false)
   const [baseWeapons, setBaseWeapons] = useState<BaseWeapon[]>([])
   const [baseMiscs, setBaseMiscs] = useState<BaseMisc[]>([])
+  const [baseDefenceGears, setBaseDefenceGears] = useState<BaseDefenceGear[]>(
+    [],
+  )
 
   const [paginationBw, setPaginationBw] = useState<Pagination>()
   const [paginationBm, setPaginationBm] = useState<Pagination>()
+  const [paginationBd, setPaginationBd] = useState<Pagination>()
 
   const loadBaseWeapons = useCallback(async (selectedPage = 1) => {
     const result = await fetchGetBaseWeaponList(
@@ -51,7 +59,7 @@ function SelectItemDialog(
   const loadBaseMiscs = useCallback(async (selectedPage = 1) => {
     const result = await fetchGetBaseMiscList(
       {},
-      { page: selectedPage, limit: 50 },
+      { page: selectedPage, limit: 50, sort: { createdAt: -1 } },
     )
     setBaseMiscs(result.baseMiscs)
     setPaginationBm({
@@ -61,11 +69,28 @@ function SelectItemDialog(
     })
   }, [])
 
+  const loadBaseDefenceGears = useCallback(async (selectedPage = 1) => {
+    const result = await fetchGetBaseDefenceGearList(
+      {},
+      { page: selectedPage, limit: 50, sort: { createdAt: -1 } },
+    )
+    setBaseDefenceGears(result.baseDefenceGears)
+    setPaginationBd({
+      page: result.page,
+      total: result.total,
+      totalPages: result.totalPages,
+    })
+  }, [])
+
   const handleOpen = async () => {
     setOpen(!open)
-    await Promise.all([loadBaseWeapons(), loadBaseMiscs()])
+    await Promise.all([
+      loadBaseWeapons(),
+      loadBaseMiscs(),
+      loadBaseDefenceGears(),
+    ])
   }
-  const selectItem = (item: BaseWeapon | BaseMisc) => {
+  const selectItem = (item: BaseWeapon | BaseMisc | BaseDefenceGear) => {
     setOpen(false)
     onSelectItem(item, selectedIndex)
   }
@@ -135,6 +160,53 @@ function SelectItemDialog(
             </div>
           )}
           {/* Weapon List End */}
+
+          {/* DefenceGear List */}
+          <div className="flex flex-wrap gap-1">
+            {baseDefenceGears.map((baseDefenceGear) => {
+              return (
+                <div
+                  key={baseDefenceGear._id}
+                  className="cursor-pointer"
+                  onClick={() => selectItem(baseDefenceGear)}
+                >
+                  <Tooltip
+                    interactive
+                    content={<div>{baseDefenceGear.name}</div>}
+                  >
+                    <div className="max-w-[36px] w-[36px] h-[36px] p-[2px] border border-dark-blue">
+                      <img
+                        className="w-full h-full"
+                        src={toAPIHostURL(baseDefenceGear.thumbnail)}
+                      />
+                    </div>
+                  </Tooltip>
+                </div>
+              )
+            })}
+          </div>
+          <div>
+            {paginationBd && (
+              <div className="w-full flex justify-start mt-[15px]">
+                <div className="flex gap-[4px]">
+                  {new Array(paginationBd.totalPages)
+                    .fill(1)
+                    .map((value, index) => {
+                      return (
+                        <div
+                          className={`cursor-pointer flex justify-center items-center w-[24px] h-[24px] text-[14px] font-bold ${index + 1 === paginationBd.page ? 'border text-[#5795dd]' : ''} hover:text-[#5795dd] hover:border`}
+                          onClick={() => loadBaseDefenceGears(index + 1)}
+                          key={createKey()}
+                        >
+                          {index + 1}
+                        </div>
+                      )
+                    })}
+                </div>
+              </div>
+            )}
+          </div>
+          {/* DefenceGear List End */}
 
           {/* Misc List */}
           <div className="flex flex-wrap gap-1">

@@ -2,28 +2,24 @@
 
 import { Card } from '@material-tailwind/react'
 import { useCallback, useEffect, useState } from 'react'
+import _ from 'lodash'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { fetchGradeInfo } from '@/services/api-fetch'
 import { toColorByGrade, translate } from '@/services/util'
 import createKey from '@/services/key-generator'
+import { DefenceGearType, ItemTypeKind } from '@/interfaces/item.interface'
 
-const TIER_LEVEL_LIMIT = {
-  tier1: 0,
-  tier2: 20,
-  tier3: 31,
-}
-
-const getMaxTierByItemLevel = (iLevel: number) => {
-  const tiers: string[] = []
-  const tierKeys = Object.keys(TIER_LEVEL_LIMIT)
-  Object.values(TIER_LEVEL_LIMIT).forEach((tierLevel, index) => {
-    if (tierLevel < iLevel) {
-      tiers.push(tierKeys[index])
-    }
-  })
-  return tiers
-}
+const SHOWABLE_TIER_COUNT = 9
 export default function GradeInfoPage() {
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+  const router = useRouter()
   const [attributes, setAttributes] = useState<{ [key: string]: any }>()
+  const [tierLimit, setTierLimit] = useState<{ [key: string]: number }>()
+  const [gradeTypeList, setGradeTypeList] = useState([
+    { iType: ItemTypeKind.Weapon },
+    { iType: ItemTypeKind.DefenceGear, gearType: DefenceGearType.BodyArmor },
+  ])
   const [grades, setGrades] = useState<
     {
       name: string
@@ -33,19 +29,72 @@ export default function GradeInfoPage() {
     }[]
   >([])
   const loadGradeInfo = useCallback(async () => {
-    const result = await fetchGradeInfo()
+    const iType = searchParams.get('iType')
+    const gearType = searchParams.get('gearType')
+    if (!iType) return
+    const result = await fetchGradeInfo(iType as ItemTypeKind, gearType as any)
     setAttributes(result.attributes)
     setGrades(result.grades)
-  }, [])
+    setTierLimit(result.tierLimit)
+  }, [searchParams])
+
+  const setSearchParam = useCallback(
+    (key: string, value: any) => {
+      const current = new URLSearchParams(Array.from(searchParams.entries()))
+      current.set(key, String(value))
+      return current
+    },
+    [searchParams],
+  )
+
+  const goToPageWithSearchParam = useCallback(
+    (iType: ItemTypeKind, gearType?: DefenceGearType) => {
+      console.log('goto', iType, gearType)
+      const current = setSearchParam('iType', iType)
+      current.set('gearType', gearType || '')
+      router.push(`${pathname}?${current.toString()}`)
+    },
+    [pathname, router, setSearchParam],
+  )
 
   useEffect(() => {
+    const iType = searchParams.get('iType')
+    if (!iType) {
+      goToPageWithSearchParam(ItemTypeKind.Weapon)
+    }
+  }, [goToPageWithSearchParam, pathname, router, searchParams, setSearchParam])
+
+  useEffect(() => {
+    const iType = searchParams.get('iType')
+    if (!iType) return
     loadGradeInfo()
-  }, [loadGradeInfo])
+  }, [loadGradeInfo, searchParams])
 
   return (
     <div className="w-full">
       <Card className="rounded p-[10px]">
         <div className="text-[24px]">등급정보</div>
+        <div className="flex flex-wrap items-center gap-[4px]">
+          {gradeTypeList.map((option) => {
+            const { iType, gearType } = option
+            const currentItemTypeKind = searchParams.get('iType')
+            return (
+              <div
+                key={createKey()}
+                className={`ff-score font-bold text-[20px] p-[10px] bg-gray-400 text-white cursor-pointer border-2 border-dashed
+                ${iType === currentItemTypeKind ? 'bg-green-400 border-green-600' : 'border-gray-400'}`}
+                onClick={() => {
+                  goToPageWithSearchParam(iType as ItemTypeKind, gearType)
+                }}
+              >
+                {translate(`iType:${iType}`)}
+                {iType === ItemTypeKind.DefenceGear && (
+                  <> - {translate(gearType!)}</>
+                )}
+              </div>
+            )
+          })}
+        </div>
         <div className="text-[16px]">
           <div className="flex items-center">
             <div>•</div>
@@ -66,16 +115,17 @@ export default function GradeInfoPage() {
             </div>
           </div>
           <div>
-            {Object.values(TIER_LEVEL_LIMIT).map((key, index) => {
-              return (
-                <div className="flex items-center" key={createKey()}>
-                  <div>•</div>
-                  <div>
-                    tier{index + 1}: 아이템 레벨 {key}부터 확률 존재
+            {tierLimit &&
+              Object.values(tierLimit).map((key, index) => {
+                return (
+                  <div className="flex items-center" key={createKey()}>
+                    <div>•</div>
+                    <div>
+                      tier{index + 1}: 아이템 레벨 {key}부터 확률 존재
+                    </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
           </div>
         </div>
         <div className="flex flex-col">
@@ -132,17 +182,19 @@ export default function GradeInfoPage() {
           <div className="text-[18px] ff-ba flex bg-gray-400 text-white [&_div]:border-r [&_div]:border-r-white [&_div]:py-[4px] [&_div]:pl-[4px] sticky top-0">
             <div className="min-w-[30px]" />
             <div className="min-w-[200px]">추가 속성</div>
-            <div className="min-w-[80px] flex justify-center">tier1</div>
-            <div className="min-w-[80px] flex justify-center">tier2</div>
-            <div className="min-w-[80px] flex justify-center">tier3</div>
-            <div className="min-w-[80px] flex justify-center">tier4</div>
-            <div className="min-w-[80px] flex justify-center">tier5</div>
-            <div className="min-w-[80px] flex justify-center">...</div>
+            {_.range(SHOWABLE_TIER_COUNT).map((v, tHeadIndex) => (
+              <div
+                key={createKey()}
+                className="min-w-[80px] flex justify-center"
+              >
+                tier{tHeadIndex + 1}
+              </div>
+            ))}
           </div>
           <div className="flex border-b border-b-gray-500 border-dashed" />
           <div className="">
             {attributes &&
-              Object.keys(attributes).map((attributeKey, index) => {
+              _.sortBy(Object.keys(attributes)).map((attributeKey, index) => {
                 const attribute: any = attributes[attributeKey]
                 return (
                   <div
@@ -156,18 +208,18 @@ export default function GradeInfoPage() {
                       <div className="min-w-[200px] flex py-[2px] px-[4px]">
                         {translate(attributeKey)}
                       </div>
-                      <div className="flex justify-center items-center min-w-[80px]">
-                        {attribute.tier1?.range.join('~')}
-                      </div>
-                      <div className="flex justify-center items-center min-w-[80px]">
-                        {attribute.tier2?.range.join('~')}
-                      </div>
-                      <div className="flex justify-center items-center min-w-[80px]">
-                        {attribute.tier3?.range.join('~')}
-                      </div>
-                      <div className="flex justify-center items-center min-w-[80px]">
-                        {attribute.tier4?.range.join('~')}
-                      </div>
+                      {_.range(SHOWABLE_TIER_COUNT).map((value, tierIndex) => {
+                        const tierName = `tier${tierIndex + 1}`
+                        const tierData = attribute[tierName] || {}
+                        return (
+                          <div
+                            key={createKey()}
+                            className="flex justify-center items-center min-w-[80px]"
+                          >
+                            {tierData?.range?.join('~')}
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
                 )

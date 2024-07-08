@@ -7,6 +7,7 @@ export interface DropTableItem extends MongooseDocument {
   iType: 'BaseWeapon' | string
   roll: number
   amount: number
+  isTopRankReward: boolean
 }
 export interface DropTable extends MongooseDocument {
   items: DropTableItem[]
@@ -23,4 +24,5 @@ export interface DropTableResponseDto extends Pagination {
 export enum BaseItemType {
   'BaseWeapon' = 'BaseWeapon',
   'BaseMisc' = 'BaseMisc',
+  'BaseDefenceGear' = 'BaseDefenceGear',
 }

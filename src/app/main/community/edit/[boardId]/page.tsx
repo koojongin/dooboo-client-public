@@ -71,7 +71,7 @@ export default function CommunityBoardEditPage({
     return {
       toolbar: {
         container: [
-          [{ header: [1, 2, false] }],
+          [{ header: [1, 2, 3, 4, 5, 6, false] }],
           ['bold', 'italic', 'underline', 'strike', 'blockquote'],
           [
             { list: 'ordered' },
@@ -81,6 +81,14 @@ export default function CommunityBoardEditPage({
           ],
           ['link', 'image'],
           ['clean'],
+          [{ font: [] }],
+          [{ align: [] }],
+          [
+            {
+              color: [],
+            },
+            { background: [] },
+          ],
         ],
         handlers: {
           image: imageHandler,

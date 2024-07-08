@@ -43,7 +43,6 @@ export class GameWeapon
     isChildArrow: boolean = false,
   ) {
     // need a wrapper Class to properly set the Matter World
-
     super(scene, x, y, key)
     this.scene = scene
     this.group = group
@@ -57,10 +56,12 @@ export class GameWeapon
   }
 
   init() {
+    this.setImmovable(true)
     this.projectiles += this.scene.resultOfMe.stat.moreProjectiles
     this.setCollideWorldBounds(true)
     this.setAngularVelocity(1000)
-    this.setCircle(5)
+    this.setOrigin(0.5, 0.5)
+    this.setCircle(this.displayWidth)
     this.pierce = this.scene.resultOfMe.stat.pierce
     const { body } = this as { body: Phaser.Physics.Arcade.Body }
     body.onWorldBounds = true
@@ -75,7 +76,6 @@ export class GameWeapon
       children,
     )!
     const angle = this.getAngle(this.scene.player, closestChild)
-    console.log(angle)
     ;[this, ..._.range(this.projectiles - 1)]
       .map((value) => {
         if (typeof value === 'object') return value
@@ -89,7 +89,11 @@ export class GameWeapon
         )
       })
       .forEach((weapon: GameWeapon, index) => {
-        const nthProjectileAngle = (90 / this.projectiles) * index
+        const angleBetweenProjectiles = 90 / (this.projectiles - 1)
+        const nthProjectileAngle =
+          angleBetweenProjectiles * index -
+          (angleBetweenProjectiles * (this.projectiles - 1)) / 2
+        // - (90 / this.projectiles) * (index + 1)
         const radian = Phaser.Math.DegToRad(angle - nthProjectileAngle)
 
         const velocity = {
@@ -138,7 +142,7 @@ export class GameWeapon
   attack(monster: OnCollisionSprite) {
     if (!monster || !monster?.active) return
     const { stat } = this.scene.resultOfMe
-    const { damage, activeSkills } = stat
+    const { damage } = stat
 
     const { lessProjectileDamage, criticalMultiplier, criticalRate } = stat
     const isCritical = pickByRate(criticalRate)
@@ -161,7 +165,7 @@ export class GameWeapon
     }
 
     const monsterData = monster as GameMonster
-    totalDamage *= 10
+    // totalDamage *= 10
 
     totalDamage = Math.max(
       totalDamage * (1 - monsterData.mData.resist / 100),
@@ -208,7 +212,12 @@ export class GameWeapon
   }
 
   getAngle(a: Phaser.GameObjects.Sprite, b: Phaser.GameObjects.Sprite) {
-    const angleRadians = Phaser.Math.Angle.Between(a.x, a.y, b.x, b.y)
+    const angleRadians = Phaser.Math.Angle.Between(
+      a.x * a.originX,
+      a.y * a.originY,
+      b.x * b.originX,
+      b.y * b.originY,
+    )
     const angleDegrees = Phaser.Math.RadToDeg(angleRadians)
     return angleDegrees
   }

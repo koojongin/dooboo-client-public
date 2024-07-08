@@ -12,8 +12,10 @@ import {
   BaseWeapon,
   BaseWeaponListResponseDto,
   BaseWeaponResponseDto,
+  DefenceGearType,
   EnhancedResult,
   InventoryResponse,
+  ItemTypeKind,
 } from '@/interfaces/item.interface'
 import {
   DropTable,
@@ -35,6 +37,7 @@ import {
 import { Currency, CurrencyResponse } from '@/interfaces/currency.interface'
 import { Pagination } from '@/interfaces/common.interface'
 import { AllSkillResponse, JobKind } from '@/interfaces/job.interface'
+import { SignedPacket } from '@/game/util'
 
 interface CreateMonsterResponse {
   monster: {
@@ -51,6 +54,13 @@ export async function fetchGetJwtToken(): Promise<{
 }
 export async function fetchMe(): Promise<MeResponse> {
   const { data } = await api.get('/user/me')
+  return data
+}
+
+export async function fetchGetCharacterById(
+  characterId: string,
+): Promise<MeResponse> {
+  const { data } = await api.get(`/character/get/${characterId}`)
   return data
 }
 
@@ -128,6 +138,13 @@ export async function fetchGetBaseWeapon(
   id: string,
 ): Promise<BaseWeaponResponseDto> {
   const { data: response } = await api.get(`/item/base-weapon/${id}`)
+  return response
+}
+
+export async function fetchGetBaseWeaponByName(
+  name: string,
+): Promise<BaseWeaponResponseDto> {
+  const { data: response } = await api.get(`/item/base-weapon/name/${name}`)
   return response
 }
 
@@ -247,6 +264,16 @@ export async function fetchEquipItem(id: string) {
   return response
 }
 
+export async function fetchEquipDefenceGear(
+  id: string,
+  gearType: DefenceGearType,
+) {
+  const { data: response } = await api.post(`/item/equip-defence-gear/${id}`, {
+    gearType,
+  })
+  return response
+}
+
 export async function fetchUnequipItem(id: string) {
   const { data: response } = await api.post(`/item/unequip/${id}`)
   return response
@@ -265,7 +292,7 @@ export async function fetchSalvageItems(
 
 export async function fetchGetEnhancePrice(
   id: string,
-  data?: { scrollPercent: number },
+  data?: { scrollPercent: number; isEnableBlackSmithScroll?: boolean },
 ): Promise<
   {
     price: number
@@ -286,7 +313,7 @@ export async function fetchGetEnhancePrice(
 
 export async function fetchEnhanceWeapon(
   id: string,
-  data: { scrollPercent: number },
+  data: { scrollPercent: number; isEnableBlackSmithScroll?: boolean },
 ): Promise<EnhancedResult> {
   const { data: response } = await api.post(`/item/enhance/${id}`, data)
   return response
@@ -294,6 +321,11 @@ export async function fetchEnhanceWeapon(
 
 export async function fetchReRollWeapon(id: string): Promise<any> {
   const { data: response } = await api.post(`/craft/reroll/${id}`)
+  return response
+}
+
+export async function fetchReRollAdditionalWeapon(id: string): Promise<any> {
+  const { data: response } = await api.post(`/craft/reroll-additional/${id}`)
   return response
 }
 
@@ -512,12 +544,18 @@ export async function fetchItemToInventory(
   return response
 }
 
-export async function fetchGradeInfo(): Promise<{
+export async function fetchGradeInfo(
+  iType: ItemTypeKind,
+  gearType?: DefenceGearType,
+): Promise<{
   attributes: object
   grades: any[]
-  tierLimit: object
+  tierLimit: { [key: string]: number }
 }> {
-  const { data: response } = await api.get(`/item/tiers`)
+  const { data: response } = await api.post(`/item/tiers`, {
+    iType,
+    gearType,
+  })
   return response
 }
 
@@ -528,6 +566,15 @@ export async function fetchMergeStackedItemInInventory(): Promise<{
   return response
 }
 
+export async function fetchMergeStackedItemInStash(stashId: string): Promise<{
+  attributes: object
+}> {
+  const { data: response } = await api.get(
+    `/item/merge-stackable/stash/${stashId}`,
+  )
+  return response
+}
+
 export async function fetchSimulateBattle(auctionId: string): Promise<any> {
   const { data: response } = await api.get(`/simulate/battle/${auctionId}`)
   return response
@@ -535,5 +582,26 @@ export async function fetchSimulateBattle(auctionId: string): Promise<any> {
 
 export async function fetchRecommendPost(boardId: string): Promise<any> {
   const { data: response } = await api.post(`/board/recommend/${boardId}`)
+  return response
+}
+
+export async function fetchUpdateRankData(packet: SignedPacket): Promise<any> {
+  const { data: response } = await api.put(`/rank/data-update`, packet)
+  return response
+}
+
+export async function fetchGetDailyRankLog(): Promise<{
+  dailyRankLog: any
+}> {
+  const { data: response } = await api.get(`/rank/daily-rank-log`)
+  return response
+}
+
+export async function fetchAttackByLastDailyRankLog(): Promise<{
+  dailyRankLog: any
+}> {
+  const { data: response } = await api.get(
+    `/rank/attack-by-last-daily-rank-log`,
+  )
   return response
 }

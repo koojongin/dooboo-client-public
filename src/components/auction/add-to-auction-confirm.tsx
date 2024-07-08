@@ -118,7 +118,11 @@ export async function confirmSaleSetting(item: Item) {
       item.iType as ItemTypeKind,
     )
   ) {
-    return
+    return Swal.fire({
+      text: '거래소에 등록할수 없는 아이템입니다.',
+      icon: 'info',
+      confirmButtonText: '닫기',
+    })
   }
 
   let amount = 0

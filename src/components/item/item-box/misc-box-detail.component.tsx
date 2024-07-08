@@ -20,7 +20,7 @@ import {
   toMMDDHHMMSS,
   translate,
 } from '@/services/util'
-import { InventoryActionKind } from './item.interface'
+import { InventoryActionKind } from '../item.interface'
 import { confirmSaleSetting } from '@/components/auction/add-to-auction-confirm'
 import { fetchConsumptionItem } from '@/services/api/api.item'
 
@@ -45,28 +45,18 @@ function ShareGoldBoxResultButton({ systemLogId }: { systemLogId: string }) {
 export default function MiscBoxDetailComponent({
   item,
   actionCallback,
-  onShowTotalDamage = false,
   actions,
   parent,
 }: {
   item: Weapon | any
   parent?: any
   actions?: string[]
-  onShowTotalDamage?: boolean
   actionCallback?: (type?: string) => void
 }) {
   const selectedItem = item.misc
 
   const shareItem = async (eItem: Weapon | any) => {
     socket.emit(EMIT_SHARE_ITEM_EVENT, { itemId: eItem._id })
-  }
-  const sellItem = async (eItem: Weapon | any) => {
-    await Swal.fire({
-      title: '미지원',
-      text: '미지원',
-      icon: 'info',
-      confirmButtonText: '확인',
-    })
   }
 
   const consumeItem = async () => {

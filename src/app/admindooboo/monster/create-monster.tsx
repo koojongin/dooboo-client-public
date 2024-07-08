@@ -4,6 +4,7 @@ import { Button, Card, Input, Typography } from '@material-tailwind/react'
 import { useState } from 'react'
 import Swal from 'sweetalert2'
 import { fetchPostMonster } from '@/services/api-fetch'
+import { Monster } from '@/interfaces/monster.interface'
 
 export default function CreateMonsterForm({ handleRefreshMonsterList }: any) {
   const [name, setName] = useState('')
@@ -12,6 +13,22 @@ export default function CreateMonsterForm({ handleRefreshMonsterList }: any) {
   const [gold, setGold] = useState(0)
   const [weight, setWeight] = useState(0)
   const [thumbnail, setThumbnail] = useState('')
+
+  const [monster, setMonster] = useState<Monster>({
+    speed: 0,
+    resist: 0,
+    collisionDamage: 10,
+    armor: 0,
+    hp: 1,
+    gold: 0,
+    name: '',
+    level: 1,
+    isHide: true,
+    inRaid: false,
+    thumbnail: '',
+    experience: 0,
+    weight: 1,
+  })
 
   const checkValidation = () => {
     let validationMessage = ''
@@ -54,7 +71,8 @@ export default function CreateMonsterForm({ handleRefreshMonsterList }: any) {
         confirmButtonText: '확인',
       })
     }
-    const monster = {
+    const newMonster = {
+      ...monster,
       name,
       hp,
       experience,
@@ -65,7 +83,7 @@ export default function CreateMonsterForm({ handleRefreshMonsterList }: any) {
 
     const formData = new FormData()
     formData.append('thumbnail', thumbnail!)
-    Object.entries(monster).forEach((data) => {
+    Object.entries(newMonster).forEach((data) => {
       const [key, value]: any = data
       if (key === 'thumbnail') return
       formData.append(key, value)
@@ -188,6 +206,15 @@ export default function CreateMonsterForm({ handleRefreshMonsterList }: any) {
             labelProps={{
               className: 'before:content-none after:content-none',
             }}
+          />
+
+          <input
+            type="number"
+            className="border w-full p-[5px]"
+            value={monster.speed}
+            onChange={(e) =>
+              setMonster({ ...monster, speed: parseInt(e.target.value, 10) })
+            }
           />
         </div>
         <Button

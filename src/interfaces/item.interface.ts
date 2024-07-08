@@ -1,4 +1,5 @@
 import { MongooseDocument, Pagination } from './common.interface'
+import { BaseItemType } from '@/interfaces/drop-table.interface'
 
 export enum MiscTypeCategoryKind {
   Etc = 'etc',
@@ -46,6 +47,7 @@ export interface Weapon extends MongooseDocument {
   maxStarForce: number
   weaponType: string
   enhancedValue: number
+  failedEnhancementCount: number
   additionalAttributes?: {
     [key: string]: number
   }
@@ -55,6 +57,30 @@ export interface Weapon extends MongooseDocument {
   }
   injectedCard: string
   card: { name: string; thumbnail: string; starForce: number }
+}
+
+export interface DefenceGear extends MongooseDocument {
+  gearType: DefenceGearType
+  gold: number
+  name: string
+  armor: number
+  evasion: number
+  energyShield: number
+  requiredEquipmentLevel: number // 1
+  requiredEquipmentStr: number
+  requiredEquipmentDex: number
+  requiredEquipmentLuk: number
+  thumbnail: string
+  iGrade: string
+  iLevel: number
+  maxStarForce: number
+  starForce: number
+  enhancedValue: number
+  enchants: any
+
+  additionalAttributes?: {
+    [key: string]: number
+  }
 }
 
 export interface BaseMisc extends MongooseDocument {
@@ -89,9 +115,35 @@ export interface BaseWeapon extends MongooseDocument {
   starForce: number
   maxStarForce: number
   weaponType: string
+  attackSpeed: number
 
   /// //
   weight: number
+}
+
+export interface BaseDefenceGear extends MongooseDocument {
+  gearType: BaseItemType
+  gold: number
+  name: string
+  armor: number[]
+  evasion: number[]
+  energyShield: number[]
+  requiredEquipmentLevel: number // 1
+  requiredEquipmentStr: number
+  requiredEquipmentDex: number
+  requiredEquipmentLuk: number
+  thumbnail: string
+  iLevel: number
+  maxStarForce: number
+}
+
+export enum DefenceGearType {
+  BodyArmor = 'BodyArmor',
+  Greave = 'Greave',
+  Helmet = 'Helmet',
+  Belt = 'Belt',
+  Ring = 'Ring',
+  Amulet = 'Amulet',
 }
 
 export interface BaseWeaponListResponseDto extends Pagination {
@@ -102,8 +154,12 @@ export interface BaseMiscListResponseDto extends Pagination {
   baseMiscs: BaseMisc[]
 }
 
+export interface BaseDefenceGearListResponseDto extends Pagination {
+  baseDefenceGears: BaseDefenceGear[]
+}
+
 export interface BaseWeaponResponseDto {
-  weapon: BaseWeapon
+  baseWeapon: BaseWeapon
 }
 
 export interface WeaponListResponseDto extends Pagination {
@@ -136,18 +192,22 @@ export interface SelectMonsterDialogRef {
 export enum ItemTypeKind {
   Misc = 'misc',
   Weapon = 'weapon',
+  DefenceGear = 'defence-gear',
 }
 
 export enum BaseItemTypeKind {
   BaseWeapon = 'BaseWeapon',
   BaseMisc = 'BaseMisc',
+  BaseDefenceGear = 'BaseDefenceGear',
 }
 export interface Item extends MongooseDocument {
   iType: ItemTypeKind | string
   weaponId?: string
   miscId?: string
+  defeneGearId?: string
   weapon?: any
   misc?: any
+  defenceGear?: any
 
   item?: any
   roll?: number

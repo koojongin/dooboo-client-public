@@ -21,10 +21,11 @@ import {
   translate,
 } from '@/services/util'
 import createKey from '@/services/key-generator'
-import { RankLog } from '@/interfaces/user.interface'
-import WeaponBoxDetailComponent from '@/components/item/weapon-box-detail.component'
+import { RankLog, RankOfDamageListResponse } from '@/interfaces/user.interface'
+import WeaponBoxDetailComponent from '@/components/item/item-box/weapon-box-detail.component'
 import { Pagination } from '@/interfaces/common.interface'
 import { DEFAULT_THUMBNAIL_URL } from '@/constants/constant'
+import { ActiveSkill } from '@/services/skill/skill'
 
 export default function CommunityPage() {
   const router = useRouter()
@@ -32,7 +33,9 @@ export default function CommunityPage() {
   const [pagination, setPagination] = useState<Pagination>()
   const [dPagination, setDPagination] = useState<Pagination>()
 
-  const [rankLogs, setRankLogs] = useState<RankLog[]>([])
+  const [rankLogs, setRankLogs] = useState<
+    Array<RankLog & { activeSkill?: ActiveSkill }>
+  >([])
 
   const tableClass = [
     'min-w-[50px] text-center',
@@ -47,7 +50,10 @@ export default function CommunityPage() {
   }, [])
 
   const loadRankByDamages = useCallback(async (selectedPage = 1) => {
-    const result = await fetchGetRankByDamageList({}, { page: selectedPage })
+    const result: RankOfDamageListResponse = await fetchGetRankByDamageList(
+      {},
+      { page: selectedPage },
+    )
     const newRanks = result?.ranks.map((rank) => {
       const newRank: any = { ...rank }
       newRank.snapshot?.items?.forEach((item: any) => {
@@ -77,7 +83,7 @@ export default function CommunityPage() {
 
   return (
     <div className="flex flex-wrap gap-[10px]">
-      <div className="w-[600px]">
+      <div className="w-[450px]">
         <div className="bg-blue-gray-500 text-white py-[4px] px-[10px] ff-gs text-[20px]">
           레벨 랭크
         </div>
@@ -85,7 +91,8 @@ export default function CommunityPage() {
           <div className={tableClass[0]}>랭크</div>
           <div className={tableClass[1]}>레벨</div>
           <div className={tableClass[2]}>캐릭터명</div>
-          <div className="">장비</div>
+          <div className="w-[60px]">장비</div>
+          <div className="w-[60px]">스킬</div>
         </div>
         <div>
           {characters &&
@@ -105,7 +112,7 @@ export default function CommunityPage() {
               return (
                 <div
                   key={createKey()}
-                  className="flex gap-1 px-[1px] py-[1px] items-center min-h-[50px] border-blue-gray-50 border-b"
+                  className="flex gap-[2px] px-[1px] py-[1px] items-center min-h-[50px] border-blue-gray-50 border-b"
                 >
                   <div className={tableClass[0]}>
                     {index +
@@ -145,7 +152,7 @@ export default function CommunityPage() {
                     </Tooltip>
                   </div>
                   {character.equip && (
-                    <div className="flex items-center gap-[2px]">
+                    <div className="flex items-center gap-[2px] w-[60px]">
                       <Tooltip
                         className="rounded-none bg-transparent"
                         interactive
@@ -170,28 +177,31 @@ export default function CommunityPage() {
                           />
                         </div>
                       </Tooltip>
-                      <div className="max-w-[165px] overflow-ellipsis truncate">
-                        [{character.equip.weapon.name}
-                        {character.equip.weapon.starForce > 0
-                          ? `+${character.equip.weapon.starForce}`
-                          : ''}
-                        ]
-                      </div>
                     </div>
+                  )}
+                  {character.activeSkill && (
+                    <Tooltip
+                      content={translate(`skill:${character.activeSkill.name}`)}
+                    >
+                      <div className="w-[60px] cursor-pointer">
+                        <div
+                          className="bg-cover w-[42px] h-[42px]"
+                          style={{
+                            backgroundImage: `url('${character.activeSkill.icon}')`,
+                          }}
+                        />
+                      </div>
+                    </Tooltip>
                   )}
                   <Tooltip
                     content={
                       <div>
-                        <div className="flex items-center justify-start">
-                          <div className="min-w-[70px]">일반</div>
-                          <div>
-                            {toYYYYMMDDHHMMSS(character.lastBattledAt!)} [
-                            {ago(character.lastBattledAt!)}]
-                          </div>
-                        </div>
-                        {character.lastEarnedAt && (
+                        {!character.lastEarnedAt && (
+                          <div>전투 기록이 없습니다.</div>
+                        )}
+                        {!!character.lastEarnedAt && (
                           <div className="flex items-center justify-start">
-                            <div className="min-w-[70px]">v2</div>
+                            <div className="min-w-[70px]">최근 전투</div>
                             <div>
                               {toYYYYMMDDHHMMSS(character.lastEarnedAt!)} [
                               {ago(character.lastEarnedAt!)}]
@@ -210,7 +220,7 @@ export default function CommunityPage() {
         <div>
           {pagination && (
             <div className="w-full flex justify-start mt-[15px]">
-              <div className="flex gap-[4px]">
+              <div className="flex flex-wrap gap-[2px]">
                 {new Array(pagination.totalPages)
                   .fill(1)
                   .map((value, index) => {
@@ -229,7 +239,7 @@ export default function CommunityPage() {
           )}
         </div>
       </div>
-      <div className="w-[600px]">
+      <div className="w-[550px]">
         <div className="bg-blue-gray-500 text-white py-[4px] px-[10px] ff-gs text-[20px]">
           데미지 랭크
           <span className="text-[16px] text-red-100">
@@ -240,33 +250,59 @@ export default function CommunityPage() {
           <div className="text-[14px] flex flex-col gap-[4px]">
             <div className="flex items-center gap-[10px]">
               <i className="text-[4px] fa-solid fa-circle" />
-              <div className="flex flex-wrap items-center gap-[4px]">
-                랭킹 1위 ~ 5위
-                <div className="flex items-center">
-                  <img
-                    src="/images/icon_diamond.webp"
-                    className="w-[18px] mr-[2px] mb-[2px]"
-                  />
-                  1,000개
+              <Tooltip
+                interactive
+                content={
+                  <div>
+                    <div className="flex flex-wrap items-center gap-[4px]">
+                      랭킹 1위 ~ 5위
+                      <div className="flex items-center">
+                        <img
+                          src="/images/icon_diamond.webp"
+                          className="w-[18px] mr-[2px] mb-[2px]"
+                        />
+                        500개
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-[4px]">
+                      랭킹 6위 ~ 그 외 순위
+                      <div className="flex items-center">
+                        <img
+                          src="/images/icon_diamond.webp"
+                          className="w-[18px] mr-[2px] mb-[2px]"
+                        />{' '}
+                        200개
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-[4px] items-center">
+                      <div>공통 보상</div>
+                      {[
+                        '/images/black-smith/init-star-force.png',
+                        '/images/black-smith/black-smith-scroll.png',
+                        '/images/black-smith/oblivion.png',
+                      ].map((src) => {
+                        return (
+                          <div
+                            className="bg-contain bg-center bg-no-repeat w-[30px] h-[30px] border border-white"
+                            key={createKey()}
+                            style={{ backgroundImage: `url(${src})` }}
+                          />
+                        )
+                      })}
+                    </div>
+                  </div>
+                }
+              >
+                <div className="cursor-pointer bg-ruliweb text-white p-[4px] rounded ff-score font-bold">
+                  랭킹 보상
                 </div>
-              </div>
+              </Tooltip>
             </div>
             <div className="flex items-center gap-[10px]">
               <i className="text-[4px] fa-solid fa-circle" />
-              <div className="flex flex-wrap items-center gap-[4px]">
-                랭킹 6위 ~ 그 외 순위
-                <div className="flex items-center">
-                  <img
-                    src="/images/icon_diamond.webp"
-                    className="w-[18px] mr-[2px] mb-[2px]"
-                  />{' '}
-                  500개
-                </div>
+              <div>
+                매일 2시부터 4시간 주기로 초기화됩니다. (2, 6, 10, 14, 18, 22)
               </div>
-            </div>
-            <div className="flex items-center gap-[10px]">
-              <i className="text-[4px] fa-solid fa-circle" />
-              <div>매일 오후 1시, 7시에 초기화됩니다.</div>
             </div>
             <div className="flex items-center gap-[10px]">
               <i className="text-[4px] fa-solid fa-circle" />
@@ -276,13 +312,13 @@ export default function CommunityPage() {
             </div>
           </div>
         </div>
-        <div className="flex gap-1 px-[1px] py-[1px] bg-blue-gray-200 bg-dark-blue text-white">
+        <div className="flex gap-[2px] px-[1px] py-[1px] bg-blue-gray-200 bg-dark-blue text-white">
           <div className="w-[40px] text-center">랭크</div>
           <div className="w-[40px] text-center">레벨</div>
           <div className="w-[150px] text-left">캐릭터명</div>
           <div className="w-[100px] text-left">총 데미지</div>
-          <div className="w-[100px] text-left">평균 데미지</div>
-          <div className="w-[100px] ml-auto" />
+          <div className="w-[60px]">장비</div>
+          <div className="w-[60px]">스킬</div>
         </div>
         <div>
           {rankLogs &&
@@ -292,19 +328,19 @@ export default function CommunityPage() {
                   key={createKey()}
                   className="flex gap-1 px-[1px] py-[1px] items-center min-h-[50px] border-blue-gray-50 border-b"
                 >
-                  <div className="w-[40px] text-center">
+                  <div className="min-w-[40px] w-[40px] text-center">
                     {' '}
                     {index +
                       1 +
                       (dPagination?.limit || 10) *
                         ((dPagination?.page || 1) - 1)}
                   </div>
-                  <div className="w-[40px] text-center">
+                  <div className="min-w-[40px] w-[40px] text-center">
                     {rankLog.owner.level}
                   </div>
                   <Tooltip content="클릭 시 프로필로 이동합니다.">
                     <div
-                      className="w-[150px] text-left flex items-center gap-[2px] cursor-pointer"
+                      className="min-w-[150px] w-[150px] text-left flex items-center gap-[2px] cursor-pointer"
                       onClick={() => {
                         goToProfile(rankLog.owner._id)
                       }}
@@ -331,39 +367,56 @@ export default function CommunityPage() {
                       </div>
                     </div>
                   </Tooltip>
-                  <div className="w-[100px] text-left">
+                  <div className="w-[100px] min-w-[100px] text-left">
                     {formatNumber(rankLog.snapshot.totalDamage)}
                   </div>
-                  <div className="w-[100px] text-left">
-                    {rankLog.snapshot.averageDamage.toFixed(1)}
-                  </div>
-                  <div>
-                    {rankLog.snapshot.weapon && (
-                      <Tooltip
-                        className="rounded-none bg-transparent"
-                        interactive
-                        content={
-                          <WeaponBoxDetailComponent
-                            item={rankLog.snapshot.weapon}
-                          />
-                        }
-                      >
-                        <div
-                          className="border-2 rounded border-gray-800"
-                          style={{
-                            borderColor: toColorByGrade(
-                              rankLog.snapshot.weapon.weapon.iGrade,
-                            ),
-                          }}
+                  <div className="min-w-[60px] w-[60px] flex">
+                    <div className="">
+                      {rankLog.snapshot.weapon && (
+                        <Tooltip
+                          className="rounded-none bg-transparent"
+                          interactive
+                          content={
+                            <WeaponBoxDetailComponent
+                              item={rankLog.snapshot.weapon}
+                            />
+                          }
                         >
-                          <div className="absolute m-[1px] px-[2px] text-[12px] border rounded px-[2px] bg-[#424242a6] text-white ff-ba ff-skew">
-                            {rankLog.snapshot.weapon.totalFlatDamage}
+                          <div
+                            className="border-2 rounded border-gray-800"
+                            style={{
+                              borderColor: toColorByGrade(
+                                rankLog.snapshot.weapon.weapon.iGrade,
+                              ),
+                            }}
+                          >
+                            <div className="absolute m-[1px] px-[2px] text-[12px] border rounded px-[2px] bg-[#424242a6] text-white ff-ba ff-skew">
+                              {rankLog.snapshot.weapon.totalFlatDamage}
+                            </div>
+                            <img
+                              className="w-[40px] h-[40px] p-[2px] border rounded"
+                              src={toAPIHostURL(
+                                rankLog.snapshot.weapon.weapon?.thumbnail || '',
+                              )}
+                            />
                           </div>
-                          <img
-                            className="w-[40px] h-[40px] p-[2px] border rounded"
-                            src={toAPIHostURL(
-                              rankLog.snapshot.weapon.weapon?.thumbnail || '',
-                            )}
+                        </Tooltip>
+                      )}
+                    </div>
+                  </div>
+                  <div className="min-w-[60px] w-[60px]">
+                    {rankLog.snapshot.activeSkill && (
+                      <Tooltip
+                        content={translate(
+                          `skill:${rankLog.snapshot.activeSkill.name}`,
+                        )}
+                      >
+                        <div className="w-[60px] cursor-pointer">
+                          <div
+                            className="bg-cover w-[42px] h-[42px]"
+                            style={{
+                              backgroundImage: `url('${rankLog.snapshot.activeSkill.icon}')`,
+                            }}
                           />
                         </div>
                       </Tooltip>
@@ -381,7 +434,7 @@ export default function CommunityPage() {
         <div>
           {dPagination && (
             <div className="w-full flex justify-start mt-[15px]">
-              <div className="flex gap-[4px]">
+              <div className="flex flex-wrap gap-[2px]">
                 {new Array(dPagination.totalPages)
                   .fill(1)
                   .map((value, index) => {

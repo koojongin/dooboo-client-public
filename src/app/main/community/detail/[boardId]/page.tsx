@@ -11,7 +11,11 @@ import {
   fetchPostBoardComment,
   fetchRecommendPost,
 } from '@/services/api-fetch'
-import { toYYYYMMDDHHMMSS } from '@/services/util'
+import {
+  getJobIconBgColor,
+  getJobIconUrl,
+  toYYYYMMDDHHMMSS,
+} from '@/services/util'
 import toAPIHostURL from '@/services/image-name-parser'
 import { DEFAULT_THUMBNAIL_URL } from '@/constants/constant'
 import { BoardCommentListBlock } from '@/app/main/community/detail/[boardId]/board-blocks'
@@ -147,16 +151,25 @@ export default function BoardDetail({
             </div>
             <div className="flex flex-col gap-[4px] justify-center">
               <div
-                className="font-bold cursor-pointer"
+                className="cursor-pointer flex items-center gap-[4px] ff-score-all font-bold"
                 onClick={() =>
                   router.push(`/main/profile/${board.character?._id}`)
                 }
               >
-                [Lv.{board.character?.level}]{board.character?.nickname}
+                <div
+                  className="bg-contain w-[20px] h-[20px]"
+                  style={{
+                    backgroundImage: `url(${getJobIconUrl(board.character?.job)})`,
+                    backgroundColor: getJobIconBgColor(board.character?.job),
+                  }}
+                />
+                <div>Lv.{board.character?.level}</div>
+                <div>{board.character?.nickname}</div>
               </div>
               <div className="flex items-center gap-[4px] text-[12px]">
                 <div>조회 {board.reads.toLocaleString()}</div>
                 <div>추천 {board.recommendCount.toLocaleString()}</div>
+                <div>댓글 {board.recommendCount.toLocaleString()}</div>
               </div>
               <div className="text-[12px]">
                 작성일 {toYYYYMMDDHHMMSS(new Date(board.createdAt!))}

@@ -176,6 +176,7 @@ export default function SkillPage() {
               CardSetCategory.AzusaSwimsuit,
               CardSetCategory.FlatCardPickUp,
               CardSetCategory.PhysicalPickUp,
+              CardSetCategory.FubukiPickUp,
             ].map((categoryName, index) => {
               return (
                 <div

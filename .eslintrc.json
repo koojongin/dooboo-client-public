@@ -54,6 +54,7 @@
     "class-methods-use-this": "off",
     "jsx-a11y/no-noninteractive-element-interactions": "off",
     "@typescript-eslint/naming-convention": "off",
+    "no-param-reassign": "off",
     "react/jsx-filename-extension": [
       "warn",
       {

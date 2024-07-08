@@ -8,6 +8,8 @@ export default function ShareItemBoxComponent({ item }: { item: Item }) {
       return toColorByGrade(item[ItemTypeKind.Weapon].iGrade)
     if (iType === ItemTypeKind.Misc)
       return toColorByGrade(item[ItemTypeKind.Misc].baseMisc.iGrade)
+    if (iType === ItemTypeKind.DefenceGear)
+      return toColorByGrade(item.defenceGear.iGrade)
     return ''
   }
 
@@ -69,6 +71,13 @@ function ItemThumbnailBox({ item }: any) {
       {item.iType === ItemTypeKind.Misc && (
         <img
           src={toAPIHostURL(item[ItemTypeKind.Misc].baseMisc.thumbnail)}
+          className="w-[40px] h-[40px] border rounded p-[1px] bg-white"
+        />
+      )}
+
+      {item.iType === ItemTypeKind.DefenceGear && (
+        <img
+          src={toAPIHostURL(item.defenceGear.thumbnail)}
           className="w-[40px] h-[40px] border rounded p-[1px] bg-white"
         />
       )}

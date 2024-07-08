@@ -305,6 +305,40 @@ export default function Page({
                     />
                   </div>
                 </div>
+
+                <div>
+                  <div>speed</div>
+                  <div>
+                    <input
+                      className="border p-[4px]"
+                      type="number"
+                      value={monster.speed}
+                      onChange={(e) =>
+                        setMonster({
+                          ...monster,
+                          speed: parseInt(e.target.value, 10),
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div>collisionDamage</div>
+                  <div>
+                    <input
+                      className="border p-[4px]"
+                      type="number"
+                      value={monster.collisionDamage}
+                      onChange={(e) =>
+                        setMonster({
+                          ...monster,
+                          collisionDamage: parseInt(e.target.value, 10),
+                        })
+                      }
+                    />
+                  </div>
+                </div>
               </div>
               <Button
                 className="mt-6 text-md"

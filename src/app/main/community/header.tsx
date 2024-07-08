@@ -52,9 +52,9 @@ export default function CommunityHeader({ children }: any) {
           <div>베스트 게시글.2.</div>
         </Card>
 
-        <Card className="p-2 rounded min-w-72">
+        {/* <Card className="p-2 rounded min-w-72">
           <img src="/images/right-banner.png" />
-        </Card>
+        </Card> */}
       </div>
     </div>
   )

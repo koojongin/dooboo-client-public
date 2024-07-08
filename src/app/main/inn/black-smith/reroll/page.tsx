@@ -4,15 +4,25 @@ import { Card } from '@material-tailwind/react'
 import { useCallback, useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import ItemBoxComponent from '@/components/item/item-box'
-import { InnItem, ItemTypeKind, Weapon } from '@/interfaces/item.interface'
+import {
+  BaseWeapon,
+  InnItem,
+  ItemTypeKind,
+  Weapon,
+} from '@/interfaces/item.interface'
 import createKey from '@/services/key-generator'
 import {
+  fetchGetBaseWeapon,
+  fetchGetBaseWeaponByName,
   fetchGetEnhancePrice,
   fetchGetMyInventory,
   fetchReRollWeapon,
 } from '@/services/api-fetch'
 import toAPIHostURL from '@/services/image-name-parser'
 import { InventoryActionKind } from '@/components/item/item.interface'
+import WeaponBoxDetailComponent from '@/components/item/item-box/weapon-box-detail.component'
+import { BaseWeaponBoxComponent } from '@/app/main/collection/maps/base-weapon-box-tooltip.component'
+import { isWeaponEnhanceable } from '@/services/util'
 
 export default function BlackSmithRerollPage() {
   const [items, setItems] = useState<InnItem[]>([])
@@ -22,6 +32,8 @@ export default function BlackSmithRerollPage() {
   const [enhancePrice, setEnhancePrice] = useState<{
     price: number
   }>()
+
+  const [baseWeapon, setBaseWeapon] = useState<BaseWeapon>()
 
   const [enhancedResult, setEnhancedResult] = useState<any>()
 
@@ -60,46 +72,49 @@ export default function BlackSmithRerollPage() {
       setSelectedWeapons([])
     }
   }
-  const onSelectItem = async (item: InnItem) => {
-    const maxItemSelectableCount = 1
-    const selectedItems = items.filter((i) => i.isSelected)
-    if (maxItemSelectableCount <= selectedItems.length) {
-      if (!selectedItems.find((sItem) => sItem._id === item._id)) return
-    }
-    const selectedItemIndex = items.findIndex((i) => i._id === item._id)
-    if (selectedItemIndex < 0) return
-    const newItems = items.map((originItem, index) => {
-      if (selectedItemIndex === index) {
-        const newItem = { ...originItem }
-        newItem.isSelected = !newItem.isSelected
-        return newItem
+  const onSelectItem = useCallback(
+    async (item: InnItem) => {
+      const maxItemSelectableCount = 1
+      const selectedItems = items.filter((i) => i.isSelected)
+      if (maxItemSelectableCount <= selectedItems.length) {
+        if (!selectedItems.find((sItem) => sItem._id === item._id)) return
       }
-      return originItem
-    })
-    setItems(newItems)
+      const selectedItemIndex = items.findIndex((i) => i._id === item._id)
+      if (selectedItemIndex < 0) return
+      const newItems = items.map((originItem, index) => {
+        if (selectedItemIndex === index) {
+          const newItem = { ...originItem }
+          newItem.isSelected = !newItem.isSelected
+          return newItem
+        }
+        return originItem
+      })
+      setItems(newItems)
 
-    const attachedWeaponIndex = selectedWeapons.findIndex(
-      (sWeapon) => sWeapon?._id === items[selectedItemIndex]._id,
-    )
+      const attachedWeaponIndex = selectedWeapons.findIndex(
+        (sWeapon) => sWeapon?._id === items[selectedItemIndex]._id,
+      )
 
-    if (attachedWeaponIndex < 0) {
-      const emptyIndex = selectedWeapons.findIndex((data) => !data)
-      if (emptyIndex < 0) {
-        setSelectedWeapons([
-          ...selectedWeapons,
-          { ...items[selectedItemIndex] },
-        ])
+      if (attachedWeaponIndex < 0) {
+        const emptyIndex = selectedWeapons.findIndex((data) => !data)
+        if (emptyIndex < 0) {
+          setSelectedWeapons([
+            ...selectedWeapons,
+            { ...items[selectedItemIndex] },
+          ])
+        } else {
+          const newWeapons: any = [...selectedWeapons]
+          newWeapons[emptyIndex] = { ...items[selectedItemIndex] }
+          return setSelectedWeapons(newWeapons)
+        }
       } else {
-        const newWeapons: any = [...selectedWeapons]
-        newWeapons[emptyIndex] = { ...items[selectedItemIndex] }
-        return setSelectedWeapons(newWeapons)
+        const newSelectedWeapons: any = [...selectedWeapons]
+        newSelectedWeapons[attachedWeaponIndex] = undefined
+        setSelectedWeapons(newSelectedWeapons)
       }
-    } else {
-      const newSelectedWeapons: any = [...selectedWeapons]
-      newSelectedWeapons[attachedWeaponIndex] = undefined
-      setSelectedWeapons(newSelectedWeapons)
-    }
-  }
+    },
+    [items, selectedWeapons],
+  )
 
   const initialRefresh = useCallback(async () => {
     await refreshInventory()
@@ -112,19 +127,22 @@ export default function BlackSmithRerollPage() {
     return Math.max(price, 0)
   }
 
-  // console.log(
-  //   new Array(30)
-  //     .fill(1)
-  //     .map((v, i) => ({ iLevel: i + 1 }))
-  //     .map((w) => getReRollPrice(w as any)),
-  // )
+  const loadBaseWeapon = useCallback(async (name: string) => {
+    const result = await fetchGetBaseWeaponByName(name)
+    setBaseWeapon(result.baseWeapon)
+  }, [])
+
   useEffect(() => {
-    if (selectedWeapons?.length <= 0) return
+    if (selectedWeapons?.length <= 0) {
+      setBaseWeapon(undefined)
+      return
+    }
     if (!selectedWeapons[0]) return
+    loadBaseWeapon(selectedWeapons[0].weapon.name)
     setEnhancePrice({
       price: getReRollPrice(selectedWeapons[0].weapon),
     })
-  }, [selectedWeapons])
+  }, [loadBaseWeapon, selectedWeapons])
 
   useEffect(() => {
     initialRefresh()
@@ -167,13 +185,7 @@ export default function BlackSmithRerollPage() {
               )}
             </div>
           </div>
-          {enhancePrice && (
-            <div className="flex items-center gap-[4px] justify-center mb-[10px]">
-              <div>소모 비용 : </div>
-              <img src="/images/icon_currency.png" className="w-[30px]" />
-              <div>{enhancePrice.price.toLocaleString()}</div>
-            </div>
-          )}
+
           <div className="flex justify-center">
             <div
               className="text-[24px] bg-green-500 text-white px-[6px] py-[4px] rounded cursor-pointer"
@@ -182,6 +194,32 @@ export default function BlackSmithRerollPage() {
               재설정하기
             </div>
           </div>
+
+          {enhancePrice && (
+            <div className="flex items-center gap-[4px] justify-center mb-[10px]">
+              <div>소모 비용 :</div>
+              <img src="/images/icon_currency.png" className="w-[30px]" />
+              <div>{enhancePrice.price.toLocaleString()}</div>
+            </div>
+          )}
+          {selectedWeapons[0] && (
+            <div className="flex flex-col justify-center items-center gap-[4px] mb-[10px]">
+              {baseWeapon && (
+                <div className="text-[14px] ff-score-all">
+                  <BaseWeaponBoxComponent baseWeapon={baseWeapon} />
+                </div>
+              )}
+              <div className="font-bold flex h-full items-center px-[10px] text-white text-[24px]">
+                <div className="rounded bg-green-500 w-[40px] h-[40px] flex items-center justify-center border-2 border-green-800 border-dashed p-[4px]">
+                  <i className="fa-solid fa-arrows-rotate" />
+                </div>
+              </div>
+
+              <div className="w-[300px] text-[14px]">
+                <WeaponBoxDetailComponent item={selectedWeapons[0]} />
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-col gap-[2px] text-[16px] mt-[20px]">
             <div className="flex items-center gap-[5px]">
@@ -212,14 +250,15 @@ export default function BlackSmithRerollPage() {
                   {new Array(100).fill(1).map((value, index) => {
                     const item = items[index] || {}
                     const disableSlotClass = 'bg-gray-800'
-                    const isOveredSlot =
-                      index >= maxItemSlots || item?.iType === ItemTypeKind.Misc
+                    const isOveredSlot = index >= maxItemSlots
+                    const invalidItem = isWeaponEnhanceable(item)
+                    const isDisabled = isOveredSlot || invalidItem
                     return (
                       <div
                         key={`black_smith_${item?._id || createKey()}`}
-                        className={`bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] ${isOveredSlot ? disableSlotClass : ''}`}
+                        className={`bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] ${isDisabled ? disableSlotClass : ''}`}
                       >
-                        {isOveredSlot && (
+                        {isDisabled && (
                           <div className="absolute z-10 bg-gray-800 bg-opacity-60 w-[50px] h-[50px] rounded" />
                         )}
                         {item && (

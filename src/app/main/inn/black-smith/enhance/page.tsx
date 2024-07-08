@@ -20,7 +20,7 @@ import ItemBoxComponent from '@/components/item/item-box'
 import EnhancedResultDialog from '../enhanced-result-dialog'
 import { InventoryActionKind } from '@/components/item/item.interface'
 import { CurrencyResponse } from '@/interfaces/currency.interface'
-import { formatNumber } from '@/services/util'
+import { formatNumber, isWeaponEnhanceable } from '@/services/util'
 
 export default function BlackSmithEnhancePage() {
   const enhancedResultDialogRef = useRef<EnhancedResultDialogRef>()
@@ -36,7 +36,8 @@ export default function BlackSmithEnhancePage() {
   const [currencyRes, setCurrencyRes] = useState<CurrencyResponse>()
 
   const [scrollOption, setScrollOption] = useState<{ percent: number }>()
-
+  const [isEnableBlackSmithScroll, setIsEnableBlackSmithScroll] =
+    useState<boolean>(false)
   const [enhanceData, setEnhanceData] = useState<{
     randomFlatDamageRange: number
   }>()
@@ -79,6 +80,7 @@ export default function BlackSmithEnhancePage() {
     if (isConfirmed) {
       const result = await fetchEnhanceWeapon(selectedWeapons[0]._id!, {
         scrollPercent: scrollOption?.percent || 0,
+        isEnableBlackSmithScroll,
       })
       await initialRefresh()
 
@@ -137,10 +139,11 @@ export default function BlackSmithEnhancePage() {
     if (selectedWeapons[0].weapon.iLevel > 30 && !scrollOption?.percent) return
     const result = await fetchGetEnhancePrice(selectedWeapons[0]._id!, {
       scrollPercent: scrollOption?.percent || 0,
+      isEnableBlackSmithScroll,
     })
     if (selectedWeapons[0]) setEnhancePrice(result)
     setEnhanceData(result.data)
-  }, [scrollOption?.percent, selectedWeapons])
+  }, [scrollOption?.percent, selectedWeapons, isEnableBlackSmithScroll])
 
   const loadMyCurrency = useCallback(async () => {
     const result = await fetchGetMyCurrency()
@@ -269,6 +272,31 @@ export default function BlackSmithEnhancePage() {
                     )
                   })}
                 </div>
+                <div className="flex flex-col border border-gray-500 p-[10px] text-[16px] justify-center rounded">
+                  <label className="cursor-pointer flex items-center gap-[4px] text-[20px] justify-center">
+                    <input
+                      type="checkbox"
+                      className="w-[24px] h-[24px]"
+                      checked={isEnableBlackSmithScroll}
+                      onChange={(e) => {
+                        setIsEnableBlackSmithScroll(e.target.checked)
+                      }}
+                    />
+                    <div>제련 확률 보정하기</div>
+                  </label>
+                  <div className="flex items-center justify-center">
+                    <div className="py-[2px] flex items-center border border-gray-200 px-[4px] rounded bg-cyan-900 text-white gap-[4px]">
+                      <div
+                        style={{
+                          backgroundImage: `url("/images/black-smith/black-smith-scroll.png")`,
+                        }}
+                        className="w-[30px] h-[30px] bg-contain bg-no-repeat bg-center bg-white rounded"
+                      />
+                      <div>블랙 스미스 스크롤</div>
+                    </div>
+                    <div>이 인벤토리에 있어야 합니다.</div>
+                  </div>
+                </div>
               </>
             )}
 
@@ -340,14 +368,15 @@ export default function BlackSmithEnhancePage() {
                 {new Array(100).fill(1).map((value, index) => {
                   const item = items[index] || {}
                   const disableSlotClass = 'bg-gray-800'
-                  const isOveredSlot =
-                    index >= maxItemSlots || item?.iType === ItemTypeKind.Misc
+                  const isOveredSlot = index >= maxItemSlots
+                  const invalidItem = isWeaponEnhanceable(item)
+                  const isDisabled = isOveredSlot || invalidItem
                   return (
                     <div
                       key={`black_smith_${item?._id || createKey()}`}
-                      className={`bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] ${isOveredSlot ? disableSlotClass : ''}`}
+                      className={`bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] ${isDisabled ? disableSlotClass : ''}`}
                     >
-                      {isOveredSlot && (
+                      {isDisabled && (
                         <div className="absolute z-10 bg-gray-800 bg-opacity-60 w-[50px] h-[50px] rounded" />
                       )}
                       {item && (
@@ -414,6 +443,18 @@ function EnhanceScrollInformation() {
           <div>스타포스 파워</div>
         </div>
         <div>가 주문서 수치에 따라 증가합니다.</div>
+      </div>
+      <div className="flex flex-wrap items-center justify-start gap-[4px]">
+        <div>주문서 제련에 실패시 실패 카운트가 다음과 같이 표기됩니다.</div>
+        <div className="ml-[4px] flex items-center justify-center gap-[4px] border-2 border-red-500 border-dashed p-[2px] bg-red-400">
+          <div
+            className="bg-contain bg-no-repeat bg-center w-[20px] h-[20px]"
+            style={{
+              backgroundImage: `url('/images/black-smith/enhance-failed.png')`,
+            }}
+          />
+          <div className="ff-wavve px-[4px]">-1</div>
+        </div>
       </div>
       <div className="flex flex-wrap items-center justify-start gap-[4px]">
         <div className="flex flex-wrap border border-blue-900 px-[3px] rounded items-center bg-blue-900 text-white gap-[4px]">

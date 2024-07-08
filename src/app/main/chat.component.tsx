@@ -212,7 +212,7 @@ export function ChatComponent() {
 
   return (
     <div
-      className={`w-full ${pathname.indexOf('main/community') >= 0 || isFoldedBox ? 'fixed bottom-[40px] left-0' : 'wide:w-[300px]'}`}
+      className={`w-full ${pathname.indexOf('main/community') >= 0 || isFoldedBox ? 'fixed bottom-[0px] left-0' : 'wide:w-[300px]'}`}
     >
       <div
         className="ff-wavve cursor-pointer border bg-ruliweb text-white p-[2px] rounded z-50"
@@ -225,7 +225,7 @@ export function ChatComponent() {
       </div>
       <div
         style={{ display: isFoldedBox ? 'none' : 'flex' }}
-        className={`w-full ${pathname.indexOf('main/community') >= 0 ? 'fixed bottom-[30px] left-0' : 'wide:w-[300px]'}`}
+        className={`w-full ${pathname.indexOf('main/community') >= 0 ? 'fixed bottom-[0px] left-0' : 'wide:w-[300px]'}`}
       >
         <div
           className={`w-full ${isFoldedBox && pathname.indexOf('main/community') < 0 ? 'min-w-[50px]' : 'min-w-[200px]'}`}
@@ -300,16 +300,18 @@ export function ChatComponent() {
                     <div
                       key={createKey()}
                       className="flex flex-wrap cursor-pointer"
-                      onClick={() => {
-                        onClickMessage(chatMessage)
-                      }}
                     >
                       {messageType === MessageType.ItemShare && (
                         <ChatItemShareComponent chatMessage={chatMessage} />
                       )}
 
                       {messageType === MessageType.Normal && (
-                        <div className="break-all pl-[5px]">
+                        <div
+                          className="break-all pl-[5px]"
+                          onClick={() => {
+                            onClickMessage(chatMessage)
+                          }}
+                        >
                           {parseHtml(
                             `[${toHHMM(new Date(chatMessage.timestamp))}] ${chatMessage.nickname}: ${chatMessage.message}`,
                           )}

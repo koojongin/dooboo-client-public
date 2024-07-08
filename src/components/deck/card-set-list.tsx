@@ -4,6 +4,35 @@ import { translate } from '@/services/util'
 import createKey from '@/services/key-generator'
 import { GatchaCardExtended } from '@/app/main/inn/deck/deck.type'
 import { BA_COLOR } from '@/constants/constant'
+import { CardDeck, GatchaCard } from '@/interfaces/gatcha.interface'
+
+export function DeckCardTooltip({ card }: { card: GatchaCard }) {
+  return (
+    <div className="flex flex-col items-start">
+      <div
+        className={`ff-wavve text-[20px] text-white flex bg-[${BA_COLOR}] p-[4px] rounded mb-[4px] border border-white`}
+      >
+        {translate(`card:${card.name}`)}
+      </div>
+      {card.options?.map((option) => {
+        return (
+          <div key={createKey()} className="flex flex-col">
+            <div className="flex items-center justify-between">
+              <div>{translate(`card:option:${option.name}`)}</div>
+              <div className="ml-[10px]">{option.value}</div>
+            </div>
+            {option.desc && (
+              <div className="flex items-center gap-[5px]">
+                <i className="ml-[10px] fa-solid fa-turn-up rotate-90" />
+                <div>{option.desc}</div>
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 export function CardSetList({
   allCardSet,
@@ -20,31 +49,7 @@ export function CardSetList({
               className="bg-black/75"
               interactive
               key={`card_frame_${card.name}`}
-              content={
-                <div className="flex flex-col items-start">
-                  <div
-                    className={`ff-wavve text-[20px] text-white flex bg-[${BA_COLOR}] p-[4px] rounded mb-[4px] border border-white`}
-                  >
-                    {translate(`card:${card.name}`)}
-                  </div>
-                  {card.options.map((option) => {
-                    return (
-                      <div key={createKey()} className="flex flex-col">
-                        <div className="flex items-center justify-between">
-                          <div>{translate(`card:option:${option.name}`)}</div>
-                          <div className="ml-[10px]">{option.value}</div>
-                        </div>
-                        {option.desc && (
-                          <div className="flex items-center gap-[5px]">
-                            <i className="ml-[10px] fa-solid fa-turn-up rotate-90" />
-                            <div>{option.desc}</div>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              }
+              content={<DeckCardTooltip card={card} />}
             >
               <div className="p-[1px] border border-gray-500 shadow-md shadow-gray-400 cursor-pointer">
                 <div className="flex flex-col border border-gray-300 max-w-[60px] items-center">

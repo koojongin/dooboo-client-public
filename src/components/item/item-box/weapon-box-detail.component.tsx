@@ -8,7 +8,7 @@ import { socket } from '@/services/socket'
 import { EMIT_SHARE_ITEM_EVENT } from '@/interfaces/chat.interface'
 import createKey from '@/services/key-generator'
 import { toColorByGrade, toMMDDHHMMSS, translate } from '@/services/util'
-import { InventoryActionKind } from './item.interface'
+import { InventoryActionKind } from '../item.interface'
 import { confirmSaleSetting } from '@/components/auction/add-to-auction-confirm'
 import { BA_COLOR } from '@/constants/constant'
 
@@ -42,15 +42,6 @@ export default function WeaponBoxDetailComponent({
     Object.keys(selectedItem.additionalAttributes || {}).length > 0
   const shareItem = async (eItem: Weapon | any) => {
     socket.emit(EMIT_SHARE_ITEM_EVENT, { itemId: eItem._id })
-  }
-
-  const sellItem = async (eItem: Weapon | any) => {
-    await Swal.fire({
-      title: '미지원',
-      text: '미지원',
-      icon: 'info',
-      confirmButtonText: '확인',
-    })
   }
 
   const addToAuction = async () => {
@@ -105,6 +96,19 @@ export default function WeaponBoxDetailComponent({
               }}
             />
             <div className="ff-wavve">+{selectedItem.enhancedValue}</div>
+            {selectedItem.failedEnhancementCount > 0 && (
+              <div className="ml-[4px] flex items-center justify-center gap-[4px] border-2 border-red-500 border-dashed p-[2px] bg-red-400">
+                <div
+                  className="bg-contain bg-no-repeat bg-center w-[20px] h-[20px]"
+                  style={{
+                    backgroundImage: `url('/images/black-smith/enhance-failed.png')`,
+                  }}
+                />
+                <div className="ff-wavve px-[4px]">
+                  -{selectedItem.failedEnhancementCount}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -255,45 +259,36 @@ export default function WeaponBoxDetailComponent({
           <div>{toMMDDHHMMSS(item.createdAt)}</div>
         </div>
       </div>
-      {
-        <>
-          <div className="px-[10px] py-[2px] mb-[4px]">
-            <div className="flex items-center gap-1">
-              {actions && actions.includes(InventoryActionKind.Equip) && (
-                <div
-                  className="flex items-center justify-center border border-white min-w-[40px] bg-green-400 rounded text-white px-[2px] cursor-pointer"
-                  onClick={() => equipItem(item)}
-                >
-                  착용
-                </div>
-              )}
-              {actions && actions.includes(InventoryActionKind.Share) && (
-                <div
-                  className="flex items-center justify-center border border-white min-w-[40px] bg-green-400 rounded text-white px-[2px] cursor-pointer"
-                  onClick={() => shareItem(item)}
-                >
-                  공유
-                </div>
-              )}
-              {actions &&
-                actions.includes(InventoryActionKind.AddToAuction) && (
-                  <div
-                    className="flex items-center justify-center border border-white min-w-[40px] bg-green-400 rounded text-white px-[2px] cursor-pointer"
-                    onClick={() => addToAuction()}
-                  >
-                    거래소 등록
-                  </div>
-                )}
-              {/*     <div
+      <>
+        <div className="px-[10px] py-[2px] mb-[4px]">
+          <div className="flex items-center gap-1">
+            {actions && actions.includes(InventoryActionKind.Equip) && (
+              <div
                 className="flex items-center justify-center border border-white min-w-[40px] bg-green-400 rounded text-white px-[2px] cursor-pointer"
-                onClick={() => sellItem(item)}
+                onClick={() => equipItem(item)}
               >
-                판매
-              </div> */}
-            </div>
+                착용
+              </div>
+            )}
+            {actions && actions.includes(InventoryActionKind.Share) && (
+              <div
+                className="flex items-center justify-center border border-white min-w-[40px] bg-green-400 rounded text-white px-[2px] cursor-pointer"
+                onClick={() => shareItem(item)}
+              >
+                공유
+              </div>
+            )}
+            {actions && actions.includes(InventoryActionKind.AddToAuction) && (
+              <div
+                className="flex items-center justify-center border border-white min-w-[40px] bg-green-400 rounded text-white px-[2px] cursor-pointer"
+                onClick={() => addToAuction()}
+              >
+                거래소 등록
+              </div>
+            )}
           </div>
-        </>
-      }
+        </div>
+      </>
     </div>
   )
 }

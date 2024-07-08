@@ -1,12 +1,14 @@
 import moment from 'moment'
 import 'moment/locale/ko'
 import parse from 'html-react-parser'
-import { Item } from '@/interfaces/item.interface'
+import { InnItem, Item, ItemTypeKind } from '@/interfaces/item.interface'
 import { JobKind } from '@/interfaces/job.interface'
 import { skillTranslate } from '@/services/skill/skill.translate'
 import { cardTranslate } from '@/services/card/card.translate'
 import { cardOptionTranslate } from '@/services/card/card.option.translate'
 import { skillTagTranslate } from '@/services/skill/skill.tag.translate'
+import { itemTranslate } from '@/services/item/item.translate'
+import { itemTypeTranslate } from '@/services/item/item.type.translate'
 
 export const toRangeString = (range: number[]) => {
   const [start, end] = range
@@ -42,16 +44,15 @@ export const toHHMMSS = (date: string | Date) => {
 
 export const getItemByType = (item: Item) => {
   switch (item.iType) {
-    case 'weapon':
+    case ItemTypeKind.Weapon:
       return item.weapon
-      break
 
-    case 'misc':
+    case ItemTypeKind.Misc:
       return item.misc
-      break
+    case ItemTypeKind.DefenceGear:
+      return item.defenceGear
     default:
       throw new Error('Unknown Item Type')
-      break
   }
 }
 
@@ -61,6 +62,10 @@ export const getTokenByLocalStorage = () => {
 
 export const toEmojiPath = (path: string) => {
   return `/images/emoji/${path}`
+}
+
+export const isWeaponEnhanceable = (item: InnItem) => {
+  return item?.iType !== ItemTypeKind.Weapon && !!item._id
 }
 
 export const translate = (text: string) => {
@@ -90,19 +95,6 @@ export const translate = (text: string) => {
       parsedText = '번개'
       break
     /// //////////////////////////////////////////////
-    case 'iCategory:etc':
-      parsedText = '기타'
-      break
-    case 'iCategory:consume':
-      parsedText = '소비'
-      break
-
-    case 'iType:weapon':
-      parsedText = '무기'
-      break
-    case 'iType:misc':
-      parsedText = '기타'
-      break
     /// ////////////////
     case 'menu:weapon':
       parsedText = '무기'
@@ -151,53 +143,6 @@ export const translate = (text: string) => {
       parsedText = '초보자'
       break
 
-    case 'dagger-mastery':
-      parsedText = '단검 마스터리'
-      break
-    case 'sword-mastery':
-      parsedText = '검 마스터리'
-      break
-    case 'claw-mastery':
-      parsedText = '아대 마스터리'
-      break
-    case 'spear-mastery':
-      parsedText = '창 마스터리'
-      break
-    case 'axe-mastery':
-      parsedText = '도끼 마스터리'
-      break
-    case 'blunt-mastery':
-      parsedText = '둔기 마스터리'
-      break
-    case 'bow-mastery':
-      parsedText = '활 마스터리'
-      break
-    case 'gun-mastery':
-      parsedText = '권총 마스터리'
-      break
-    case 'cannon-mastery':
-      parsedText = '대포 마스터리'
-      break
-
-    case 'add-str':
-      parsedText = '추가 힘'
-      break
-    case 'add-dex':
-      parsedText = '추가 민첩'
-      break
-    case 'add-luk':
-      parsedText = '추가 행운'
-      break
-    case 'add-critical-rate':
-      parsedText = '치명타 확률 증가'
-      break
-    case 'add-critical-multiplier':
-      parsedText = '치명타 배율 증가'
-      break
-    case 'power-strike':
-      parsedText = '파워 스트라이크'
-      break
-
     /// //////////////
     case 'trade-sort:created':
       parsedText = '등록순'
@@ -212,34 +157,6 @@ export const translate = (text: string) => {
       parsedText = '아이템 레벨순'
       break
     /// ///////////////////////////
-    case 'axe':
-      parsedText = '도끼'
-      break
-    case 'sword':
-      parsedText = '검'
-      break
-    case 'dagger':
-      parsedText = '단검'
-      break
-    case 'bow':
-      parsedText = '활'
-      break
-    case 'blunt':
-      parsedText = '둔기'
-      break
-    case 'spear':
-      parsedText = '창'
-      break
-    case 'gun':
-      parsedText = '권총'
-      break
-    case 'cannon':
-      parsedText = '대포'
-      break
-    case 'claw':
-      parsedText = '아대'
-      break
-
     case 'normal':
       parsedText = '일반'
       break
@@ -256,118 +173,6 @@ export const translate = (text: string) => {
       parsedText = '태초'
       break
 
-    /// /////////////////////////////////////////////////////
-    case 'INCREASED_ATTACK_SPEED':
-      parsedText = '공격 속도 증가(%)'
-      break
-    case 'REGENERATE_MANA':
-      parsedText = '초당 마나회복(+)'
-      break
-    case 'ADDED_MANA_ON_KILL':
-      parsedText = '처치시 MP 회복(+)'
-      break
-    case 'ADDED_LIFE_ON_KILL':
-      parsedText = '처치 시 HP 회복(+)'
-      break
-    case 'ADDED_MANA':
-      parsedText = 'MP 추가(+)'
-      break
-    case 'REDUCTION_MANA_COST':
-      parsedText = '스킬의 MP 소모량 감소'
-      break
-    case 'REDUCTION_REQUIRED_EQUIPPED_LEVEL':
-      parsedText = '착용 레벨 감소'
-      break
-    case 'INCREASED_DAMAGE':
-      parsedText = '피해 증가(%)'
-      break
-    case 'INCREASED_DAMAGE_WITH_ROGUE':
-      parsedText = '도적 피해 증가(%)'
-      break
-    case 'INCREASED_DAMAGE_WITH_WARRIOR':
-      parsedText = '전사 피해 증가(%)'
-      break
-    case 'INCREASED_DAMAGE_WITH_BOWMAN':
-      parsedText = '궁수 피해 증가(%)'
-      break
-    case 'INCREASED_PHYSICAL_DAMAGE':
-      parsedText = '물리 피해 증가(%)'
-      break
-    case 'INCREASED_COLD_DAMAGE':
-      parsedText = '냉기 피해 증가(%)'
-      break
-    case 'INCREASED_FIRE_DAMAGE':
-      parsedText = '화염 피해 증가(%)'
-      break
-    case 'INCREASED_LIGHTNING_DAMAGE':
-      parsedText = '번개 피해 증가(%)'
-      break
-    case 'ADDED_PHYSICAL_DAMAGE':
-      parsedText = '물리 피해 추가(+)'
-      break
-    case 'ADDED_COLD_DAMAGE':
-      parsedText = '냉기 피해 추가(+)'
-      break
-    case 'ADDED_FIRE_DAMAGE':
-      parsedText = '화염 피해 추가(+)'
-      break
-    case 'ADDED_LIGHTNING_DAMAGE':
-      parsedText = '번개 피해 추가(+)'
-      break
-    case 'ADDED_DAMAGE_WITH_AXE':
-      parsedText = '도끼 피해 추가(+)'
-      break
-    case 'ADDED_DAMAGE_WITH_SWORD':
-      parsedText = '검 피해 추가(+)'
-      break
-    case 'ADDED_DAMAGE_WITH_DAGGER':
-      parsedText = '단검 피해 추가(+)'
-      break
-    case 'ADDED_DAMAGE_WITH_BOW':
-      parsedText = '활 피해 추가(+)'
-      break
-    case 'ADDED_DAMAGE_WITH_BLUNT':
-      parsedText = '둔기 피해 추가(+)'
-      break
-    case 'ADDED_DAMAGE_WITH_SPEAR':
-      parsedText = '창 피해 추가(+)'
-      break
-    case 'ADDED_DAMAGE_WITH_GUN':
-      parsedText = '권총 피해 추가(+)'
-      break
-    case 'ADDED_DAMAGE_WITH_CANNON':
-      parsedText = '대포 피해 추가(+)'
-      break
-    case 'ADDED_DAMAGE_WITH_CLAW':
-      parsedText = '아대 피해 추가(+)'
-      break
-    case 'INCREASED_DAMAGE_WITH_AXE':
-      parsedText = '도끼 피해 증가(%)'
-      break
-    case 'INCREASED_DAMAGE_WITH_SWORD':
-      parsedText = '검 피해 증가(%)'
-      break
-    case 'INCREASED_DAMAGE_WITH_DAGGER':
-      parsedText = '단검 피해 증가(%)'
-      break
-    case 'INCREASED_DAMAGE_WITH_BOW':
-      parsedText = '활 피해 증가(%)'
-      break
-    case 'INCREASED_DAMAGE_WITH_BLUNT':
-      parsedText = '둔기 피해 증가(%)'
-      break
-    case 'INCREASED_DAMAGE_WITH_SPEAR':
-      parsedText = '창 피해 증가(%)'
-      break
-    case 'INCREASED_DAMAGE_WITH_GUN':
-      parsedText = '권총 피해 증가(%)'
-      break
-    case 'INCREASED_DAMAGE_WITH_CANNON':
-      parsedText = '대포 피해 증가(%)'
-      break
-    case 'INCREASED_DAMAGE_WITH_CLAW':
-      parsedText = '아대 피해 증가(%)'
-      break
     default:
       break
   }
@@ -375,6 +180,8 @@ export const translate = (text: string) => {
   parsedText = cardOptionTranslate(parsedText)
   parsedText = skillTranslate(parsedText)
   parsedText = skillTagTranslate(parsedText)
+  parsedText = itemTranslate(parsedText)
+  parsedText = itemTypeTranslate(parsedText)
   return parsedText
 }
 
@@ -441,13 +248,13 @@ export function formatNumber(number: number) {
   })
 }
 
-export function getJobIconUrl(job: string) {
+export function getJobIconUrl(job: string | undefined) {
   if (job === JobKind.Bowman) return '/images/job/icon_job_bowman.webp'
   if (job === JobKind.Warrior) return '/images/job/icon_job_warrior.webp'
   if (job === JobKind.Rogue) return '/images/job/icon_job_rogue.webp'
   return '/images/job/icon_job_novice.png'
 }
-export function getJobIconBgColor(job: string) {
+export function getJobIconBgColor(job: string | undefined) {
   if (job === JobKind.Bowman) return '#3b8839'
   if (job === JobKind.Warrior) return '#e84b4b'
   if (job === JobKind.Rogue) return '#525bee'

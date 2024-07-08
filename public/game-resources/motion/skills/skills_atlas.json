@@ -1,10 +1,10 @@
 {
     "frames": [
         {
-            "filename": "power-strike_0",
+            "filename": "strike_002",
             "frame": {
-                "w": 80,
-                "h": 80,
+                "w": 92,
+                "h": 92,
                 "x": 0,
                 "y": 0
             },
@@ -14,11 +14,11 @@
             }
         },
         {
-            "filename": "power-strike_1",
+            "filename": "strike_001",
             "frame": {
-                "w": 80,
-                "h": 80,
-                "x": 80,
+                "w": 92,
+                "h": 92,
+                "x": 92,
                 "y": 0
             },
             "anchor": {
@@ -27,12 +27,12 @@
             }
         },
         {
-            "filename": "power-strike_2",
+            "filename": "strike_003",
             "frame": {
-                "w": 80,
-                "h": 80,
+                "w": 92,
+                "h": 92,
                 "x": 0,
-                "y": 80
+                "y": 92
             },
             "anchor": {
                 "x": 0.5,
@@ -40,12 +40,12 @@
             }
         },
         {
-            "filename": "power-strike_3",
+            "filename": "strike_004",
             "frame": {
-                "w": 80,
-                "h": 80,
-                "x": 80,
-                "y": 80
+                "w": 92,
+                "h": 92,
+                "x": 92,
+                "y": 92
             },
             "anchor": {
                 "x": 0.5,
@@ -53,12 +53,155 @@
             }
         },
         {
-            "filename": "power-strike_4",
+            "filename": "tile000",
             "frame": {
-                "w": 80,
-                "h": 80,
-                "x": 160,
+                "w": 32,
+                "h": 12,
+                "x": 184,
                 "y": 0
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tile001",
+            "frame": {
+                "w": 32,
+                "h": 12,
+                "x": 184,
+                "y": 12
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tile002",
+            "frame": {
+                "w": 32,
+                "h": 12,
+                "x": 184,
+                "y": 24
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tile003",
+            "frame": {
+                "w": 32,
+                "h": 12,
+                "x": 184,
+                "y": 36
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tile004",
+            "frame": {
+                "w": 32,
+                "h": 12,
+                "x": 184,
+                "y": 48
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tile005",
+            "frame": {
+                "w": 32,
+                "h": 12,
+                "x": 184,
+                "y": 60
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tile006",
+            "frame": {
+                "w": 32,
+                "h": 12,
+                "x": 184,
+                "y": 72
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tile007",
+            "frame": {
+                "w": 32,
+                "h": 12,
+                "x": 184,
+                "y": 84
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tile010",
+            "frame": {
+                "w": 32,
+                "h": 12,
+                "x": 184,
+                "y": 96
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tile008",
+            "frame": {
+                "w": 32,
+                "h": 12,
+                "x": 184,
+                "y": 108
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tile009",
+            "frame": {
+                "w": 32,
+                "h": 12,
+                "x": 184,
+                "y": 120
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "shuriken",
+            "frame": {
+                "w": 31,
+                "h": 26,
+                "x": 184,
+                "y": 132
             },
             "anchor": {
                 "x": 0.5,

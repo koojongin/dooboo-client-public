@@ -3,7 +3,10 @@
 import { Card } from '@material-tailwind/react'
 import { useCallback, useEffect, useState } from 'react'
 import { GatchaCardExtended } from '@/app/main/inn/deck/deck.type'
-import { fetchCardSet, fetchGetAllCardSet } from '@/services/api/api.card'
+import {
+  fetchGetAllCardSet,
+  fetchGetCardsByCharacterId,
+} from '@/services/api/api.card'
 import { CardSetList } from '@/components/deck/card-set-list'
 
 export default function AdminCharacterDeck({
@@ -16,7 +19,7 @@ export default function AdminCharacterDeck({
   const loadAllCardSet = useCallback(async () => {
     const [resultOfAllCards, resultOfMyCards] = await Promise.all([
       fetchGetAllCardSet(),
-      fetchCardSet(params.characterId),
+      fetchGetCardsByCharacterId(params.characterId),
     ])
 
     const allCards = resultOfAllCards.cardSet.map((card) => {

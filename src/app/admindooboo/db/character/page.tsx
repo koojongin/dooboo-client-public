@@ -16,7 +16,7 @@ export default function AdminCharacterListPage() {
     const result = await fetchGetCharacterList(
       {},
       {
-        sort: { lastBattledAt: -1, level: 1, nickname: 1 },
+        sort: { lastEarnedAt: -1, level: 1, nickname: 1 },
         limit: 20,
         page: selectedPage,
       },
@@ -56,11 +56,11 @@ export default function AdminCharacterListPage() {
                   {character.gold.toLocaleString()}
                 </div>
                 <div className="w-[130px]">
-                  {character.lastBattledAt &&
-                    toMMDDHHMMSS(character.lastBattledAt)}
+                  {character.lastEarnedAt &&
+                    toMMDDHHMMSS(character.lastEarnedAt)}
                 </div>
                 <div className="w-[80px]">
-                  {character.lastBattledAt && ago(character.lastBattledAt)}
+                  {character.lastEarnedAt && ago(character.lastEarnedAt)}
                 </div>
               </div>
             )

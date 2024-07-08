@@ -1,17 +1,24 @@
 import { OnCollisionSprite } from '@/game/scenes/interfaces/onCollision'
 // eslint-disable-next-line import/no-cycle
-import { FightScene } from '@/game/scenes/interfaces/scene.interface'
+import {
+  FightScene,
+  VirtualJoystickPlugin,
+} from '@/game/scenes/interfaces/scene.interface'
 // eslint-disable-next-line import/no-cycle
 import { GameWeapon } from '@/game/scenes/objects/GameWeapon'
-import { AnimationKey, Resource } from '@/game/scenes/enums/enum'
+import { AnimationKey, GameEvent, Resource } from '@/game/scenes/enums/enum'
 import { ItemTypeKind, Weapon } from '@/interfaces/item.interface'
 import { DropTableItem } from '@/interfaces/drop-table.interface'
 import { SkillKind } from '@/interfaces/skill.interface'
 import { formatNumber } from '@/services/util'
 import { BA_COLOR, BA_FAMILY } from '@/constants/constant'
+// eslint-disable-next-line import/no-cycle
 import { GameStrike } from '@/game/scenes/objects/skills/GameStrike'
+// eslint-disable-next-line import/no-cycle
+import { GameIceShuriken } from './skills/GameIceShuriken'
+import { EventBus } from '@/game/EventBus'
+import { GameFireWall } from '@/game/scenes/objects/skills/GameFireWall'
 
-let mpTimer = 0
 export interface CursorKeys {
   up: Phaser.Input.Keyboard.Key
   down: Phaser.Input.Keyboard.Key
@@ -23,6 +30,7 @@ export interface DataQueue {
   experience: number
   gold: number
   items: DropTableItem[]
+  damaged: number
 }
 export class GamePlayer
   extends Phaser.Physics.Arcade.Sprite
@@ -46,14 +54,15 @@ export class GamePlayer
 
   cursor!: CursorKeys
 
+  joystick!: any
+
   weapon?: Weapon
 
-  queue: DataQueue = { experience: 0, gold: 0, items: [] }
+  queue: DataQueue = { experience: 0, gold: 0, items: [], damaged: 0 }
 
   attackMotions = [AnimationKey.Swingpf, AnimationKey.Stabtf]
 
-  activeSkill!: { name: SkillKind; mp: number }
-  // { name: SkillKind.ThrowWeapon, mp: 100 },
+  activeSkill!: { name: SkillKind }
 
   constructor(scene: FightScene, x: number, y: number, key: string) {
     // need a wrapper Class to properly set the Matter World
@@ -71,9 +80,9 @@ export class GamePlayer
   }
 
   init() {
-    this.activeSkill = { name: this.scene.resultOfSkill.activeSkill, mp: 20 }
-    // this.activeSkill = { name: SkillKind.Strike, mp: 20 }
-    // this.activeSkill = { name: SkillKind.ThrowWeapon, mp: 20 }
+    this.speed = this.scene.resultOfMe.stat.speed
+    this.activeSkill = { name: this.scene.resultOfSkill.activeSkill }
+    console.log(this.activeSkill)
     this.setCollideWorldBounds(true)
     this.setImmovable(true)
     this.currentMp = this.scene.resultOfMe.stat.mp
@@ -96,15 +105,29 @@ export class GamePlayer
       },
       this.scene,
     )
-    this.anims.timeScale = 2
+    this.anims.timeScale = 2 + this.scene.resultOfMe.stat.attackSpeed
     this.cursor = this.scene.input.keyboard!.addKeys({
       up: Phaser.Input.Keyboard.KeyCodes.W,
       down: Phaser.Input.Keyboard.KeyCodes.S,
       left: Phaser.Input.Keyboard.KeyCodes.A,
       right: Phaser.Input.Keyboard.KeyCodes.D,
     }) as CursorKeys
+
+    this.joystick = (
+      this.scene.plugins.get('rexVirtualJoystick') as VirtualJoystickPlugin
+    )
+      .add(this.scene, {
+        x: 100,
+        y: 500,
+        radius: 50,
+        base: this.scene.add.circle(0, 0, 50, 0x888888),
+        thumb: this.scene.add.circle(0, 0, 25, 0xcccccc),
+        dir: '8dir',
+        forceMin: 10,
+        enable: true,
+      })
+      .on('update', this.dumpJoyStickState, this)
     this.anims.play(AnimationKey.Stand1)
-    this.playOnceAttackAnimation()
 
     const weaponItem = (this.scene.resultOfMe.equippedItems || []).find(
       (item) => item.iType === ItemTypeKind.Weapon,
@@ -114,23 +137,16 @@ export class GamePlayer
     }
   }
 
-  onCollision(target: OnCollisionSprite) {
-    // console.log(target)
+  dumpJoyStickState() {
+    const cursorKeys = this.joystick.createCursorKeys()
+    this.cursor.up.isDown = cursorKeys.up.isDown
+    this.cursor.down.isDown = cursorKeys.down.isDown
+    this.cursor.left.isDown = cursorKeys.left.isDown
+    this.cursor.right.isDown = cursorKeys.right.isDown
   }
 
-  playOnceAttackAnimation() {
-    if (
-      this.scene.weaponGroup.getLength() < 100 &&
-      this.scene.monsterGroup.getLength() > 0
-    ) {
-      this.onReadyAttack = false
-      if (this.anims.currentAnim?.key === AnimationKey.Stabtf) {
-        // 공속 너무빨라서 애니메이션 끝나기전에 호출되면 강제 공격
-        this.attack()
-      } else {
-        this.play(AnimationKey.Stabtf)
-      }
-    }
+  onCollision(target: OnCollisionSprite) {
+    // console.log(target)
   }
 
   attack() {
@@ -141,24 +157,47 @@ export class GamePlayer
     }
 
     if (this.activeSkill.name === SkillKind.Strike) {
-      this.strike()
+      const ps = new GameStrike(this.scene, this.x, this.y)
     }
 
     if (this.activeSkill.name === SkillKind.ThrowWeapon) {
       this.spawnWeapon.call(this)
     }
-  }
 
-  strike() {
-    const ps = new GameStrike(this.scene, this.x, this.y)
+    if (this.activeSkill.name === SkillKind.FireWall) {
+      const ps = new GameFireWall(
+        this.scene,
+        this.x,
+        this.y,
+        this.scene.weaponGroup,
+      )
+    }
+
+    if (this.activeSkill.name === SkillKind.IceShuriken) {
+      const shuriken = new GameIceShuriken(
+        this.scene,
+        this.x,
+        this.y,
+        this.scene.weaponGroup,
+      )
+    }
   }
 
   onCollisionWithDropItem() {}
 
   update(time: number, delta: number) {
-    mpTimer += delta
-
     this.setVelocity(0)
+    const { stat } = this.scene.resultOfMe
+    if (
+      this.onReadyAttack &&
+      this.currentMp >= stat.mpConsumption &&
+      this.anims.currentAnim?.key !== AnimationKey.Stabtf &&
+      this.scene.monsterGroup.getLength() > 0 &&
+      this.scene.weaponGroup.getLength() <= 200
+    ) {
+      this.anims.play(AnimationKey.Stabtf)
+      this.onReadyAttack = false
+    }
     const currentAnimKey = this.anims.currentAnim?.key
     // 키 입력에 따라 속도 설정
     if (this.cursor.left.isDown) {
@@ -183,9 +222,9 @@ export class GamePlayer
       }
     }
 
-    if (this.onReadyAttack) {
-      this.playOnceAttackAnimation()
-    }
+    // if (this.onReadyAttack) {
+    //   this.playOnceAttackAnimation()
+    // }
 
     if (this.currentMp < this.maxMp) {
       // this.currentMp += this.scene.resultOfMe.stat.mpRegenerate
@@ -195,6 +234,15 @@ export class GamePlayer
         this.maxMp,
       )
       this.scene.statusBox.mpBar.update()
+    }
+
+    if (this.currentHp < this.maxHp) {
+      this.currentHp = Math.min(
+        this.currentHp +
+          (delta / 1000) * this.scene.resultOfMe.stat.hpRegenerate, // this.scene.resultOfMe.stat.mpRegenerate,
+        this.maxHp,
+      )
+      this.scene.statusBox.hpBar.update()
     }
   }
 
@@ -210,11 +258,13 @@ export class GamePlayer
   }
 
   onDamaged(damage: number) {
-    this.currentHp -= damage
+    this.currentHp -= Math.max(0, damage - this.scene.resultOfMe.stat.armor)
     if (this.currentHp <= 0) {
       this.currentHp = this.maxHp
       const convertedScene: any = this.scene
       convertedScene.resetMonster()
+      this.queue.damaged = 0
+      EventBus.emit(GameEvent.PlayerDead)
     }
     this.scene.statusBox.hpBar.update()
   }
@@ -247,5 +297,8 @@ export class GamePlayer
         collisionText.destroy() // 애니메이션 완료 후 텍스트 제거
       },
     })
+
+    this.queue.damaged += totalDamage
+    EventBus.emit(GameEvent.OnDamagedMonster)
   }
 }

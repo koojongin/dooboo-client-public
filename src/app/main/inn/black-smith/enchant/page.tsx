@@ -18,7 +18,7 @@ import createKey from '@/services/key-generator'
 import ItemBoxComponent from '@/components/item/item-box'
 import { InventoryActionKind } from '@/components/item/item.interface'
 import { CurrencyResponse } from '@/interfaces/currency.interface'
-import { formatNumber, translate } from '@/services/util'
+import { formatNumber, isWeaponEnhanceable, translate } from '@/services/util'
 import {
   fetchEnchantWeapon,
   fetchGetEnchantData,
@@ -246,14 +246,15 @@ export default function BlackSmithEnchantPage() {
                 {new Array(100).fill(1).map((value, index) => {
                   const item = items[index] || {}
                   const disableSlotClass = 'bg-gray-800'
-                  const isOveredSlot =
-                    index >= maxItemSlots || item?.iType === ItemTypeKind.Misc
+                  const isOveredSlot = index >= maxItemSlots
+                  const invalidItem = isWeaponEnhanceable(item)
+                  const isDisabled = isOveredSlot || invalidItem
                   return (
                     <div
                       key={`black_smith_${item?._id || createKey()}`}
-                      className={`bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] ${isOveredSlot ? disableSlotClass : ''}`}
+                      className={`bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] ${isDisabled ? disableSlotClass : ''}`}
                     >
-                      {isOveredSlot && (
+                      {isDisabled && (
                         <div className="absolute z-10 bg-gray-800 bg-opacity-60 w-[50px] h-[50px] rounded" />
                       )}
                       {item && (

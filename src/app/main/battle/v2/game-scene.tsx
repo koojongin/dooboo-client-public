@@ -3,10 +3,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Card, Tooltip } from '@material-tailwind/react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { IRefPhaserGame, PhaserGame } from '@/game/PhaserGame'
 import { MainMenu } from '@/game/scenes/MainMenu'
 import { FightScene } from '@/game/scenes/interfaces/scene.interface'
-import { fetchGetMapsName, fetchGetMyInventory } from '@/services/api-fetch'
+import {
+  fetchGetMapsName,
+  fetchGetMyInventory,
+  fetchMe,
+} from '@/services/api-fetch'
 import {
   BaseItemTypeKind,
   InventoryResponse,
@@ -24,6 +29,9 @@ import { BaseWeaponBoxTooltipComponent } from '@/app/main/collection/maps/base-w
 import { BaseMiscBoxTooltipComponent } from '@/app/main/collection/maps/base-misc-box-tooltip.component'
 import { DataQueue } from '@/game/scenes/objects/GamePlayer'
 import { GameConfig, GameEvent } from '@/game/scenes/enums/enum'
+import { formatNumber } from '@/services/util'
+import { PendingEarnedBox } from '@/app/main/battle/v2/pending-data.component'
+import { MeResponse } from '@/interfaces/user.interface'
 
 export default function GameSceneComponent() {
   const router = useRouter()
@@ -38,7 +46,10 @@ export default function GameSceneComponent() {
   const [selectedMapName, setSelectedMapName] = useState<string>()
   const [selectedMap, setSelectedMap] = useState<DbMap>()
   const [resultOfMap, setResultOfMap] = useState<GetMapResponse>()
-  const [pendingData, setPendingData] = useState<DataQueue>()
+  const [meResponse, setMeResponse] = useState<MeResponse>()
+  const [pendingData, setPendingData] = useState<
+    DataQueue & { damaged: number }
+  >()
 
   const changeScene = () => {
     if (phaserRef.current) {
@@ -62,7 +73,7 @@ export default function GameSceneComponent() {
 
   const loadMaps = useCallback(async () => {
     const { maps: rMaps } = await fetchGetMapsName()
-    setMaps(rMaps)
+    setMaps(rMaps.filter((map) => map.name !== '허수아비'))
   }, [])
 
   const currentScene = (_scene: Phaser.Scene) => {
@@ -84,20 +95,25 @@ export default function GameSceneComponent() {
     [scene],
   )
 
-  const goToInn = () => {
-    router.push('/main/inn/stash')
+  const goToRoute = (path: string) => {
+    router.push(path)
   }
+
+  const loadMe = useCallback(async () => {
+    const result = await fetchMe()
+    setMeResponse(result)
+  }, [])
 
   useEffect(() => {
     if (scene?.scene.key === 'Game') {
       loadInventory()
-      // setPendingData((scene as FightScene).player.queue)
     }
   }, [loadInventory, scene])
 
   useEffect(() => {
     loadMaps()
-  }, [loadMaps])
+    loadMe()
+  }, [loadMaps, loadMe])
 
   useEffect(() => {
     EventBus.on('event', (data: any) => {
@@ -115,11 +131,28 @@ export default function GameSceneComponent() {
     EventBus.on(GameEvent.MonsterDead, (data: any) => {
       setPendingData(undefined)
       setTimeout(() => {
-        setPendingData((scene as FightScene).player.queue)
+        setPendingData({ ...(scene as FightScene).player.queue })
       }, 1)
     })
+
+    EventBus.on(GameEvent.OnDamagedMonster, (data: any) => {
+      setPendingData(undefined)
+      setTimeout(() => {
+        setPendingData({ ...(scene as FightScene).player.queue })
+      }, 1)
+    })
+
+    EventBus.on(GameEvent.PlayerDead, (data: any) => {
+      setPendingData(undefined)
+      setTimeout(() => {
+        setPendingData({ ...(scene as FightScene).player.queue })
+      }, 1)
+    })
+
     return () => {
       EventBus.removeListener(GameEvent.MonsterDead)
+      EventBus.removeListener(GameEvent.OnDamagedMonster)
+      EventBus.removeListener(GameEvent.PlayerDead)
     }
   }, [pendingData, scene])
 
@@ -135,14 +168,49 @@ export default function GameSceneComponent() {
   return (
     <div className="flex flex-col gap-[4px]">
       <Card className="p-[10px]">
-        <div className="w-[200px] bg-white">
-          <MapSelectPopoverComponent
-            maps={maps}
-            selectedMap={selectedMapName}
-            setSelectedMap={setSelectedMapName}
-          />
+        {meResponse && (
+          <div>
+            {!meResponse.stat.characterSkill && (
+              <div className="text-red-500 text-[20px] ff-score ">
+                <div>
+                  선택된 캐릭터 스킬이 없습니다. 전직을 먼저 진행해주세요
+                </div>
+                <div
+                  className="inline-flex ff-score font-bold bg-green-500 text-white cursor-pointer rounded p-[10px]"
+                  onClick={() => goToRoute('/main/skill')}
+                >
+                  전직 페이지로 이동하기
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        <div className="flex items-center justify-between">
+          <div className="w-[200px] bg-white">
+            {scene?.scene?.key !== 'Game' &&
+              !!meResponse?.stat.characterSkill && (
+                <MapSelectPopoverComponent
+                  maps={maps}
+                  selectedMap={selectedMapName}
+                  setSelectedMap={setSelectedMapName}
+                />
+              )}
+            {selectedMap && (
+              <div className="flex items-center gap-[4px]">
+                <div>{selectedMap.name}</div>
+                <div>지역 레벨 : {selectedMap.level}</div>
+              </div>
+            )}
+          </div>
+          <Link
+            target="_blank"
+            href="/main/community/detail/6683e307c9638e8b6885783c"
+          >
+            <div className="bg-blue-800 p-[4px] cursor-pointer ff-score font-bold text-white">
+              윈도우 클라이언트 다운로드
+            </div>
+          </Link>
         </div>
-        {selectedMap && <div>지역 레벨 : {selectedMap.level}</div>}
       </Card>
       <div className="flex">
         <PhaserGame
@@ -168,7 +236,7 @@ export default function GameSceneComponent() {
               * 인벤토리가 가득 찼습니다. 아이템을 더이상 획득할 수 없습니다.{' '}
               <span
                 className="underline text-[20px] cursor-pointer"
-                onClick={() => goToInn()}
+                onClick={() => goToRoute('/main/inn/stash')}
               >
                 여관
               </span>
@@ -203,96 +271,6 @@ export default function GameSceneComponent() {
             })}
         </div>
       </Card>
-    </div>
-  )
-}
-
-function PendingEarnedBox({
-  pendingData,
-  scene,
-  inventoryRes,
-}: {
-  pendingData?: DataQueue
-  scene: FightScene
-  inventoryRes?: InventoryResponse
-}) {
-  const { gold = 0, experience = 0, items = [] } = pendingData || {}
-  return (
-    <Card className="p-[4px] rounded-none ff-score-all font-bold min-w-[140px]">
-      <Tooltip
-        content={
-          <div>
-            <div>
-              획득 대기 목록은 {GameConfig.QueueResolveTime / 1000}초 주기로
-              획득 후 갱신 됩니다.
-            </div>
-            <div className="text-red-500">
-              (주의! 갱신되지 않았을때 페이지 이동시 모든 목록이 손실됩니다.)
-            </div>
-          </div>
-        }
-      >
-        <div className="flex items-center cursor-pointer gap-[4px]">
-          <div>획득 대기</div>
-          <div className="flex items-center justify-center bg-gray-800 text-white rounded-full text-[12px] w-[16px] h-[16px]">
-            <i className="fa-solid fa-question" />
-          </div>
-        </div>
-      </Tooltip>
-      <div>+{gold.toLocaleString()} gold</div>
-      <div>+{experience.toLocaleString()} exp</div>
-      <div>
-        {inventoryRes?.isFulled && (
-          <Tooltip content="인벤토리가 가득차면 더 이상 아이템을 획득할 수 없습니다.">
-            <div className="text-red-500 flex items-center gap-[4px] cursor-pointer">
-              <div>인벤토리 가득참</div>
-              <div className="flex items-center justify-center bg-gray-800 text-white rounded-full text-[12px] w-[16px] h-[16px]">
-                <i className="fa-solid fa-question" />
-              </div>
-            </div>
-          </Tooltip>
-        )}
-        {!inventoryRes?.isFulled &&
-          items.map((dropItem) => (
-            <PendingItem dropItem={dropItem} key={createKey()} />
-          ))}
-      </div>
-    </Card>
-  )
-}
-
-function PendingItem({ dropItem }: { dropItem: DropTableItem }) {
-  const { iType, item } = dropItem
-  const { thumbnail } = item
-  return (
-    <div>
-      {iType === BaseItemTypeKind.BaseWeapon && (
-        <Tooltip
-          className="rounded-none bg-transparent"
-          interactive
-          placement="right"
-          content={<BaseWeaponBoxTooltipComponent item={dropItem} />}
-        >
-          <div
-            className="w-[40px] h-[40px] bg-contain bg-center bg-no-repeat"
-            style={{ backgroundImage: `url('${toAPIHostURL(thumbnail)}')` }}
-          />
-        </Tooltip>
-      )}
-
-      {iType === BaseItemTypeKind.BaseMisc && (
-        <Tooltip
-          className="rounded-none bg-transparent"
-          interactive
-          placement="right"
-          content={<BaseMiscBoxTooltipComponent item={dropItem} />}
-        >
-          <div
-            className="w-[40px] h-[40px] bg-contain bg-center bg-no-repeat"
-            style={{ backgroundImage: `url('${toAPIHostURL(thumbnail)}')` }}
-          />
-        </Tooltip>
-      )}
     </div>
   )
 }

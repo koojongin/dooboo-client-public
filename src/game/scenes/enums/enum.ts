@@ -20,7 +20,8 @@ export enum AnimationKey {
   Swingpf = 'swingpf',
   Stand1 = 'stand1',
   Walk2 = 'walk2',
-  Strike = 'power-strike',
+  Strike = 'strike',
+  FireWall = 'fire-wall',
 }
 
 export enum SoundKey {
@@ -31,12 +32,13 @@ export enum SoundKey {
 export enum GameEvent {
   MonsterDead = 'MonsterDead',
   DropItem = 'DropItem',
+  OnDamagedMonster = 'OnDamagedMonster',
+  PlayerDead = 'PlayerDead',
+  OnGameStop = 'OnGameStop',
 }
 
 export enum GameConfig {
   QueueResolveTime = 1000 * 30,
-}
-
-export enum ActiveSkill {
-  EnergyBolt = 'energy-bolt',
+  Version = 4,
+  CROW_PRESERVE_TIME = 1000 * 15,
 }

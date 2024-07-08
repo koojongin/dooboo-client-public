@@ -18,6 +18,7 @@ export function PickUpBox({
     if (categoryName === CardSetCategory.AzusaSwimsuit) return 6
     if (categoryName === CardSetCategory.FlatCardPickUp) return 7
     if (categoryName === CardSetCategory.PhysicalPickUp) return 8
+    if (categoryName === CardSetCategory.FubukiPickUp) return 9
     return 0
   }
 

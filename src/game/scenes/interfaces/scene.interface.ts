@@ -8,6 +8,21 @@ import { GameStatusBox } from '@/game/scenes/objects/GameStatus'
 import { GameSoundManager } from '@/game/scenes/objects/GameSoundManager'
 import { SkillMeResponse } from '@/interfaces/skill.interface'
 
+export interface VirtualJoystickPlugin extends Phaser.Plugins.ScenePlugin {
+  add(
+    scene: Phaser.Scene,
+    config: {
+      x: number
+      y: number
+      radius: number
+      base: Phaser.GameObjects.GameObject
+      thumb: Phaser.GameObjects.GameObject
+      dir?: string
+      forceMin?: number
+      enable?: boolean
+    },
+  ): any
+}
 export interface FightScene extends Phaser.Scene {
   player: GamePlayer
   resultOfMap: GetMapResponse
