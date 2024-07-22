@@ -247,7 +247,7 @@ export default function Page({
       icon: 'success',
       confirmButtonText: '닫기',
     })
-    router.push('/admindooboo/item/weapon')
+    // router.push('/admindooboo/item/weapon')
   }
 
   const convertWeaponValueForElement = (value: any) => {

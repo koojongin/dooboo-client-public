@@ -9,7 +9,7 @@ import toAPIHostURL from '@/services/image-name-parser'
 import createKey from '@/services/key-generator'
 import { Monster } from '@/interfaces/monster.interface'
 import { translate } from '@/services/util'
-import { BaseItemTypeKind } from '@/interfaces/item.interface'
+import { BaseItemTypeKind, ItemTypeKind } from '@/interfaces/item.interface'
 import { BaseMiscBoxTooltipComponent } from './base-misc-box-tooltip.component'
 import { BaseWeaponBoxTooltipComponent } from './base-weapon-box-tooltip.component'
 import { fetchGetMap } from '@/services/api-admin-fetch'
@@ -35,6 +35,11 @@ export default function CollectionMapsPage() {
 
     const { map: rMap, monsters: rMonsters } = await fetchGetMap(map._id!)
 
+    const order = [
+      BaseItemTypeKind.BaseMisc,
+      BaseItemTypeKind.BaseWeapon,
+      BaseItemTypeKind.BaseDefenceGear,
+    ]
     const sorted = {
       ...rMap,
       monsters: _.sortBy(
@@ -42,7 +47,11 @@ export default function CollectionMapsPage() {
           if (!monster.drop) return monster
           if ((monster.drop?.items?.length || 0) > 0) {
             const newMonster = { ...monster }
-            newMonster.drop!.items = _.sortBy(newMonster.drop!.items, 'roll')
+            newMonster.drop!.items = _.orderBy(
+              newMonster.drop!.items,
+              [(item) => order.indexOf(item.iType as any)],
+              ['asc'],
+            )
             return newMonster
           }
           return monster

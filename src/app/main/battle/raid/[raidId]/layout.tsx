@@ -18,7 +18,7 @@ export default function RootLayout({
           뒤로가기
         </div>
       </div>
-      <div className="mt-[5px] w-full">{children}</div>
+      <div className="mt-[5px]">{children}</div>
     </div>
   )
 }

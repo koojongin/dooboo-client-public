@@ -323,11 +323,11 @@ function InnInventory({
     const selectedItems = items.filter((item) => item.isSelected)
     if (selectedItems.length === 0) return
     if (
-      selectedItems.filter((item) => item.weapon).length !==
-      selectedItems.length
+      selectedItems.filter((item) => !!item.weapon || !!item.defenceGear)
+        .length !== selectedItems.length
     ) {
       return Swal.fire({
-        title: `무기만 분해할 수 있습니다.`,
+        title: `무기 또는 방어구만 분해할 수 있습니다.`,
         icon: 'warning',
         confirmButtonText: '확인',
       })
@@ -475,6 +475,24 @@ function InnInventory({
     )
   }
 
+  const selectEquipableItemsWithoutStarForce = () => {
+    setItems(
+      items.map((item, index) => {
+        const newItem = item
+        const { weapon, defenceGear } = item
+        if (weapon || defenceGear) {
+          if (weapon?.starForce === 0) {
+            newItem.isSelected = true
+          }
+          if (defenceGear?.starForce === 0) {
+            newItem.isSelected = true
+          }
+        }
+        return newItem
+      }),
+    )
+  }
+
   const selectAllInStash = () => {
     if (!selectedStash) return
     if (
@@ -547,6 +565,12 @@ function InnInventory({
                 나누기
               </div>
             </Tooltip>
+            <div
+              className="border py-[2px] px-[5px] text-[16px] rounded text-white bg-lightBlue-950 cursor-pointer hover:bg-green-300"
+              onClick={() => selectEquipableItemsWithoutStarForce()}
+            >
+              스타포스가 없는 장비만 선택
+            </div>
           </div>
           <div className="flex justify-between ff-ba mt-[5px]">
             <div className="text-blue-gray-600 border-blue-gray-900 border-b-0 border min-w-[60px] flex items-center justify-center ff-ba text-[18px] h-[27px] px-[4px]">
@@ -591,6 +615,7 @@ function InnInventory({
                             InventoryActionKind.AddToAuction,
                             InventoryActionKind.Consume,
                             InventoryActionKind.Equip,
+                            InventoryActionKind.Lock,
                           ]}
                           onShowTotalDamage
                           actionCallback={syncData}

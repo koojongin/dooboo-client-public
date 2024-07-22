@@ -20,6 +20,17 @@ export async function fetchGetAuctionWeapons(
   return response
 }
 
+export async function fetchGetAuctionDefenceGears(
+  condition = {},
+  opts?: { page: number },
+): Promise<AuctionListResponse> {
+  const { data: response } = await api.post(`/auction/list/defence-gear`, {
+    condition,
+    opts,
+  })
+  return response
+}
+
 export async function fetchGetAuctionMiscs(
   condition = {},
   opts?: { page: number },

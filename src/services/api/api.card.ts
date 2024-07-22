@@ -40,6 +40,7 @@ export async function fetchSaveDeck(
 export async function fetchGetMyDeck(): Promise<{
   cards: GatchaCard[]
   decks: CardDeck[]
+  maxCardSlots: number
 }> {
   const { data: response } = await api.get(`/card/my-deck`)
   return response

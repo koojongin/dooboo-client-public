@@ -119,14 +119,14 @@ export class GameMonster
     if (!this.active) return
     const isExistDropCondition = (this.mData.drop?.items || []).length > 0
     if (isExistDropCondition && !this.scene.isFulledInventory) {
-      const [dropItem] = _.shuffle(
-        this.mData.drop?.items, // .filter((i) => i.iType === BaseItemType.BaseMisc),
-      )
-      const isPicked = pickByRoll(dropItem.roll)
-      if (isPicked) {
-        this.scene.player.queue.items.push(dropItem)
-        this.scene.soundManager.play(SoundKey.WeaponDrop)
-      }
+      if (this.scene.isScareCrowMode || this.scene.isRaidMode) return
+      this.mData.drop?.items.forEach((dropItem) => {
+        const isPicked = pickByRoll(dropItem.roll)
+        if (isPicked) {
+          this.scene.player.queue.items.push(dropItem)
+          this.scene.soundManager.play(SoundKey.WeaponDrop)
+        }
+      })
     }
     // this.maskGraphics.clear()
     // this.clearMask(true)
@@ -150,9 +150,12 @@ export class GameMonster
     this.scene.statusBox.expBar.update()
     EventBus.emit(GameEvent.MonsterDead)
 
-    if (this.mData.name === '허수아비') return
+    if (this.scene.isScareCrowMode) return
     if (this.scene.resultOfMap.map.name === 'TEST') {
       this.scene.applyStackedQueue()
+    }
+    if (this.scene.isRaidMode) {
+      return
     }
     this.destroy()
   }

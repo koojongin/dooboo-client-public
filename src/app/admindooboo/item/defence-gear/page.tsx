@@ -15,7 +15,10 @@ export default function ItemDefenceGearPage() {
   const [pagination, setPagination] = useState<Pagination>()
 
   const loadBaseDefenceGears = useCallback(async (selectedPage = 1) => {
-    const result = await fetchGetBaseDefenceGearList({}, { page: selectedPage })
+    const result = await fetchGetBaseDefenceGearList(
+      {},
+      { page: selectedPage, sort: { createdAt: -1 } },
+    )
     setBaseDefenceGears(result.baseDefenceGears)
     setPagination({ ...result })
   }, [])
@@ -41,6 +44,7 @@ export default function ItemDefenceGearPage() {
               <tr>
                 {[
                   '',
+                  'id',
                   'name',
                   'armor',
                   'evasion',
@@ -78,6 +82,7 @@ export default function ItemDefenceGearPage() {
                           className="w-[40px] h-[40px] border border-blue-gray-50 bg-blue-gray-50/50 object-contain"
                         />
                       </td>
+                      <td>{baseDefenceGear.id}</td>
                       <td>{baseDefenceGear.name}</td>
                       <td>{baseDefenceGear.armor.join('-')}</td>
                       <td>{baseDefenceGear.evasion.join('-')}</td>

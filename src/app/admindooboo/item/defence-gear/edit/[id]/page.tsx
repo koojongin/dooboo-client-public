@@ -81,7 +81,7 @@ export default function Page({
     }
 
     if (!baseDefenceGear.gold) {
-      error.message = 'gold 없음'
+      baseDefenceGear.gold = 0
     }
 
     if (error.message) {
@@ -95,8 +95,13 @@ export default function Page({
 
     if (isCreateMode) await fetchPostBaseDefenceGear(baseDefenceGear)
     else await fetchPutBaseDefenceGear(baseDefenceGear)
-    router.push('/admindooboo/item/defence-gear')
-  }, [baseDefenceGear, isCreateMode, router])
+    return Swal.fire({
+      title: '생성 또는 수정됨.',
+      icon: 'success',
+      confirmButtonText: '닫기',
+    })
+    // router.push('/admindooboo/item/defence-gear')
+  }, [baseDefenceGear, isCreateMode])
 
   const loadBaseDefenceGear = useCallback(async (baseDefenceGearId: string) => {
     const result = await fetchGetBaseDefenceGearOne(baseDefenceGearId)

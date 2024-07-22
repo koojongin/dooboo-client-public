@@ -4,23 +4,25 @@ import { Card } from '@material-tailwind/react'
 import { useCallback, useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import ItemBoxComponent from '@/components/item/item-box'
-import { InnItem, ItemTypeKind, Weapon } from '@/interfaces/item.interface'
+import { InnItem, ItemTypeKind } from '@/interfaces/item.interface'
 import createKey from '@/services/key-generator'
 import {
-  fetchGetEnhancePrice,
   fetchGetMyInventory,
-  fetchReRollAdditionalWeapon,
-  fetchReRollWeapon,
+  fetchReRollAdditionalOriginItem,
 } from '@/services/api-fetch'
 import toAPIHostURL from '@/services/image-name-parser'
 import { InventoryActionKind } from '@/components/item/item.interface'
-import { isWeaponEnhanceable } from '@/services/util'
+import {
+  getReRollPrice,
+  isAdditionalOptionReRollable,
+  ValidReRollItemTypes,
+} from '@/services/util'
 
 export default function BlackSmithRerollAdditionalPage() {
   const [items, setItems] = useState<InnItem[]>([])
   const [maxItemSlots, setMaxItemSlots] = useState<number>(0)
   const [gold, setGold] = useState<number>(0)
-  const [selectedWeapons, setSelectedWeapons] = useState<InnItem[]>([])
+  const [selectedCraftItems, setSelectedCraftItems] = useState<InnItem[]>([])
   const [enhancePrice, setEnhancePrice] = useState<{
     price: number
   }>()
@@ -40,8 +42,13 @@ export default function BlackSmithRerollAdditionalPage() {
   }
 
   const enhanceWeapon = async () => {
-    if (selectedWeapons?.length === 0) return
-    if (!selectedWeapons[0]?.weapon) return
+    if (selectedCraftItems?.length === 0) return
+    if (
+      !ValidReRollItemTypes.includes(
+        selectedCraftItems[0].iType as ItemTypeKind,
+      )
+    )
+      return
     const { isConfirmed } = await Swal.fire({
       title: `정말로 재설정하시겠습니까?`,
       confirmButtonText: '예',
@@ -50,7 +57,7 @@ export default function BlackSmithRerollAdditionalPage() {
     })
 
     if (isConfirmed) {
-      await fetchReRollAdditionalWeapon(selectedWeapons[0].weapon._id!)
+      await fetchReRollAdditionalOriginItem(selectedCraftItems[0]._id!)
       await Promise.all([
         Swal.fire({
           title: '재설정 되었습니다.',
@@ -59,7 +66,7 @@ export default function BlackSmithRerollAdditionalPage() {
         }),
         refreshInventory(),
       ])
-      setSelectedWeapons([])
+      setSelectedCraftItems([])
     }
   }
   const onSelectItem = async (item: InnItem) => {
@@ -80,53 +87,44 @@ export default function BlackSmithRerollAdditionalPage() {
     })
     setItems(newItems)
 
-    const attachedWeaponIndex = selectedWeapons.findIndex(
+    const attachedWeaponIndex = selectedCraftItems.findIndex(
       (sWeapon) => sWeapon?._id === items[selectedItemIndex]._id,
     )
 
     if (attachedWeaponIndex < 0) {
-      const emptyIndex = selectedWeapons.findIndex((data) => !data)
+      const emptyIndex = selectedCraftItems.findIndex((data) => !data)
       if (emptyIndex < 0) {
-        setSelectedWeapons([
-          ...selectedWeapons,
+        setSelectedCraftItems([
+          ...selectedCraftItems,
           { ...items[selectedItemIndex] },
         ])
       } else {
-        const newWeapons: any = [...selectedWeapons]
+        const newWeapons: any = [...selectedCraftItems]
         newWeapons[emptyIndex] = { ...items[selectedItemIndex] }
-        return setSelectedWeapons(newWeapons)
+        return setSelectedCraftItems(newWeapons)
       }
     } else {
-      const newSelectedWeapons: any = [...selectedWeapons]
+      const newSelectedWeapons: any = [...selectedCraftItems]
       newSelectedWeapons[attachedWeaponIndex] = undefined
-      setSelectedWeapons(newSelectedWeapons)
+      setSelectedCraftItems(newSelectedWeapons)
     }
   }
 
   const initialRefresh = useCallback(async () => {
     await refreshInventory()
-    setSelectedWeapons([])
+    setSelectedCraftItems([])
     setEnhancePrice(undefined)
   }, [])
 
-  const getReRollPrice = (weapon: Weapon) => {
-    const price = parseInt(String((weapon.iLevel - 1) / 10), 10) * 100000
-    return Math.max(price, 0)
-  }
-
-  // console.log(
-  //   new Array(30)
-  //     .fill(1)
-  //     .map((v, i) => ({ iLevel: i + 1 }))
-  //     .map((w) => getReRollPrice(w as any)),
-  // )
   useEffect(() => {
-    if (selectedWeapons?.length <= 0) return
-    if (!selectedWeapons[0]) return
+    if (selectedCraftItems?.length <= 0) return
+    if (!selectedCraftItems[0]) return
     setEnhancePrice({
-      price: getReRollPrice(selectedWeapons[0].weapon),
+      price: getReRollPrice(
+        selectedCraftItems[0].weapon || selectedCraftItems[0].defenceGear,
+      ),
     })
-  }, [selectedWeapons])
+  }, [selectedCraftItems])
 
   useEffect(() => {
     initialRefresh()
@@ -169,10 +167,10 @@ export default function BlackSmithRerollAdditionalPage() {
           <div className="flex items-center justify-center gap-[2px]">
             <div>대상 아이템</div>
             <div className="bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] items-center justify-center">
-              {selectedWeapons[0] && (
+              {selectedCraftItems[0] && (
                 <ItemBoxComponent
                   className="p-[2px]"
-                  item={selectedWeapons[0]}
+                  item={selectedCraftItems[0]}
                   onShowTotalDamage
                   actionCallback={() => {}}
                   // onSelect={onSelectItem}
@@ -233,8 +231,8 @@ export default function BlackSmithRerollAdditionalPage() {
                     const item = items[index] || {}
                     const disableSlotClass = 'bg-gray-800'
                     const isOveredSlot = index >= maxItemSlots
-                    const invalidItem = isWeaponEnhanceable(item)
-                    const isDisabled = isOveredSlot || invalidItem
+                    const invalidItem = !isAdditionalOptionReRollable(item)
+                    const isDisabled = isOveredSlot || (item?.id && invalidItem)
                     return (
                       <div
                         key={`black_smith_${item?._id || createKey()}`}

@@ -1,8 +1,9 @@
 import { Tooltip } from '@material-tailwind/react'
 import { CharacterStat } from '@/interfaces/user.interface'
-import { formatNumber } from '@/services/util'
+import { formatNumber, translate } from '@/services/util'
+import createKey from '@/services/key-generator'
 
-export function AttackOptionsBox({ stat }: { stat: CharacterStat }) {
+export function StatAttackOptionsBox({ stat }: { stat: CharacterStat }) {
   const dps =
     stat.damage *
     stat.attackSpeed *
@@ -18,6 +19,35 @@ export function AttackOptionsBox({ stat }: { stat: CharacterStat }) {
         </Tooltip>
         <div>{formatNumber(stat.attackSpeed)}</div>
       </div>
+      <hr className="border-dashed border-gray-500" />
+      {[
+        'addedDamageOfAxe',
+        'addedDamageOfSword',
+        'addedDamageOfDagger',
+        'addedDamageOfBow',
+        'addedDamageOfBlunt',
+        'addedDamageOfSpear',
+        'addedDamageOfGun',
+        'addedDamageOfCannon',
+        'addedDamageOfClaw',
+      ]
+        .filter((key) => {
+          const data: any = stat.calculationData || {}
+          return data[key] > 0
+        })
+        .map((key) => {
+          const data: any = stat.calculationData || {}
+          return (
+            <div className="w-full flex justify-between" key={createKey()}>
+              <div>
+                기본 {translate(key.replace('addedDamageOf', '').toLowerCase())}{' '}
+                피해
+              </div>
+              <div>+{data[key]}</div>
+            </div>
+          )
+        })}
+      <hr className="border-dashed border-gray-500" />
       <div className="w-full flex justify-between">
         <div>기본 물리 피해</div>
         <div>{stat.damageOfPhysical}</div>

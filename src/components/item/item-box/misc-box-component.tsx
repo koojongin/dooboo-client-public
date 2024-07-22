@@ -44,9 +44,11 @@ export function MiscBoxComponent({
       >
         <div className="relative max-w-full max-h-full w-[50px] h-[50px]">
           <MiscStackChip stack={selectedItem?.stack} />
-          <img
-            className="max-w-full max-h-full w-[50px] h-[50px]"
-            src={`${toAPIHostURL(selectedItem?.baseMisc?.thumbnail)}`}
+          <div
+            className="max-w-full max-h-full w-[50px] h-[50px] bg-contain bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${toAPIHostURL(selectedItem?.baseMisc?.thumbnail)})`,
+            }}
           />
         </div>
       </Tooltip>

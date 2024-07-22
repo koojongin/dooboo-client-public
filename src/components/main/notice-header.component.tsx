@@ -16,11 +16,12 @@ export function NoticeHeaderComponent() {
       { category: { $in: ['공지', '패치노트'] } },
       { page: 1, limit: 1 },
     )
-
     setNotice((result?.boards || [])[0])
   }, [])
 
   useEffect(() => {
+    if (pathname.indexOf('main/profile') >= 0) return
+    if (pathname.indexOf('admindooboo') >= 0) return
     loadNotice()
   }, [loadNotice, pathname])
 

@@ -117,11 +117,11 @@ export class GamePlayer
       this.scene.plugins.get('rexVirtualJoystick') as VirtualJoystickPlugin
     )
       .add(this.scene, {
-        x: 100,
+        x: 150,
         y: 500,
         radius: 50,
-        base: this.scene.add.circle(0, 0, 50, 0x888888),
-        thumb: this.scene.add.circle(0, 0, 25, 0xcccccc),
+        base: this.scene.add.circle(0, 0, 100, 0x888888),
+        thumb: this.scene.add.circle(0, 0, 50, 0xcccccc),
         dir: '8dir',
         forceMin: 10,
         enable: true,

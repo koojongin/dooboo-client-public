@@ -4,7 +4,97 @@ import { CardDeck, GatchaCard } from '@/interfaces/gatcha.interface'
 import { ActiveSkill } from '@/services/skill/skill'
 import { CharacterSkill } from '@/interfaces/skill.interface'
 
+export interface CalculateData {
+  damageOfPhysical: number
+  damageOfCold: number
+  damageOfFire: number
+  damageOfLightning: number
+  totalSpeed: number
+  totalAddedHp: number
+  totalAddedMp: number
+  totalWeaponTypeFlatDamage: number
+  totalMpConsumption: number
+  totalIncreasedAll: number
+  totalIncreasedPhysical: number
+  totalIncreasedFire: number
+  totalIncreasedCold: number
+  totalIncreasedLightning: number
+  totalIncreasedAxe: number
+  totalIncreasedSword: number
+  totalIncreasedDagger: number
+  totalIncreasedBow: number
+  totalIncreasedBlunt: number
+  totalIncreasedSpear: number
+  totalIncreasedGun: number
+  totalIncreasedCannon: number
+  totalIncreasedClaw: number
+  totalIncreasedCriticalMultiplier: number
+  totalIncreasedCriticalRate: number
+  totalIncreasedDamageWithMeleeSkill: number
+  totalIncreasedAreaOfEffect: number
+  totalIncreasedDamageOfPhysicalWithSkill: number
+  totalIncreasedDamageOfColdWithSkill: number
+  totalIncreasedDamageOfLightningWithSkill: number
+  totalIncreasedDamageOfFireWithSkill: number
+  totalIncreasedProjectileDamageWithSkill: number
+  totalIncreasedDamageWithAttackSkill: number
+  totalIncreasedDamageWithSpellSkill: number
+  totalTrinityIncreasedElementalDamage: number
+  totalTrinityIncreasedDamageOfFire: number
+  totalTrinityIncreasedDamageOfCold: number
+  totalTrinityIncreasedDamageOfLightning: number
+  totalTrinityIncreasedDamageOfPhysical: number
+  totalIncreasedBowmanDamage: number
+  totalIncreasedRogueDamage: number
+  totalIncreasedWarriorDamage: number
+  totalAddedManaCost: number
+  totalMoreDamage: number
+  totalMoreHitCount: number
+  totalMoreDuration: number
+  totalStr: number
+  totalDex: number
+  totalLuk: number
+  totalPierce: number
+  totalConvertRateStrToCriticalMultiplier: number
+  totalConvertRateDexToCriticalMultiplier: number
+  totalConvertRateLukToCriticalMultiplier: number
+  totalAddedRecoveryHpOnKill: number
+  totalAddedRecoveryMpOnKill: number
+  totalRegenerateMp: number
+  totalRegenerateHp: number
+  totalAttackSpeed: number
+  totalMoreProjectiles: number
+  totalLessProjectileDamage: number
+
+  totalArmor: number
+  totalAddedArmor: number
+  totalIncreasedArmor: number
+
+  totalIncreasedStr: number
+  totalIncreasedDex: number
+  totalIncreasedLuk: number
+
+  totalIncreasedHp: number
+  totalIncreasedMp: number
+
+  totalIncreasedResistanceOfPhysical: number
+  totalIncreasedResistanceOfCold: number
+  totalIncreasedResistanceOfFire: number
+  totalIncreasedResistanceOfLightning: number
+  totalIncreasedResistanceOfAll: number
+
+  addedDamageOfAxe: number
+  addedDamageOfSword: number
+  addedDamageOfDagger: number
+  addedDamageOfBow: number
+  addedDamageOfBlunt: number
+  addedDamageOfSpear: number
+  addedDamageOfGun: number
+  addedDamageOfCannon: number
+  addedDamageOfClaw: number
+}
 export interface CharacterStat {
+  calculationData: CalculateData
   criticalMultiplier: number // 10
   criticalRate: number // 5
   damageOfPhysical: number // 10
@@ -55,6 +145,7 @@ export interface CharacterStat {
   damageOfSpellWithSkill: number
 
   characterSkill: { activeSkill: string }
+  activeSkill: ActiveSkill
 }
 
 export interface MeResponse {

@@ -51,7 +51,7 @@ export class GameStrike extends Phaser.Physics.Arcade.Sprite {
   attackToMonster(monster: GameMonster) {
     if (!monster || !monster?.active) return
     const { stat } = this.scene.resultOfMe
-    const { damage, turn } = stat
+    const { damage } = stat
     const { criticalMultiplier, criticalRate } = stat
     const isCritical = pickByRate(criticalRate)
 

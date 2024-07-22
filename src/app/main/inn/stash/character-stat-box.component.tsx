@@ -3,9 +3,10 @@ import { useState } from 'react'
 import { ProfilePopover } from '@/components/popover/profile-popover'
 import { DEFAULT_THUMBNAIL_URL } from '@/constants/constant'
 import { MeResponse } from '@/interfaces/user.interface'
-import { AttackOptionsBox } from '@/app/main/inn/stash/stat-attack-options-box'
 import { StatNormalOptionsBox } from '@/app/main/inn/stash/stat-normal-options-box'
 import createKey from '@/services/key-generator'
+import { StatDefenceOptionsBox } from '@/app/main/inn/stash/stat-defence-options-box'
+import { StatAttackOptionsBox } from '@/app/main/inn/stash/stat-attack-options-box'
 
 const EXP_WIDTH = 200
 export function CharacterStatBoxComponent({
@@ -97,12 +98,12 @@ export function CharacterStatBoxComponent({
           </div>
         </div>
         <div className="flex flex-col text-[14px] ff-score-all font-bold">
-          <div className="flex items-center border-b border-b-gray-500 mt-[5px]">
-            {['일반', '공격'].map((key) => {
+          <div className="flex items-center border-b border-b-gray-500 mt-[5px] gap-[1px]">
+            {['일반', '공격', '방어'].map((key, index) => {
               return (
                 <div
                   key={createKey()}
-                  className={`px-[8px] py-[4px] cursor-pointer text-[16px]
+                  className={`px-[8px] py-[4px] cursor-pointer text-[16px] border-gray-600 rounded-t border-r border-t border-l
                   ${key === selectedTab ? 'bg-green-500 text-white' : ''}`}
                   onClick={() => {
                     setSelectedTab(key)
@@ -115,7 +116,8 @@ export function CharacterStatBoxComponent({
           </div>
           <div className="border border-t-0 border-gray-600 p-[5px]">
             {selectedTab === '일반' && <StatNormalOptionsBox stat={stat} />}
-            {selectedTab === '공격' && <AttackOptionsBox stat={stat} />}
+            {selectedTab === '공격' && <StatAttackOptionsBox stat={stat} />}
+            {selectedTab === '방어' && <StatDefenceOptionsBox stat={stat} />}
           </div>
         </div>
       </div>

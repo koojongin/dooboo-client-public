@@ -7,6 +7,7 @@ import { GameStatusBox } from '@/game/scenes/objects/GameStatus'
 // eslint-disable-next-line import/no-cycle
 import { GameSoundManager } from '@/game/scenes/objects/GameSoundManager'
 import { SkillMeResponse } from '@/interfaces/skill.interface'
+import { GetRaidResponse } from '@/services/api/api.raid'
 
 export interface VirtualJoystickPlugin extends Phaser.Plugins.ScenePlugin {
   add(
@@ -28,6 +29,7 @@ export interface FightScene extends Phaser.Scene {
   resultOfMap: GetMapResponse
   resultOfMe: MeResponse
   resultOfSkill: SkillMeResponse
+  resultOfRaid?: GetRaidResponse
 
   monsterGroup: Phaser.GameObjects.Group
   weaponGroup: Phaser.GameObjects.Group
@@ -40,4 +42,10 @@ export interface FightScene extends Phaser.Scene {
   applyStackedQueue: () => void
 
   isFulledInventory: boolean
+
+  isScareCrowMode: boolean
+  isRaidMode: boolean
+
+  stopGame: () => void
+  elapsedTime: number
 }

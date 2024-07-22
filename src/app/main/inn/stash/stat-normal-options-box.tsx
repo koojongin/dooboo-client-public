@@ -13,20 +13,21 @@ export function StatNormalOptionsBox({ stat }: { stat: CharacterStat }) {
               <i className="fa-regular fa-circle-question" />
             </div>
           </Tooltip>
-          <div>{stat.hp}</div>
+          <div>{formatNumber(stat.hp)}</div>
         </div>
         {stat.addedHp > 0 && (
           <div className="flex items-center gap-[2px] justify-between">
-            <i className="fa-solid fa-turn-up rotate-90" />
+            <i className="fa-solid fa-turn-up rotate-90 text-[10px]" />
             <div>
-              {stat.hp - stat.addedHp}(+{stat.addedHp})
+              {formatNumber(stat.hp - stat.addedHp)}(+
+              {formatNumber(stat.addedHp)})
             </div>
           </div>
         )}
       </div>
       <div className="w-full flex justify-between">
         <div>MP</div>
-        <div>{stat.mp}</div>
+        <div>{formatNumber(stat.mp)}</div>
       </div>
       <div className="w-full flex justify-between">
         <div>방어력</div>
@@ -34,13 +35,13 @@ export function StatNormalOptionsBox({ stat }: { stat: CharacterStat }) {
       </div>
       <div className="w-full flex justify-between">
         <div>초당 HP 회복</div>
-        <div>{stat.hpRegenerate}</div>
+        <div>{formatNumber(stat.hpRegenerate)}</div>
       </div>
       <div className="w-full flex justify-between">
         <div>초당 MP 회복</div>
-        <div>{stat.mpRegenerate}</div>
+        <div>{formatNumber(stat.mpRegenerate)}</div>
       </div>
-
+      <hr className="border-dashed border-gray-500" />
       <div className="w-full flex justify-between">
         <div>힘</div>
         <div>+{formatNumber(stat.str)}</div>
@@ -52,6 +53,11 @@ export function StatNormalOptionsBox({ stat }: { stat: CharacterStat }) {
       <div className="w-full flex justify-between">
         <div>행운</div>
         <div>+{formatNumber(stat.luk)}</div>
+      </div>
+      <hr className="border-dashed border-gray-500" />
+      <div className="w-full flex justify-between">
+        <div>이동속도</div>
+        <div>+{formatNumber(stat.speed)}</div>
       </div>
     </div>
   )

@@ -84,7 +84,8 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
       monster.thumbnail = `${API_SERVER_URL}/${monster.thumbnail}`
       return monster
     })
-    setMonsters(_.sortBy(mixedMonsters, 'map.name'))
+    // setMonsters(_.sortBy(mixedMonsters, 'map.name'))
+    setMonsters(mixedMonsters)
     setPagination({
       total,
       totalPages,
@@ -99,9 +100,8 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
         return a
       })
       .value()
-    // router.push(`${pathname}?${current.toString()}`)
     refreshMonsters()
-  }, [refreshMonsters])
+  }, [refreshMonsters, searchParams])
 
   useImperativeHandle(forwardedRef, () => ({
     refresh: () => {
@@ -155,12 +155,9 @@ export default forwardRef<MonsterListRef, any>(function MonsterListComponent(
                     <td className={`${classes}`}>
                       <div>{monster._id}</div>
                     </td>
-                    <td
-                      className={`${classes} flex items-center justify-start`}
-                      style={{ padding: 0 }}
-                    >
+                    <td className={`${classes}`} style={{ padding: 0 }}>
                       <div
-                        className="bg-green-500 text-white cursor-pointer"
+                        className="inline-flex bg-green-500 text-white cursor-pointer rounded px-[4px]"
                         onClick={() => onClickMap(monster?.map)}
                       >
                         {monster?.map?.name}

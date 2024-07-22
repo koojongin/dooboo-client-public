@@ -27,8 +27,11 @@ export default function Home() {
           <img className="min-w-[800px]" src="/images/tofu.webp" />
         </div>
         <div className="noselect flex flex-col justify-between w-full">
-          <div className="text-white bg-gray-400 text-center w-full min-h-[300px] flex items-center justify-center text-[30px] duration-300 hover:font-bold hover:bg-white hover:text-black hover:cursor-pointer hover:text-[35px]">
-            게임이름(미정)
+          <div
+            className="text-white bg-gray-400 text-center w-full min-h-[300px] flex items-center justify-center text-[30px] duration-300 hover:font-bold hover:bg-white hover:text-black hover:cursor-pointer hover:text-[35px]"
+            // onClick={() => router.push('/registration')}
+          >
+            -
           </div>
           <div
             onClick={() => router.push('/register')}

@@ -51,6 +51,14 @@ export default function AdminMonsterByMapPage({
         {map && (
           <div>
             <div>{map.name}</div>
+            <div className="flex items-center gap-[4px] p-[5px]">
+              <div>isRaid</div>
+              <input type="checkbox" checked={map.isRaid} disabled />
+            </div>
+            <div className="flex items-center gap-[4px] p-[5px]">
+              <div>isHide</div>
+              <input type="checkbox" checked={map.isHide} disabled />
+            </div>
             <table className="min-w-[800px]">
               <thead>
                 <tr className="bg-gray-100">

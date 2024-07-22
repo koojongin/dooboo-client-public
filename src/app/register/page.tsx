@@ -20,7 +20,10 @@ export default function Register() {
   const isDev = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
   const addHookString = '+webhook.incoming'
   // &&prompt=none
-  const loginUrl = `https://discord.com/oauth2/authorize?client_id=1219938115016458331&response_type=code&redirect_uri=https%3A%2F%2Fdooboo.online%3A3001%2Foauth2&scope=email+identify+guilds${isDev ? addHookString : ''}`
+  const REDIRECT_URI = encodeURIComponent(
+    isDev ? 'http://localhost:4001/oauth2' : 'http://dooboo.online:3001/oauth2',
+  )
+  const loginUrl = `https://discord.com/oauth2/authorize?client_id=1219938115016458331&response_type=code&redirect_uri=${REDIRECT_URI}&scope=email+identify+guilds${isDev ? addHookString : ''}`
 
   const handleChange = (element: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(element.target.value)
@@ -120,7 +123,7 @@ export default function Register() {
               >
                 {searchValidMessage}
               </div>
-              <div className="text-xl text-red-800 text-red-800">
+              <div className="text-xl text-red-800">
                 * 닉네임은 2~16자, 영어,한글만 가능합니다. (자음,모음,영어
                 대문자 불가능)
               </div>

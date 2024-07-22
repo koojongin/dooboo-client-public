@@ -1,4 +1,10 @@
 export const itemTranslate = (text: string) => {
+  if (text === 'str') return '힘'
+  if (text === 'dex') return '민첩'
+  if (text === 'luk') return '행운'
+  if (text === 'hp') return 'HP'
+  if (text === 'mp') return 'MP'
+
   if (text === 'INCREASED_DAMAGE_OF_PROJECTILE_WITH_SKILL')
     return '투사체 스킬 피해 증가(%)'
   if (text === 'INCREASED_DAMAGE_OF_MELEE_WITH_SKILL')
@@ -74,5 +80,9 @@ export const itemTranslate = (text: string) => {
   if (text === 'INCREASED_HP') return 'HP 증가(%)'
   if (text === 'INCREASED_MP') return 'MP 증가(%)'
   if (text === 'INCREASED_ARMOR') return '방어력 증가(%)'
+  if (text === 'ADDED_MOVEMENT') return '이동속도 추가(+)'
+  if (text === 'ADDED_STR_AND_DEX') return '힘 및 민첩 추가(+)'
+  if (text === 'ADDED_DEX_AND_LUK') return '민첩 및 행운 추가(+)'
+  if (text === 'ADDED_LUK_AND_STR') return '행운 및 힘 추가(+)'
   return text
 }

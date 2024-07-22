@@ -3,6 +3,7 @@ import { toColorByGrade } from '@/services/util'
 import WeaponBoxDetailComponent from '@/components/item/item-box/weapon-box-detail.component'
 import toAPIHostURL from '@/services/image-name-parser'
 import { InnItem, Item, Weapon } from '@/interfaces/item.interface'
+import { ItemLockIcon } from '@/components/item/item-box/item-lock-icon'
 
 export function WeaponBoxComponent({
   item,
@@ -79,12 +80,15 @@ export function WeaponBoxComponent({
         }
       >
         <div className="relative max-w-full max-h-full w-[50px] h-[50px]">
+          {/* {!!item?._id && <ItemLockIcon />} */}
           <div className="absolute text-[12px] border rounded px-[2px] ff-ba ff-skew bg-[#424242a6] text-white">
             {totalFlatDamage}
           </div>
-          <img
-            className="max-w-full max-h-full w-[50px] h-[50px]"
-            src={`${toAPIHostURL(selectedItem?.thumbnail)}`}
+          <div
+            className="max-w-full max-h-full w-[50px] h-[50px] bg-contain bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${toAPIHostURL(selectedItem?.thumbnail)})`,
+            }}
           />
         </div>
       </Tooltip>

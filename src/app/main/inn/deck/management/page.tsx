@@ -38,14 +38,14 @@ export default function DeckManagementPage() {
       <div>덱 관리</div>
       {decks.length === 0 && <div>관리 할 수 있는 덱 목록이 없습니다.</div>}
       {decks.length > 0 && (
-        <div className="flex flex-col gap-[4px] items-start">
+        <div className="flex flex-col gap-[10px] items-start">
           {decks.map((deck, index) => {
             return (
               <div
                 key={deck._id}
-                className="flex items-center border border-blue-950 min-w-[500px] justify-start"
+                className="flex items-center border border-blue-950 min-w-[500px] justify-start p-[10px] rounded shadow-md shadow-gray-800/60"
               >
-                <div className="min-w-[30px] flex items-center justify-center">
+                <div className="min-w-[40px] flex items-center justify-center rounded-full mr-[10px] ff-wavve bg-gray-800 text-white shadow-md shadow-gray-800/30">
                   {deck.index}
                 </div>
                 <div className="flex flex-col">
@@ -61,23 +61,24 @@ export default function DeckManagementPage() {
                         }
                         setDecks(newDecks)
                       }}
-                      className="border border-green-600 text-[16px]"
+                      className="border border-green-600 text-[16px] p-[5px]"
                     />
                     <div
-                      className="bg-green-600 text-white p-[5px] cursor-pointer"
+                      className="bg-green-600 text-white p-[5px] cursor-pointer items-center flex"
                       onClick={() => changeDeckName(deck)}
                     >
                       덱 이름 변경
                     </div>
                   </div>
-                  <div className="flex">
+                  <div className="flex gap-[4px]">
                     {deck.cards.map((card) => {
                       return (
-                        <GatchaCardComponent
+                        <div
                           key={createKey()}
-                          card={card}
-                          isOwn
-                        />
+                          className="border border-blue-950 shadow-md shadow-gray-900/60 rounded overflow-hidden"
+                        >
+                          <GatchaCardComponent card={card} isOwn />
+                        </div>
                       )
                     })}
                   </div>

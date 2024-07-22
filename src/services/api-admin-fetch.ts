@@ -6,7 +6,7 @@ import {
   BaseMisc,
   BaseMiscListResponseDto,
 } from '@/interfaces/item.interface'
-import { GetMapResponse } from '@/interfaces/map.interface'
+import { GetMapResponse, GetMapsResponse } from '@/interfaces/map.interface'
 import { GatchaCard } from '@/interfaces/gatcha.interface'
 import { ShopItem } from '@/interfaces/shop.interface'
 
@@ -132,4 +132,20 @@ export async function fetchGetMonstersByMap(condition = {}, opts = {}) {
 export async function fetchRewardDamageRank() {
   const { data } = await api.post('/rank/reward-damage-rank')
   return data
+}
+
+export async function fetchAdminGetMaps(
+  condition?: { [key: string]: any },
+  opts?: { [key: string]: any },
+): Promise<GetMapsResponse> {
+  const { data: response } = await api.post('/map/admin/list', {
+    condition,
+    opts,
+  })
+  return response
+}
+
+export async function fetchAdminPutMap(data: any) {
+  const { data: response } = await api.put(`/map/update`, data)
+  return response
 }

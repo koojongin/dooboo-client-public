@@ -96,6 +96,12 @@ export function ProfileLeftBoxComponent({
           >
             덱보기
           </div>
+          <div
+            className="bg-cyan-900 text-white flex items-center justify-center min-w-[120px] min-h-[30px] rounded shadow-md shadow-cyan-950/50 cursor-pointer"
+            onClick={() => goToSubRoute('raid')}
+          >
+            레이드 기록
+          </div>
         </div>
       </div>
     </Card>

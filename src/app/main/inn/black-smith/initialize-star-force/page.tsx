@@ -4,7 +4,12 @@ import { Card } from '@material-tailwind/react'
 import { useCallback, useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import ItemBoxComponent from '@/components/item/item-box'
-import { InnItem, ItemTypeKind, Weapon } from '@/interfaces/item.interface'
+import {
+  InnItem,
+  Item,
+  ItemTypeKind,
+  Weapon,
+} from '@/interfaces/item.interface'
 import createKey from '@/services/key-generator'
 import {
   fetchGetEnhancePrice,
@@ -14,13 +19,13 @@ import {
 } from '@/services/api-fetch'
 import toAPIHostURL from '@/services/image-name-parser'
 import { InventoryActionKind } from '@/components/item/item.interface'
-import { isWeaponEnhanceable } from '@/services/util'
+import { isInitStarForcable, isWeaponEnhanceable } from '@/services/util'
 
 export default function BlackSmithInitializeStarForcePage() {
   const [items, setItems] = useState<InnItem[]>([])
   const [maxItemSlots, setMaxItemSlots] = useState<number>(0)
   const [gold, setGold] = useState<number>(0)
-  const [selectedWeapons, setSelectedWeapons] = useState<InnItem[]>([])
+  const [selectedItems, setSelectedItems] = useState<InnItem[]>([])
   const [enhancePrice, setEnhancePrice] = useState<{
     price: number
   }>()
@@ -40,8 +45,8 @@ export default function BlackSmithInitializeStarForcePage() {
   }
 
   const enhanceWeapon = async () => {
-    if (selectedWeapons?.length === 0) return
-    if (!selectedWeapons[0]?.weapon) return
+    if (selectedItems?.length === 0) return
+    if (!selectedItems[0]?.weapon && !selectedItems[0]?.defenceGear) return
     const { isConfirmed } = await Swal.fire({
       title: `정말로 초기화하시겠습니까?`,
       confirmButtonText: '예',
@@ -50,7 +55,7 @@ export default function BlackSmithInitializeStarForcePage() {
     })
 
     if (isConfirmed) {
-      await fetchInitializeStarForce(selectedWeapons[0].weapon._id!)
+      await fetchInitializeStarForce(selectedItems[0]._id!)
       await Promise.all([
         Swal.fire({
           title: '초기화 되었습니다.',
@@ -59,14 +64,14 @@ export default function BlackSmithInitializeStarForcePage() {
         }),
         refreshInventory(),
       ])
-      setSelectedWeapons([])
+      setSelectedItems([])
     }
   }
   const onSelectItem = async (item: InnItem) => {
     const maxItemSelectableCount = 1
-    const selectedItems = items.filter((i) => i.isSelected)
-    if (maxItemSelectableCount <= selectedItems.length) {
-      if (!selectedItems.find((sItem) => sItem._id === item._id)) return
+    const _selectedItems = items.filter((i) => i.isSelected)
+    if (maxItemSelectableCount <= _selectedItems.length) {
+      if (!_selectedItems.find((sItem) => sItem._id === item._id)) return
     }
     const selectedItemIndex = items.findIndex((i) => i._id === item._id)
     if (selectedItemIndex < 0) return
@@ -80,53 +85,45 @@ export default function BlackSmithInitializeStarForcePage() {
     })
     setItems(newItems)
 
-    const attachedWeaponIndex = selectedWeapons.findIndex(
+    const attachedWeaponIndex = _selectedItems.findIndex(
       (sWeapon) => sWeapon?._id === items[selectedItemIndex]._id,
     )
 
     if (attachedWeaponIndex < 0) {
-      const emptyIndex = selectedWeapons.findIndex((data) => !data)
+      const emptyIndex = _selectedItems.findIndex((data) => !data)
       if (emptyIndex < 0) {
-        setSelectedWeapons([
-          ...selectedWeapons,
-          { ...items[selectedItemIndex] },
-        ])
+        setSelectedItems([..._selectedItems, { ...items[selectedItemIndex] }])
       } else {
-        const newWeapons: any = [...selectedWeapons]
+        const newWeapons: any = [..._selectedItems]
         newWeapons[emptyIndex] = { ...items[selectedItemIndex] }
-        return setSelectedWeapons(newWeapons)
+        return setSelectedItems(newWeapons)
       }
     } else {
-      const newSelectedWeapons: any = [...selectedWeapons]
+      const newSelectedWeapons: any = [..._selectedItems]
       newSelectedWeapons[attachedWeaponIndex] = undefined
-      setSelectedWeapons(newSelectedWeapons)
+      setSelectedItems(newSelectedWeapons)
     }
   }
 
   const initialRefresh = useCallback(async () => {
     await refreshInventory()
-    setSelectedWeapons([])
+    setSelectedItems([])
     setEnhancePrice(undefined)
   }, [])
 
-  const getReRollPrice = (weapon: Weapon) => {
-    const price = parseInt(String((weapon.iLevel - 1) / 10), 10) * 100000
+  const getReRollPrice = (item: Item) => {
+    const originItem = item.defenceGear || item.weapon
+    const price = parseInt(String((originItem.iLevel - 1) / 10), 10) * 100000
     return Math.max(price, 0)
   }
 
-  // console.log(
-  //   new Array(30)
-  //     .fill(1)
-  //     .map((v, i) => ({ iLevel: i + 1 }))
-  //     .map((w) => getReRollPrice(w as any)),
-  // )
   useEffect(() => {
-    if (selectedWeapons?.length <= 0) return
-    if (!selectedWeapons[0]) return
+    if (selectedItems?.length <= 0) return
+    if (!selectedItems[0]) return
     setEnhancePrice({
-      price: getReRollPrice(selectedWeapons[0].weapon),
+      price: getReRollPrice(selectedItems[0]),
     })
-  }, [selectedWeapons])
+  }, [selectedItems])
 
   useEffect(() => {
     initialRefresh()
@@ -158,10 +155,10 @@ export default function BlackSmithInitializeStarForcePage() {
           <div className="flex items-center justify-center gap-[2px]">
             <div>대상 아이템</div>
             <div className="bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] items-center justify-center">
-              {selectedWeapons[0] && (
+              {selectedItems[0] && (
                 <ItemBoxComponent
                   className="p-[2px]"
-                  item={selectedWeapons[0]}
+                  item={selectedItems[0]}
                   onShowTotalDamage
                   actionCallback={() => {}}
                   // onSelect={onSelectItem}
@@ -200,7 +197,7 @@ export default function BlackSmithInitializeStarForcePage() {
                     const item = items[index] || {}
                     const disableSlotClass = 'bg-gray-800'
                     const isOveredSlot = index >= maxItemSlots
-                    const invalidItem = isWeaponEnhanceable(item)
+                    const invalidItem = !isInitStarForcable(item)
                     const isDisabled = isOveredSlot || invalidItem
                     return (
                       <div

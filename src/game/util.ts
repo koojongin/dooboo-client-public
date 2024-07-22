@@ -1,5 +1,6 @@
 import { createHmac } from 'crypto'
 import { AES } from 'crypto-js'
+// eslint-disable-next-line import/no-cycle
 import { DataQueue } from '@/game/scenes/objects/GamePlayer'
 
 const SECRET_KEY = 'dbs4321'

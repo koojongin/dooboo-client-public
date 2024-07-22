@@ -12,11 +12,13 @@ export const itemTypeTranslate = (text: string) => {
   if (text === 'claw') return '아대'
 
   if (text === DefenceGearType.BodyArmor) return '갑옷'
-  if (text === DefenceGearType.Greave) return '다리보호구'
+  if (text === DefenceGearType.Greave) return '바지'
   if (text === DefenceGearType.Belt) return '허리띠'
   if (text === DefenceGearType.Helmet) return '투구'
   if (text === DefenceGearType.Ring) return '반지'
   if (text === DefenceGearType.Amulet) return '목걸이'
+  if (text === DefenceGearType.Gloves) return '장갑'
+  if (text === DefenceGearType.Boots) return '신발'
 
   if (text === 'iCategory:etc') return '기타'
   if (text === 'iCategory:consume') return '소비'

@@ -75,7 +75,7 @@ export default function DefenceGearBoxDetailComponent({
       </div>
       <div className="text-center bg-[#9bb5c44f] py-[5px]">
         <div className="ff-wavve text-[24px]">{selectedItem.name}</div>
-        {selectedItem.starForce > 0 && selectedItem.iLevel > 30 && (
+        {selectedItem.starForce > 0 && (
           <div className="flex items-center justify-center gap-[4px]">
             <div
               className="bg-contain bg-no-repeat bg-center w-[20px] h-[20px]"
@@ -131,6 +131,18 @@ export default function DefenceGearBoxDetailComponent({
         <div className="border-b border-b-gray-400" />
       </div>
       <div className="px-[10px]">
+        {['str', 'dex', 'luk', 'hp', 'mp']
+          .filter((key) => !!(selectedItem as any)[key])
+          .map((attributeName) => {
+            const data = (selectedItem as any)[attributeName]
+            return (
+              <div key={createKey()} className="flex justify-between">
+                <div className="">{translate(attributeName)}</div>
+                <div>{data}</div>
+              </div>
+            )
+          })}
+
         {!!selectedItem.armor && (
           <div className="flex justify-between">
             <div className="">방어력</div>
@@ -150,43 +162,45 @@ export default function DefenceGearBoxDetailComponent({
           </div>
         )}
       </div>
-      {isExistAdditionalAttributes && (
-        <div>
-          <div className="border-b border-b-gray-400 border-dotted" />
-          <div className="px-[10px] mt-[6px] text-[#ffea00]">추가 속성</div>
-        </div>
-      )}
-      {isExistAdditionalAttributes && (
-        <div className="px-[10px]">
-          <div className="border-b border-b-gray-400" />
-          {_.sortBy(
-            Object.keys(selectedItem.additionalAttributes || {}),
-            (k) => k,
-          ).map((key: string) => {
-            const attributeValue = (selectedItem.additionalAttributes || {})[
-              key
-            ]
-            const isEnchanted =
-              selectedItem.enchants?.fixedAttributeName === key
-            return (
-              <div
-                key={createKey()}
-                className={isEnchanted ? 'text-green-500' : ''}
-              >
-                <div className="flex justify-between">
-                  <div className="flex items-center gap-[2px]">
-                    {isEnchanted && (
-                      <i className="fa-solid fa-wrench text-[12px]" />
-                    )}
-                    <div>{translate(key)}</div>
+      <>
+        {isExistAdditionalAttributes && (
+          <div>
+            <div className="border-b border-b-gray-400 border-dotted" />
+            <div className="px-[10px] mt-[6px] text-[#ffea00]">추가 속성</div>
+          </div>
+        )}
+        {isExistAdditionalAttributes && (
+          <div className="px-[10px]">
+            <div className="border-b border-b-gray-400" />
+            {_.sortBy(
+              Object.keys(selectedItem.additionalAttributes || {}),
+              (k) => k,
+            ).map((key: string) => {
+              const attributeValue = (selectedItem.additionalAttributes || {})[
+                key
+              ]
+              const isEnchanted =
+                selectedItem.enchants?.fixedAttributeName === key
+              return (
+                <div
+                  key={createKey()}
+                  className={isEnchanted ? 'text-green-500' : ''}
+                >
+                  <div className="flex justify-between">
+                    <div className="flex items-center gap-[2px]">
+                      {isEnchanted && (
+                        <i className="fa-solid fa-wrench text-[12px]" />
+                      )}
+                      <div>{translate(key)}</div>
+                    </div>
+                    <div>{attributeValue}</div>
                   </div>
-                  <div>{attributeValue}</div>
                 </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
+              )
+            })}
+          </div>
+        )}
+      </>
       <div className="border-b border-b-gray-400 border-dotted" />
       <div className="px-[10px] py-[2px]">
         <div className="flex justify-between items-center">

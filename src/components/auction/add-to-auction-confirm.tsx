@@ -111,18 +111,21 @@ function SaleDialogContent({
 }
 
 export async function confirmSaleSetting(item: Item) {
-  if (!item?._id) return
+  if (!item?._id) return false
 
   if (
-    ![ItemTypeKind.Weapon, ItemTypeKind.Misc].includes(
-      item.iType as ItemTypeKind,
-    )
+    ![
+      ItemTypeKind.Weapon,
+      ItemTypeKind.Misc,
+      ItemTypeKind.DefenceGear,
+    ].includes(item.iType as ItemTypeKind)
   ) {
-    return Swal.fire({
+    Swal.fire({
       text: '거래소에 등록할수 없는 아이템입니다.',
       icon: 'info',
       confirmButtonText: '닫기',
     })
+    return false
   }
 
   let amount = 0

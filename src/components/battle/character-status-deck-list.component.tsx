@@ -20,7 +20,8 @@ export default function CharacterStatusDeckListComponent({
   return (
     <div>
       <div className="flex flex-wrap gap-[10px]">
-        {new Array(5).fill(1).map((v, index) => {
+        {mixedCards.length === 0 && <div>설정된 카드가 없습니다.</div>}
+        {new Array(mixedCards.length).fill(1).map((v, index) => {
           const card = mixedCards[index]
           return (
             <div

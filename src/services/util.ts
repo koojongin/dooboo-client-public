@@ -1,7 +1,13 @@
 import moment from 'moment'
 import 'moment/locale/ko'
 import parse from 'html-react-parser'
-import { InnItem, Item, ItemTypeKind } from '@/interfaces/item.interface'
+import {
+  DefenceGear,
+  InnItem,
+  Item,
+  ItemTypeKind,
+  Weapon,
+} from '@/interfaces/item.interface'
 import { JobKind } from '@/interfaces/job.interface'
 import { skillTranslate } from '@/services/skill/skill.translate'
 import { cardTranslate } from '@/services/card/card.translate'
@@ -9,7 +15,18 @@ import { cardOptionTranslate } from '@/services/card/card.option.translate'
 import { skillTagTranslate } from '@/services/skill/skill.tag.translate'
 import { itemTranslate } from '@/services/item/item.translate'
 import { itemTypeTranslate } from '@/services/item/item.type.translate'
+import { enhanceOptionsTranslate } from '@/services/craft/enhance.options.translate'
+import { itemImprintingOptionTranslate } from '@/services/item/item.imprinting.translate'
 
+export const ValidReRollItemTypes = [
+  ItemTypeKind.Weapon,
+  ItemTypeKind.DefenceGear,
+]
+
+export const ValidEnhanceRecoveryItemTypes = [
+  ItemTypeKind.Weapon,
+  // ItemTypeKind.DefenceGear,
+]
 export const toRangeString = (range: number[]) => {
   const [start, end] = range
   return `${start} ~ ${end}`
@@ -68,6 +85,50 @@ export const isWeaponEnhanceable = (item: InnItem) => {
   return item?.iType !== ItemTypeKind.Weapon && !!item._id
 }
 
+export const isInitStarForcable = (item: InnItem) => {
+  return (
+    ValidReRollItemTypes.includes(item?.iType as ItemTypeKind) && !!item._id
+  )
+}
+
+export const isDefenceGearEnhanceable = (item: InnItem) => {
+  return item?.iType !== ItemTypeKind.DefenceGear && !!item._id
+}
+export const getReRollPrice = (originItem: Weapon | DefenceGear) => {
+  const price = parseInt(String((originItem.iLevel - 1) / 10), 10) * 100000
+  return Math.max(price, 0)
+}
+
+export const isEnhanceRecoverable = (item: InnItem) => {
+  return (
+    ValidEnhanceRecoveryItemTypes.includes(item?.iType as ItemTypeKind) &&
+    !!item._id
+  )
+}
+export const isBaseOptionReRollable = (item: InnItem) => {
+  return (
+    ValidReRollItemTypes.includes(item?.iType as ItemTypeKind) && !!item._id
+  )
+}
+
+export const isImprintable = (item: InnItem) => {
+  return (
+    [ItemTypeKind.Weapon].includes(item?.iType as ItemTypeKind) && !!item._id
+  )
+}
+
+export const isEnchantableItemType = (item: InnItem) => {
+  return (
+    ValidReRollItemTypes.includes(item?.iType as ItemTypeKind) && !!item._id
+  )
+}
+
+export const isAdditionalOptionReRollable = (item: InnItem) => {
+  return (
+    ValidReRollItemTypes.includes(item?.iType as ItemTypeKind) && !!item._id
+  )
+}
+
 export const translate = (text: string) => {
   let parsedText = text
   switch (text) {
@@ -79,6 +140,19 @@ export const translate = (text: string) => {
       break
     case 'select:All':
       parsedText = '모두'
+      break
+
+    case 'physical':
+      parsedText = '물리'
+      break
+    case 'fire':
+      parsedText = '화염'
+      break
+    case 'cold':
+      parsedText = '냉기'
+      break
+    case 'lightning':
+      parsedText = '번개'
       break
 
     // convert
@@ -98,6 +172,9 @@ export const translate = (text: string) => {
     /// ////////////////
     case 'menu:weapon':
       parsedText = '무기'
+      break
+    case 'menu:defence-gear':
+      parsedText = '방어구'
       break
     case 'menu:misc':
       parsedText = '기타'
@@ -182,10 +259,40 @@ export const translate = (text: string) => {
   parsedText = skillTagTranslate(parsedText)
   parsedText = itemTranslate(parsedText)
   parsedText = itemTypeTranslate(parsedText)
+  parsedText = enhanceOptionsTranslate(parsedText)
+  parsedText = itemImprintingOptionTranslate(parsedText)
   return parsedText
 }
 
-export const toColorByGrade = (grade: string) => {
+export const getAttributeColor = (key: string) => {
+  const lowerKey = key.toLowerCase()
+
+  if (lowerKey.includes('cold')) return AttributeColor.Cold
+
+  if (lowerKey.includes('fire')) return AttributeColor.Fire
+
+  if (lowerKey.includes('lightning')) return AttributeColor.Lightning
+  return 'inherit'
+}
+export enum GradeColor {
+  Normal = '#ece0e0',
+  Magic = '#0082ff',
+  Rare = '#fdd125',
+  Epic = '#6000d2',
+  Primordial = '#2ebe29',
+}
+
+export enum AttributeColor {
+  Cold = '#268bb7',
+  Fire = '#b72626',
+  Lightning = '#9b9b46',
+}
+
+export const toColorTextByGrade = (grade: string) => {
+  if (grade === 'normal') return '#525050'
+  return '#fff'
+}
+export const toColorByGrade = (grade: string): GradeColor => {
   let color = '#fff'
   switch (grade) {
     case 'normal':
@@ -206,7 +313,7 @@ export const toColorByGrade = (grade: string) => {
     default:
       break
   }
-  return color
+  return <GradeColor>color
 }
 
 export const parseHtml = (content: string) => {

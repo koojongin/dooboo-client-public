@@ -20,8 +20,16 @@ import ItemBoxComponent from '@/components/item/item-box'
 export default function BlackSmithPage() {
   const smithOptions = [
     {
-      name: '스타포스 제련',
+      name: '무기 스타포스 제련',
       desc: '아이템 결정과 골드를 소모하여 무기를 제련합니다.',
+    },
+    {
+      name: '방어구 스타포스 제련',
+      desc: '아이템 결정과 골드를 소모하여 방어구를 제련합니다.',
+    },
+    {
+      name: '제련 복구',
+      desc: '무기 제련에 실패한 횟수를 복구합니다.',
     },
     {
       name: '기본 속성 재설정',

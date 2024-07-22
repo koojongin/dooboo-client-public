@@ -2,6 +2,8 @@ import { GameObjects, Scene } from 'phaser'
 
 import { EventBus } from '../EventBus'
 import { GetMapResponse } from '@/interfaces/map.interface'
+import { GameConfig } from '@/game/scenes/enums/enum'
+import { GetRaidResponse } from '@/services/api/api.raid'
 
 export class MainMenu extends Scene {
   background!: GameObjects.Image
@@ -10,11 +12,21 @@ export class MainMenu extends Scene {
 
   resultOfMap?: GetMapResponse
 
+  resultOfRaid?: GetRaidResponse
+
   constructor() {
     super('MainMenu')
   }
 
+  preload() {
+    this.load.image('sky-bg', '/game-resources/skybg.png')
+  }
+
   create() {
+    this.add
+      .image(0, 0, 'sky-bg')
+      // .setDisplaySize(GameConfig.Width, GameConfig.Height)
+      .setOrigin(0, 0)
     this.title = this.add
       .text(
         this.sys.game.canvas.width / 2,
@@ -61,12 +73,23 @@ export class MainMenu extends Scene {
       .setOrigin(0.5)
       .setDepth(100)
     EventBus.emit('current-scene-ready', this)
+    this.onCreateAfter()
+  }
+
+  onCreateAfter() {
+    if (this.resultOfRaid) {
+      this.changeScene()
+    }
   }
 
   changeScene() {
+    console.log(this.resultOfMap)
     if (!this.resultOfMap) {
       return
     }
-    this.scene.start('Game', { resultOfMap: this.resultOfMap })
+    this.scene.start('Game', {
+      resultOfMap: this.resultOfMap,
+      resultOfRaid: this.resultOfRaid,
+    })
   }
 }

@@ -2,7 +2,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 
 const api = axios.create({
-  baseURL: `https://dooboo.online:${process.env.NEXT_PUBLIC_SERVER_PORT}`,
+  baseURL: `http://dooboo.online:${process.env.NEXT_PUBLIC_SERVER_PORT}`,
 })
 
 // 요청 인터셉터

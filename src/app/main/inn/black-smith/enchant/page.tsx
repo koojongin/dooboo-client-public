@@ -9,6 +9,7 @@ import {
   fetchGetMyInventory,
 } from '@/services/api-fetch'
 import {
+  DefenceGear,
   EnhancedResultDialogRef,
   InnItem,
   ItemTypeKind,
@@ -18,7 +19,13 @@ import createKey from '@/services/key-generator'
 import ItemBoxComponent from '@/components/item/item-box'
 import { InventoryActionKind } from '@/components/item/item.interface'
 import { CurrencyResponse } from '@/interfaces/currency.interface'
-import { formatNumber, isWeaponEnhanceable, translate } from '@/services/util'
+import {
+  formatNumber,
+  isBaseOptionReRollable,
+  isEnchantableItemType,
+  isWeaponEnhanceable,
+  translate,
+} from '@/services/util'
 import {
   fetchEnchantWeapon,
   fetchGetEnchantData,
@@ -29,7 +36,7 @@ export default function BlackSmithEnchantPage() {
   const [maxItemSlots, setMaxItemSlots] = useState<number>(0)
   const [gold, setGold] = useState<number>(0)
   const [isFulledInventory, setIsFulledInventory] = useState<boolean>()
-  const [selectedWeapons, setSelectedWeapons] = useState<InnItem[]>([])
+  const [selectedOriginItems, setSelectedOriginItems] = useState<InnItem[]>([])
   const [currencyRes, setCurrencyRes] = useState<CurrencyResponse>()
   const [enchantData, setEnchantData] = useState<any>()
   const [selectedAttribute, setSelectedAttribute] = useState<any>()
@@ -52,7 +59,7 @@ export default function BlackSmithEnchantPage() {
   }
 
   const enchantWeapon = async () => {
-    const weapons = selectedWeapons.filter((d) => !!d)
+    const weapons = selectedOriginItems.filter((d) => !!d)
     if (weapons.length !== 1) {
       await Swal.fire({
         title: '강화 재료를 모두 선택하세요',
@@ -73,7 +80,7 @@ export default function BlackSmithEnchantPage() {
 
     if (isConfirmed) {
       const result = await fetchEnchantWeapon(
-        selectedWeapons[0].weapon._id!,
+        selectedOriginItems[0]._id!,
         selectedAttribute,
       )
       await initialRefresh()
@@ -97,40 +104,40 @@ export default function BlackSmithEnchantPage() {
     })
     setItems(newItems)
 
-    const attachedWeaponIndex = selectedWeapons.findIndex(
+    const attachedWeaponIndex = selectedOriginItems.findIndex(
       (sWeapon) => sWeapon?._id === items[selectedItemIndex]._id,
     )
 
     if (attachedWeaponIndex < 0) {
-      const emptyIndex = selectedWeapons.findIndex((data) => !data)
+      const emptyIndex = selectedOriginItems.findIndex((data) => !data)
       if (emptyIndex < 0) {
-        setSelectedWeapons([
-          ...selectedWeapons,
+        setSelectedOriginItems([
+          ...selectedOriginItems,
           { ...items[selectedItemIndex] },
         ])
       } else {
-        const newWeapons: any = [...selectedWeapons]
+        const newWeapons: any = [...selectedOriginItems]
         newWeapons[emptyIndex] = { ...items[selectedItemIndex] }
-        return setSelectedWeapons(newWeapons)
+        return setSelectedOriginItems(newWeapons)
       }
     } else {
-      const newSelectedWeapons: any = [...selectedWeapons]
+      const newSelectedWeapons: any = [...selectedOriginItems]
       newSelectedWeapons[attachedWeaponIndex] = undefined
-      setSelectedWeapons(newSelectedWeapons)
+      setSelectedOriginItems(newSelectedWeapons)
     }
   }
 
   const updateEnchantData = useCallback(async () => {
     setEnchantData(undefined)
-    if (!selectedWeapons[0]) {
+    if (!selectedOriginItems[0]) {
       return
     }
     const result = await fetchGetEnchantData(
-      selectedWeapons[0].weapon._id!,
+      selectedOriginItems[0]._id!,
       selectedAttribute,
     )
     setEnchantData(result)
-  }, [selectedWeapons, selectedAttribute])
+  }, [selectedOriginItems, selectedAttribute])
 
   const loadMyCurrency = useCallback(async () => {
     const result = await fetchGetMyCurrency()
@@ -140,17 +147,17 @@ export default function BlackSmithEnchantPage() {
   const initialRefresh = useCallback(async () => {
     await refreshInventory()
     await loadMyCurrency()
-    setSelectedWeapons([])
+    setSelectedOriginItems([])
   }, [loadMyCurrency])
 
   useEffect(() => {
-    if (selectedWeapons?.filter((d) => !!d).length <= 0) {
+    if (selectedOriginItems?.filter((d) => !!d).length <= 0) {
       setSelectedAttribute(undefined)
       setEnchantData(undefined)
       return
     }
     updateEnchantData()
-  }, [selectedWeapons, updateEnchantData])
+  }, [selectedOriginItems, updateEnchantData])
 
   useEffect(() => {
     initialRefresh()
@@ -191,10 +198,10 @@ export default function BlackSmithEnchantPage() {
             <div className="flex items-center justify-center gap-[2px]">
               <div>원본</div>
               <div className="bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] items-center justify-center flex">
-                {selectedWeapons[0] && (
+                {selectedOriginItems[0] && (
                   <ItemBoxComponent
                     className="p-[2px]"
-                    item={selectedWeapons[0]}
+                    item={selectedOriginItems[0]}
                     onShowTotalDamage
                     actionCallback={() => {}}
                     // onSelect={onSelectItem}
@@ -205,7 +212,7 @@ export default function BlackSmithEnchantPage() {
             <div className="flex justify-center">
               {enchantData &&
                 selectedAttribute &&
-                Object.keys(enchantData.weapon?.additionalAttributes || {})
+                Object.keys(enchantData.targetItem?.additionalAttributes || {})
                   .length > 0 && (
                   <div
                     className="text-[24px] bg-green-500 text-white px-[6px] py-[4px] rounded cursor-pointer"
@@ -247,8 +254,8 @@ export default function BlackSmithEnchantPage() {
                   const item = items[index] || {}
                   const disableSlotClass = 'bg-gray-800'
                   const isOveredSlot = index >= maxItemSlots
-                  const invalidItem = isWeaponEnhanceable(item)
-                  const isDisabled = isOveredSlot || invalidItem
+                  const invalidItem = !isEnchantableItemType(item)
+                  const isDisabled = isOveredSlot || (item?.id && invalidItem)
                   return (
                     <div
                       key={`black_smith_${item?._id || createKey()}`}
@@ -284,20 +291,24 @@ function EnchantDataBox({
   selectedAttribute,
   onClick,
 }: {
-  enchantData: { price: number; weapon: Weapon; changeableAttributes: any[] }
+  enchantData: {
+    price: number
+    targetItem: Weapon | DefenceGear
+    changeableAttributes: any[]
+  }
   selectedAttribute: any
   onClick: (attributeName: string) => void
 }) {
   const attributeKeys = Object.keys(
-    enchantData?.weapon?.additionalAttributes || {},
+    enchantData.targetItem?.additionalAttributes || {},
   )
   if (attributeKeys.length === 0) {
     return <div>마법 부여를 할 수 없는 아이템</div>
   }
 
   const isExistEnchanted = Object.keys(
-    enchantData.weapon.additionalAttributes || {},
-  ).includes(enchantData.weapon.enchants.fixedAttributeName || '')
+    enchantData.targetItem.additionalAttributes || {},
+  ).includes(enchantData.targetItem.enchants.fixedAttributeName || '')
   return (
     <div className="flex flex-col w-full items-center p-[5px] gap-[5px]">
       <div className="flex flex-row gap-[2px] items-center">
@@ -307,12 +318,14 @@ function EnchantDataBox({
       </div>
       <div>변경할 속성을 선택하세요</div>
       <div className="w-full p-[10px] flex flex-col border border-blue-950 rounded">
-        {Object.keys(enchantData.weapon?.additionalAttributes || {}).map(
+        {Object.keys(enchantData.targetItem?.additionalAttributes || {}).map(
           (attributeName) => {
-            const attributes = enchantData.weapon?.additionalAttributes || {}
+            const attributes =
+              enchantData.targetItem?.additionalAttributes || {}
             const attribute = attributes[attributeName]
             const isEnchanted =
-              enchantData.weapon.enchants.fixedAttributeName === attributeName
+              enchantData.targetItem.enchants.fixedAttributeName ===
+              attributeName
             if (isEnchanted) {
               onClick(attributeName)
             }

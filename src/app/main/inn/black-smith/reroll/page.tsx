@@ -5,16 +5,15 @@ import { useCallback, useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import ItemBoxComponent from '@/components/item/item-box'
 import {
+  BaseDefenceGear,
   BaseWeapon,
   InnItem,
   ItemTypeKind,
-  Weapon,
 } from '@/interfaces/item.interface'
 import createKey from '@/services/key-generator'
 import {
-  fetchGetBaseWeapon,
+  fetchGetBaseDefenceGearByName,
   fetchGetBaseWeaponByName,
-  fetchGetEnhancePrice,
   fetchGetMyInventory,
   fetchReRollWeapon,
 } from '@/services/api-fetch'
@@ -22,18 +21,24 @@ import toAPIHostURL from '@/services/image-name-parser'
 import { InventoryActionKind } from '@/components/item/item.interface'
 import WeaponBoxDetailComponent from '@/components/item/item-box/weapon-box-detail.component'
 import { BaseWeaponBoxComponent } from '@/app/main/collection/maps/base-weapon-box-tooltip.component'
-import { isWeaponEnhanceable } from '@/services/util'
+import {
+  getReRollPrice,
+  isBaseOptionReRollable,
+  ValidReRollItemTypes,
+} from '@/services/util'
+import { BaseDefenceGearBoxComponent } from '@/app/main/collection/maps/base-defence-gear-box-tooltip.component'
+import DefenceGearBoxDetailComponent from '@/components/item/item-box/defence-gear-box-detail.component'
 
 export default function BlackSmithRerollPage() {
   const [items, setItems] = useState<InnItem[]>([])
   const [maxItemSlots, setMaxItemSlots] = useState<number>(0)
   const [gold, setGold] = useState<number>(0)
-  const [selectedWeapons, setSelectedWeapons] = useState<InnItem[]>([])
+  const [selectedCraftItems, setSelectedCraftItems] = useState<InnItem[]>([])
   const [enhancePrice, setEnhancePrice] = useState<{
     price: number
   }>()
 
-  const [baseWeapon, setBaseWeapon] = useState<BaseWeapon>()
+  const [baseItem, setBaseItem] = useState<BaseWeapon | BaseDefenceGear>()
 
   const [enhancedResult, setEnhancedResult] = useState<any>()
 
@@ -50,8 +55,13 @@ export default function BlackSmithRerollPage() {
   }
 
   const enhanceWeapon = async () => {
-    if (selectedWeapons?.length === 0) return
-    if (!selectedWeapons[0]?.weapon) return
+    if (selectedCraftItems?.length === 0) return
+    if (
+      !ValidReRollItemTypes.includes(
+        selectedCraftItems[0].iType as ItemTypeKind,
+      )
+    )
+      return
     const { isConfirmed } = await Swal.fire({
       title: `정말로 재설정하시겠습니까?`,
       confirmButtonText: '예',
@@ -60,7 +70,7 @@ export default function BlackSmithRerollPage() {
     })
 
     if (isConfirmed) {
-      await fetchReRollWeapon(selectedWeapons[0].weapon._id!)
+      await fetchReRollWeapon(selectedCraftItems[0]._id!)
       await Promise.all([
         Swal.fire({
           title: '재설정 되었습니다.',
@@ -69,7 +79,7 @@ export default function BlackSmithRerollPage() {
         }),
         refreshInventory(),
       ])
-      setSelectedWeapons([])
+      setSelectedCraftItems([])
     }
   }
   const onSelectItem = useCallback(
@@ -91,58 +101,65 @@ export default function BlackSmithRerollPage() {
       })
       setItems(newItems)
 
-      const attachedWeaponIndex = selectedWeapons.findIndex(
+      const attachedWeaponIndex = selectedCraftItems.findIndex(
         (sWeapon) => sWeapon?._id === items[selectedItemIndex]._id,
       )
 
       if (attachedWeaponIndex < 0) {
-        const emptyIndex = selectedWeapons.findIndex((data) => !data)
+        const emptyIndex = selectedCraftItems.findIndex((data) => !data)
         if (emptyIndex < 0) {
-          setSelectedWeapons([
-            ...selectedWeapons,
+          setSelectedCraftItems([
+            ...selectedCraftItems,
             { ...items[selectedItemIndex] },
           ])
         } else {
-          const newWeapons: any = [...selectedWeapons]
+          const newWeapons: any = [...selectedCraftItems]
           newWeapons[emptyIndex] = { ...items[selectedItemIndex] }
-          return setSelectedWeapons(newWeapons)
+          return setSelectedCraftItems(newWeapons)
         }
       } else {
-        const newSelectedWeapons: any = [...selectedWeapons]
+        const newSelectedWeapons: any = [...selectedCraftItems]
         newSelectedWeapons[attachedWeaponIndex] = undefined
-        setSelectedWeapons(newSelectedWeapons)
+        setSelectedCraftItems(newSelectedWeapons)
       }
     },
-    [items, selectedWeapons],
+    [items, selectedCraftItems],
   )
 
   const initialRefresh = useCallback(async () => {
     await refreshInventory()
-    setSelectedWeapons([])
+    setSelectedCraftItems([])
     setEnhancePrice(undefined)
   }, [])
 
-  const getReRollPrice = (weapon: Weapon) => {
-    const price = parseInt(String((weapon.iLevel - 1) / 10), 10) * 100000
-    return Math.max(price, 0)
-  }
-
   const loadBaseWeapon = useCallback(async (name: string) => {
     const result = await fetchGetBaseWeaponByName(name)
-    setBaseWeapon(result.baseWeapon)
+    setBaseItem(result.baseWeapon)
+  }, [])
+
+  const loadBaseDefenceGear = useCallback(async (name: string) => {
+    const result = await fetchGetBaseDefenceGearByName(name)
+    setBaseItem(result.baseDefenceGear)
   }, [])
 
   useEffect(() => {
-    if (selectedWeapons?.length <= 0) {
-      setBaseWeapon(undefined)
+    if (selectedCraftItems?.length <= 0) {
+      setBaseItem(undefined)
       return
     }
-    if (!selectedWeapons[0]) return
-    loadBaseWeapon(selectedWeapons[0].weapon.name)
+    if (!selectedCraftItems[0]) return
+    if (selectedCraftItems[0].iType === ItemTypeKind.Weapon) {
+      loadBaseWeapon(selectedCraftItems[0].weapon.name)
+    }
+    if (selectedCraftItems[0].iType === ItemTypeKind.DefenceGear) {
+      loadBaseDefenceGear(selectedCraftItems[0].defenceGear.name)
+    }
     setEnhancePrice({
-      price: getReRollPrice(selectedWeapons[0].weapon),
+      price: getReRollPrice(
+        selectedCraftItems[0].weapon || selectedCraftItems[0].defenceGear,
+      ),
     })
-  }, [loadBaseWeapon, selectedWeapons])
+  }, [loadBaseDefenceGear, loadBaseWeapon, selectedCraftItems])
 
   useEffect(() => {
     initialRefresh()
@@ -174,10 +191,10 @@ export default function BlackSmithRerollPage() {
           <div className="flex items-center justify-center gap-[2px]">
             <div>대상 아이템</div>
             <div className="bg-white relative flex border-[1px] border-r rounded-md w-[50px] h-[50px] items-center justify-center">
-              {selectedWeapons[0] && (
+              {selectedCraftItems[0] && (
                 <ItemBoxComponent
                   className="p-[2px]"
-                  item={selectedWeapons[0]}
+                  item={selectedCraftItems[0]}
                   onShowTotalDamage
                   actionCallback={() => {}}
                   // onSelect={onSelectItem}
@@ -202,11 +219,11 @@ export default function BlackSmithRerollPage() {
               <div>{enhancePrice.price.toLocaleString()}</div>
             </div>
           )}
-          {selectedWeapons[0] && (
+          {selectedCraftItems[0]?.iType === ItemTypeKind.Weapon && (
             <div className="flex flex-col justify-center items-center gap-[4px] mb-[10px]">
-              {baseWeapon && (
+              {baseItem && (
                 <div className="text-[14px] ff-score-all">
-                  <BaseWeaponBoxComponent baseWeapon={baseWeapon} />
+                  <BaseWeaponBoxComponent baseWeapon={baseItem as BaseWeapon} />
                 </div>
               )}
               <div className="font-bold flex h-full items-center px-[10px] text-white text-[24px]">
@@ -216,7 +233,28 @@ export default function BlackSmithRerollPage() {
               </div>
 
               <div className="w-[300px] text-[14px]">
-                <WeaponBoxDetailComponent item={selectedWeapons[0]} />
+                <WeaponBoxDetailComponent item={selectedCraftItems[0]} />
+              </div>
+            </div>
+          )}
+
+          {selectedCraftItems[0]?.iType === ItemTypeKind.DefenceGear && (
+            <div className="flex flex-col justify-center items-center gap-[4px] mb-[10px]">
+              {baseItem && (
+                <div className="text-[14px] ff-score-all">
+                  <BaseDefenceGearBoxComponent
+                    baseDefenceGear={baseItem as BaseDefenceGear}
+                  />
+                </div>
+              )}
+              <div className="font-bold flex h-full items-center px-[10px] text-white text-[24px]">
+                <div className="rounded bg-green-500 w-[40px] h-[40px] flex items-center justify-center border-2 border-green-800 border-dashed p-[4px]">
+                  <i className="fa-solid fa-arrows-rotate" />
+                </div>
+              </div>
+
+              <div className="w-[300px] text-[14px]">
+                <DefenceGearBoxDetailComponent item={selectedCraftItems[0]} />
               </div>
             </div>
           )}
@@ -242,7 +280,7 @@ export default function BlackSmithRerollPage() {
         </div>
 
         <div className="grow basis-1 border flex justify-center">
-          <div className="flex  flex-col">
+          <div className="flex flex-col">
             <div>인벤토리</div>
             <div className="">
               <div>
@@ -251,8 +289,8 @@ export default function BlackSmithRerollPage() {
                     const item = items[index] || {}
                     const disableSlotClass = 'bg-gray-800'
                     const isOveredSlot = index >= maxItemSlots
-                    const invalidItem = isWeaponEnhanceable(item)
-                    const isDisabled = isOveredSlot || invalidItem
+                    const invalidItem = !isBaseOptionReRollable(item)
+                    const isDisabled = isOveredSlot || (item?.id && invalidItem)
                     return (
                       <div
                         key={`black_smith_${item?._id || createKey()}`}

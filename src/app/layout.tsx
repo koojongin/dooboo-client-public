@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 }
 
 export async function getNotice(): Promise<any | never> {
-  const baseURL = `https://dooboo.online:${process.env.NEXT_PUBLIC_SERVER_PORT}`
+  const baseURL = `http://dooboo.online:${process.env.NEXT_PUBLIC_SERVER_PORT}`
   const response = await axios.post(`${baseURL}/board/list`, {
     condition: { category: { $in: ['공지', '패치노트'] } },
     opts: { page: 1, limit: 1 },

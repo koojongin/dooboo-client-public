@@ -22,6 +22,7 @@ import { GameSoundManager } from '@/game/scenes/objects/GameSoundManager'
 import { fetchApplyEarnedData, fetchGameLogin } from '@/services/api/api.game'
 import { createSignedPacket } from '@/game/util'
 import { SkillMeResponse } from '@/interfaces/skill.interface'
+import { GetRaidResponse } from '@/services/api/api.raid'
 
 const CROW_START_POINT = {
   x: 800,
@@ -44,6 +45,8 @@ export class Game extends Scene implements FightScene {
 
   resultOfMap!: GetMapResponse
 
+  resultOfRaid?: GetRaidResponse
+
   resultOfMe!: MeResponse
 
   resultOfSkill!: SkillMeResponse
@@ -61,6 +64,8 @@ export class Game extends Scene implements FightScene {
   maxMonsterPool = 100
 
   isScareCrowMode = false
+
+  isRaidMode = false
 
   elapsedTime = 0
 
@@ -81,14 +86,16 @@ export class Game extends Scene implements FightScene {
     this.backgroundUpdateInterval = null
   }
 
-  init({ resultOfMap }: any) {
+  init({ resultOfMap, resultOfRaid }: any) {
     this.resultOfMap = resultOfMap!
+    this.resultOfRaid = resultOfRaid!
   }
 
   async preload() {
     this.isScareCrowMode = !!this.resultOfMap.monsters.find(
       (monster) => monster.name === '허수아비',
     )
+    this.isRaidMode = this.resultOfMap.map.isRaid
     const loader: any = this.plugins.get('rexawaitloaderplugin')
     loader.addToScene(this)
     const loadRex: Phaser.Loader.LoaderPlugin & { rexAwait: any } = this
@@ -96,7 +103,7 @@ export class Game extends Scene implements FightScene {
     loadRex.rexAwait(async (resolve: any, reject: any) => {
       const [result, resultOfLogin, resultOfSkill] = await Promise.all([
         fetchMe(),
-        fetchGameLogin(this.isScareCrowMode),
+        fetchGameLogin(this.isScareCrowMode || this.isRaidMode),
         fetchGetMySkill(),
       ])
       const { character: gameCharacter } = resultOfLogin
@@ -108,14 +115,16 @@ export class Game extends Scene implements FightScene {
       this.resultOfMe = result!
       this.resultOfSkill = resultOfSkill!
       const { character, equippedItems } = result
-      const [item] = equippedItems || []
-      let thumbnailUrl = character?.thumbnail
+      const [weaponItem] = equippedItems.filter((item) => item.weapon)
+      const thumbnailUrl = character?.thumbnail
         ? character.thumbnail
         : DEFAULT_THUMBNAIL_URL
 
-      if (item?.weapon) {
-        thumbnailUrl =
-          toAPIHostURL(item.weapon.thumbnail) || DEFAULT_THUMBNAIL_URL
+      let weaponImageUrl
+
+      if (weaponItem?.weapon) {
+        weaponImageUrl =
+          toAPIHostURL(weaponItem.weapon.thumbnail) || DEFAULT_THUMBNAIL_URL
       }
       this.load.animation(Resource.SwingAnimationPath)
       this.load.animation(Resource.SkillsAnimationPath)
@@ -136,7 +145,7 @@ export class Game extends Scene implements FightScene {
       )
       this.load.audio(SoundKey.WeaponDrop, '/audio/item_drop.mp3')
       this.load.audio(SoundKey.EtcDrop, '/audio/etc_drop.mp3')
-      this.load.image('weapon', thumbnailUrl)
+      this.load.image('weapon', weaponImageUrl)
       this.loadMapResource()
       resolve()
     })
@@ -218,7 +227,7 @@ export class Game extends Scene implements FightScene {
 
   startSpawnTimer() {
     let startingPoint: any
-    if (this.isScareCrowMode) {
+    if (this.isScareCrowMode || this.isRaidMode) {
       startingPoint = CROW_START_POINT
     }
     this.time.addEvent({
@@ -267,9 +276,13 @@ export class Game extends Scene implements FightScene {
         EventBus.emit('event', { eventName: 'refresh' })
       } catch (error: any) {
         console.log(error)
-        this.scene.stop()
+        this.stopGame()
       }
     }
+  }
+
+  stopGame() {
+    this.scene.stop()
   }
 
   changeScene() {
@@ -279,8 +292,17 @@ export class Game extends Scene implements FightScene {
   update(time: number, delta: number) {
     if (this.isScareCrowMode) {
       if (this.elapsedTime >= GameConfig.CROW_PRESERVE_TIME) {
-        this.scene.stop()
+        this.stopGame()
         EventBus.emit(GameEvent.OnGameStop)
+        return
+      }
+    }
+
+    if (this.isRaidMode) {
+      if (this.elapsedTime >= GameConfig.RAID_PRESERVE_TIME) {
+        this.stopGame()
+        EventBus.emit(GameEvent.OnGameStop)
+        return
       }
     }
 
@@ -310,7 +332,7 @@ export class Game extends Scene implements FightScene {
     if (this.monsterGroup!.getLength() < this.maxMonsterPool) {
       const [randomMonster] = _.shuffle(this.resultOfMap.monsters.map((m) => m))
       const randomId = randomMonster._id
-      if (randomMonster.name === '허수아비') {
+      if (this.isScareCrowMode || this.isRaidMode) {
         if (this.monsterGroup.getLength() > 0) return
       }
 

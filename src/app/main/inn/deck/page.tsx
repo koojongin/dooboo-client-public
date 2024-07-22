@@ -27,9 +27,10 @@ export default function DeckPage() {
   const [deckCardSet, setDeckCardSet] = useState<Array<GatchaCardExtended>>([])
   const [summedCardOptions, setSummedCardOptions] = useState<any[]>([])
   const [decks, setDecks] = useState<CardDeck[]>([])
-
+  const [maxCardSlots, setMaxCardSlots] = useState<number>(0)
   const loadMyCards = useCallback(async () => {
     const result = await fetchGetMyDeck()
+    setMaxCardSlots(result.maxCardSlots)
     setDeckCardSet(result.cards)
     setDecks(_.orderBy(result.decks, ['index'], ['asc']))
   }, [])
@@ -74,7 +75,7 @@ export default function DeckPage() {
       }
       return
     }
-    if (deckCardSet.length === 5) return
+    if (deckCardSet.length >= maxCardSlots) return
     if (deckCardSet.map((deckCard) => deckCard.name).includes(card.name)) return
     const updatedCardSet = [...deckCardSet, card]
     setDeckCardSet(updatedCardSet)
@@ -149,7 +150,7 @@ export default function DeckPage() {
           <div className="flex gap-[10px]">
             <div>
               <div className="flex flex-wrap gap-[10px]">
-                {new Array(5).fill(1).map((v, index) => {
+                {new Array(maxCardSlots).fill(1).map((v, index) => {
                   const baseCard = deckCardSet[index]
                   const [extendedBaseCard] = allCardSet.filter(
                     (aCard) => aCard.name === baseCard?.name,
@@ -280,9 +281,14 @@ export default function DeckPage() {
                           }}
                         >
                           {(card.stack || 0) > 0 && (
-                            <div className="absolute bg-white/85 text-gray-800 ff-ba text-[16px] border border-gray-600 px-[3px] flex items-center justify-center">
-                              x{card.stack}
-                            </div>
+                            <>
+                              <div className="absolute right-0 ff-wavve bottom-0 bg-white/85 text-gray-800 text-[12px] border border-gray-600 px-[3px] flex items-center justify-center m-[1px]">
+                                x{card.stack}
+                              </div>
+                              <div className="absolute left-0 top-0 ff-wavve font-bold bg-white/95 text-gray-900 text-[14px] px-[3px] flex items-center justify-center border border-dotted border-blue-950">
+                                Lv.{card.level}
+                              </div>
+                            </>
                           )}
                         </div>
                         <div className="flex bg-white/90 items-center justify-center ff-ba text-[16px] h-[22px]">

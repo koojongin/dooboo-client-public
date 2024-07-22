@@ -36,7 +36,7 @@ export class GameStatusBox {
       color: '#ea4481',
       getValue: () => this.scene.player.currentHp,
       getLabel: () =>
-        `${Math.floor(this.scene.player.currentHp)}/${this.scene.player.maxHp}`,
+        `${Math.floor(this.scene.player.currentHp)}/${Math.floor(this.scene.player.maxHp)}`,
     })
     this.mpBar = new GameGaugeBar(this.scene, {
       x: 10,
@@ -47,7 +47,7 @@ export class GameStatusBox {
       color: '#348ee7',
       getValue: () => this.scene.player.currentMp,
       getLabel: () =>
-        `${Math.floor(this.scene.player.currentMp)}/${this.scene.player.maxMp}`,
+        `${Math.floor(this.scene.player.currentMp)}/${Math.floor(this.scene.player.maxMp)}`,
     })
     this.expBar = new GameGaugeBar(this.scene, {
       x: 10,

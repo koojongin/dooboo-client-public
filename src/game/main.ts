@@ -6,11 +6,12 @@ import { GameOver } from './scenes/GameOver'
 import { Game as MainGame } from './scenes/Game'
 import { MainMenu } from './scenes/MainMenu'
 import { Preloader } from './scenes/Preloader'
+import { GameConfig } from '@/game/scenes/enums/enum'
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.WEBGL,
-  width: 1080,
-  height: 800,
+  width: GameConfig.Width,
+  height: GameConfig.Height,
   parent: 'game-container',
   backgroundColor: '#028af8',
   pixelArt: true,

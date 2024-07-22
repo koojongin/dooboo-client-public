@@ -9,6 +9,8 @@ import {
   RankOfDamageListResponse,
 } from '@/interfaces/user.interface'
 import {
+  BaseDefenceGearListResponseDto,
+  BaseDefenceGearResponseDto,
   BaseWeapon,
   BaseWeaponListResponseDto,
   BaseWeaponResponseDto,
@@ -72,16 +74,7 @@ export async function fetchBattle(name: string): Promise<BattleResponseDto> {
 export async function fetchPostMonster(
   data: any,
 ): Promise<CreateMonsterResponse> {
-  const { data: response } = await api.post('/monster/create', data, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-    transformRequest: [
-      () => {
-        return data
-      },
-    ],
-  })
+  const { data: response } = await api.post('/monster/create', data)
   return response
 }
 
@@ -134,6 +127,22 @@ export async function fetchGetBaseWeaponList(
   return response
 }
 
+export async function fetchGetBaseDefenceGearList(
+  _condition: any,
+  _opts: any,
+): Promise<BaseDefenceGearListResponseDto> {
+  const condition = { ..._condition }
+  const opts = { ..._opts }
+  if (!opts.page) opts.page = 1
+  if (!opts.limit) opts.limit = 10
+
+  const { data: response } = await api.post('/base-defence-gear/list', {
+    condition,
+    opts,
+  })
+  return response
+}
+
 export async function fetchGetBaseWeapon(
   id: string,
 ): Promise<BaseWeaponResponseDto> {
@@ -145,6 +154,13 @@ export async function fetchGetBaseWeaponByName(
   name: string,
 ): Promise<BaseWeaponResponseDto> {
   const { data: response } = await api.get(`/item/base-weapon/name/${name}`)
+  return response
+}
+
+export async function fetchGetBaseDefenceGearByName(
+  name: string,
+): Promise<BaseDefenceGearResponseDto> {
+  const { data: response } = await api.get(`/base-defence-gear/name/${name}`)
   return response
 }
 
@@ -259,6 +275,26 @@ export async function fetchUploadItemFile(
   return response
 }
 
+export async function fetchUploadMonsterFile(
+  formData: any,
+): Promise<{ path: string }> {
+  const { data: response } = await api.post(
+    '/monster/upload',
+    {},
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      transformRequest: [
+        () => {
+          return formData
+        },
+      ],
+    },
+  )
+  return response
+}
+
 export async function fetchEquipItem(id: string) {
   const { data: response } = await api.post(`/item/equip/${id}`)
   return response
@@ -324,7 +360,9 @@ export async function fetchReRollWeapon(id: string): Promise<any> {
   return response
 }
 
-export async function fetchReRollAdditionalWeapon(id: string): Promise<any> {
+export async function fetchReRollAdditionalOriginItem(
+  id: string,
+): Promise<any> {
   const { data: response } = await api.post(`/craft/reroll-additional/${id}`)
   return response
 }

@@ -1,17 +1,31 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Card, CardBody, Chip } from '@material-tailwind/react'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/navigation'
 import { fetchDeleteMap, fetchGetMaps } from '@/services/api-fetch'
 import { DbMap } from '@/interfaces/map.interface'
+import { fetchAdminGetMaps } from '@/services/api-admin-fetch'
 
-export default function MapPage() {
+export default function MapPage({
+  searchParams,
+}: {
+  searchParams: { type: 'raid' | 'normal' | 'string' | undefined }
+}) {
   const router = useRouter()
   const [maps, setMaps] = useState<(DbMap & { totalWeight: number })[]>([])
-  const getMapList = async () => {
-    const { maps: rMaps } = await fetchGetMaps()
+  const loadMapList = useCallback(async (type?: string) => {
+    const condition: any = {}
+    if (type === 'raid') {
+      condition.isRaid = true
+    }
+    if (type === 'normal') {
+      condition.isRaid = { $in: [false, null] }
+    }
+    const { maps: rMaps } = await fetchAdminGetMaps(condition, {
+      sort: { level: -1 },
+    })
     const newMaps: (DbMap & { totalWeight: number })[] = rMaps.map((map) => {
       const newMap: any = { ...map }
 
@@ -26,14 +40,14 @@ export default function MapPage() {
       return newMap
     })
     setMaps(newMaps)
-  }
+  }, [])
 
   const goToEditMonster = (monsterId: string) => {
     router.push(`/admindooboo/monster/edit/${monsterId}`)
   }
 
   const editMap = (map: DbMap) => {
-    router.push(`/admindooboo/monster/${map._id}`)
+    router.push(`/admindooboo/map/${map._id}`)
     return
   }
   const deleteMap = async (map: DbMap) => {
@@ -55,13 +69,13 @@ export default function MapPage() {
         icon: 'success',
         confirmButtonText: '확인',
       })
-      await getMapList()
+      await loadMapList()
     }
   }
 
   useEffect(() => {
-    getMapList()
-  }, [])
+    loadMapList(searchParams.type)
+  }, [loadMapList, searchParams.type])
   return (
     <div>
       <div className="flex flex-col gap-1">
@@ -69,26 +83,41 @@ export default function MapPage() {
           maps.map((map) => {
             return (
               <div key={map._id}>
-                <Card>
-                  <CardBody>
-                    <div className="flex gap-5 items-center">
-                      <div>{map.name}</div>
-                      <div className="flex gap-1">
-                        <div
-                          className="cursor-pointer bg-green-500 px-2.5 rounded-lg flex items-center text-[16px] leading-[1.5] text-white"
-                          onClick={() => editMap(map)}
-                        >
-                          수정
-                        </div>
-                        <div
-                          className="cursor-pointer bg-red-700 px-2.5 rounded-lg flex items-center text-[16px] leading-[1.5] text-white"
-                          onClick={() => deleteMap(map)}
-                        >
-                          삭제
-                        </div>
+                <Card className="rounded shadow-none border p-[5px] ff-score-all font-bold">
+                  <div className="flex gap-[10px] items-center">
+                    <div className="w-[40px]">{map.level}</div>
+                    <div className="w-[150px]">{map.name}</div>
+                    <div
+                      className={`w-[20px] flex items-center gap-[2px] ${!map.isHide ? 'text-green-500' : 'text-gray-300'}`}
+                    >
+                      {!map.isHide ? (
+                        <i className="fa-solid fa-eye" />
+                      ) : (
+                        <i className="fa-solid fa-eye-slash" />
+                      )}
+                    </div>
+                    <div
+                      className={`w-[70px] flex items-center gap-[2px] ${map.isRaid ? 'text-green-500' : 'text-gray-300'}`}
+                    >
+                      isRaid
+                      <input type="checkbox" checked={map.isRaid} disabled />
+                    </div>
+                    <div className="flex gap-1">
+                      <div
+                        className="cursor-pointer bg-green-500 px-[10px] rounded-lg flex items-center text-[16px] text-white"
+                        onClick={() => editMap(map)}
+                      >
+                        수정
+                      </div>
+                      <div
+                        className="cursor-pointer bg-red-700 px-[10px] rounded-lg flex items-center text-[16px] text-white"
+                        onClick={() => deleteMap(map)}
+                      >
+                        삭제
                       </div>
                     </div>
-                    <hr className="m-1" />
+                  </div>
+                  {/* <hr className="m-1" />
                     <div className="flex flex-col gap-1 items-start w-full">
                       <div className="">총 무게 {map.totalWeight}</div>
                       <div className="flex gap-1">
@@ -119,8 +148,7 @@ export default function MapPage() {
                           )
                         })}
                       </div>
-                    </div>
-                  </CardBody>
+                    </div> */}
                 </Card>
               </div>
             )

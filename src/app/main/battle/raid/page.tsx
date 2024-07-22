@@ -135,10 +135,11 @@ export default function BattleRaidPage() {
                 </div>
                 <div className="flex items-center">
                   <div
-                    className="bg-blue-gray-800 text-white w-[80px] h-[80px] flex items-center justify-center cursor-pointer text-[34px] ff-ba ff-skew"
+                    className="bg-blue-gray-800 text-white w-[80px] h-[80px] flex flex-col items-center justify-center cursor-pointer text-[24px] ff-score-all font-bold ff-skew"
                     onClick={() => attackRaid(raid._id!)}
                   >
-                    공격
+                    <div>기록</div>
+                    <div>공격</div>
                   </div>
                   <div
                     className="bg-green-500 text-white w-[80px] h-[80px] flex items-center justify-center cursor-pointer text-[34px] ff-ba ff-skew"

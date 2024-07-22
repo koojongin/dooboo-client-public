@@ -1,5 +1,3 @@
-'use client'
-
 import { Dispatch, SetStateAction, useCallback, useState } from 'react'
 import { InnItem, ItemTypeKind } from '@/interfaces/item.interface'
 import { InventoryActionKind } from '@/components/item/item.interface'
@@ -16,14 +14,12 @@ export default function ItemBoxComponent({
   actionCallback = () => {},
   onSelect = () => {},
   setLastOpenedItemId,
-  lastOpenedItemId,
 }: {
   item: InnItem | any
   className: string
   setLastOpenedItemId?: Dispatch<SetStateAction<string | undefined>>
-  lastOpenedItemId?: string
   equippedItems?: any[]
-  actions?: string[]
+  actions?: InventoryActionKind[]
   onShowTotalDamage?: boolean
   actionCallback?: () => void
   onSelect?: (param: InnItem, ...rest: any) => void
@@ -48,7 +44,7 @@ export default function ItemBoxComponent({
   }
 
   return (
-    <>
+    <div className="relative">
       {item.iType === ItemTypeKind.Weapon && (
         <WeaponBoxComponent
           item={item}
@@ -82,6 +78,6 @@ export default function ItemBoxComponent({
           actions={actions}
         />
       )}
-    </>
+    </div>
   )
 }

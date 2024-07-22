@@ -57,6 +57,9 @@ export interface Weapon extends MongooseDocument {
   }
   injectedCard: string
   card: { name: string; thumbnail: string; starForce: number }
+  imprinting?: {
+    [key: string]: { value: number }
+  }
 }
 
 export interface DefenceGear extends MongooseDocument {
@@ -143,7 +146,9 @@ export enum DefenceGearType {
   Helmet = 'Helmet',
   Belt = 'Belt',
   Ring = 'Ring',
+  Boots = 'Boots',
   Amulet = 'Amulet',
+  Gloves = 'Gloves',
 }
 
 export interface BaseWeaponListResponseDto extends Pagination {
@@ -160,6 +165,10 @@ export interface BaseDefenceGearListResponseDto extends Pagination {
 
 export interface BaseWeaponResponseDto {
   baseWeapon: BaseWeapon
+}
+
+export interface BaseDefenceGearResponseDto {
+  baseDefenceGear: BaseDefenceGear
 }
 
 export interface WeaponListResponseDto extends Pagination {

@@ -208,14 +208,17 @@ export default function CreateMonsterForm({ handleRefreshMonsterList }: any) {
             }}
           />
 
-          <input
-            type="number"
-            className="border w-full p-[5px]"
-            value={monster.speed}
-            onChange={(e) =>
-              setMonster({ ...monster, speed: parseInt(e.target.value, 10) })
-            }
-          />
+          <div className="flex items-center gap-[5px]">
+            <div className="w-[100px]">속도</div>
+            <input
+              type="number"
+              className="border w-full p-[5px]"
+              value={monster.speed}
+              onChange={(e) =>
+                setMonster({ ...monster, speed: parseInt(e.target.value, 10) })
+              }
+            />
+          </div>
         </div>
         <Button
           className="mt-6 text-md"

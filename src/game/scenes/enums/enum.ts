@@ -35,10 +35,14 @@ export enum GameEvent {
   OnDamagedMonster = 'OnDamagedMonster',
   PlayerDead = 'PlayerDead',
   OnGameStop = 'OnGameStop',
+  OnEndRaid = 'OnEndRaid',
 }
 
 export enum GameConfig {
   QueueResolveTime = 1000 * 30,
-  Version = 4,
+  Version = 5,
   CROW_PRESERVE_TIME = 1000 * 15,
+  RAID_PRESERVE_TIME = 1000 * 10,
+  Width = 1080,
+  Height = 800,
 }

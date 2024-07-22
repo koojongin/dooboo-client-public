@@ -1,4 +1,5 @@
 import { MongooseDocument, Pagination } from '@/interfaces/common.interface'
+// eslint-disable-next-line import/no-cycle
 import { BaseMisc, BaseWeapon } from '@/interfaces/item.interface'
 
 export interface DropTableItem extends MongooseDocument {

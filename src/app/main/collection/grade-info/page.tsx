@@ -19,6 +19,11 @@ export default function GradeInfoPage() {
   const [gradeTypeList, setGradeTypeList] = useState([
     { iType: ItemTypeKind.Weapon },
     { iType: ItemTypeKind.DefenceGear, gearType: DefenceGearType.BodyArmor },
+    { iType: ItemTypeKind.DefenceGear, gearType: DefenceGearType.Greave },
+    { iType: ItemTypeKind.DefenceGear, gearType: DefenceGearType.Helmet },
+    { iType: ItemTypeKind.DefenceGear, gearType: DefenceGearType.Gloves },
+    { iType: ItemTypeKind.DefenceGear, gearType: DefenceGearType.Boots },
+    { iType: ItemTypeKind.DefenceGear, gearType: DefenceGearType.Belt },
   ])
   const [grades, setGrades] = useState<
     {
@@ -49,7 +54,6 @@ export default function GradeInfoPage() {
 
   const goToPageWithSearchParam = useCallback(
     (iType: ItemTypeKind, gearType?: DefenceGearType) => {
-      console.log('goto', iType, gearType)
       const current = setSearchParam('iType', iType)
       current.set('gearType', gearType || '')
       router.push(`${pathname}?${current.toString()}`)
@@ -78,11 +82,14 @@ export default function GradeInfoPage() {
           {gradeTypeList.map((option) => {
             const { iType, gearType } = option
             const currentItemTypeKind = searchParams.get('iType')
+            const currentGearType = searchParams.get('gearType') || undefined
+            const isActive =
+              iType === currentItemTypeKind && currentGearType === gearType
             return (
               <div
                 key={createKey()}
                 className={`ff-score font-bold text-[20px] p-[10px] bg-gray-400 text-white cursor-pointer border-2 border-dashed
-                ${iType === currentItemTypeKind ? 'bg-green-400 border-green-600' : 'border-gray-400'}`}
+                ${isActive ? 'bg-green-400 border-green-600' : 'border-gray-400'}`}
                 onClick={() => {
                   goToPageWithSearchParam(iType as ItemTypeKind, gearType)
                 }}

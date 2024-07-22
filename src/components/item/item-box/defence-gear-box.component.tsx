@@ -57,9 +57,11 @@ export function DefenceGearBoxComponent({
         }
       >
         <div className="relative max-w-full max-h-full w-[50px] h-[50px]">
-          <img
-            className="max-w-full max-h-full w-[50px] h-[50px]"
-            src={`${toAPIHostURL(selectedItem?.thumbnail)}`}
+          <div
+            className="max-w-full max-h-full w-[50px] h-[50px] bg-contain bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${toAPIHostURL(selectedItem?.thumbnail)})`,
+            }}
           />
         </div>
       </Tooltip>

@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Card, Tooltip } from '@material-tailwind/react'
 import _ from 'lodash'
+import { useRouter } from 'next/navigation'
+import Swal from 'sweetalert2'
 import { fetchRaidAttack, fetchRaidDetail } from '@/services/api/api.raid'
 import { MergedRaidLog, Raid, RaidLog } from '@/interfaces/raid.interface'
 import createKey from '@/services/key-generator'
@@ -24,6 +26,7 @@ export default function RaidDetailPage({
 }: {
   params: { raidId: string }
 }) {
+  const router = useRouter()
   const [raid, setRaid] = useState<Raid>()
   const [dropItems, setDropItems] = useState<DropTableItem[]>([])
 
@@ -37,10 +40,16 @@ export default function RaidDetailPage({
 
   const attackRaid = useCallback(
     async (raidId: string) => {
-      await fetchRaidAttack(raidId)
-      await loadRaid(raidId)
+      // await fetchRaidAttack(raidId)
+      // await loadRaid(raidId)
+      // return Swal.fire({
+      //   title: '준비중',
+      //   icon: 'info',
+      //   confirmButtonText: '확인',
+      // })
+      router.push(`/main/battle/raid/${raidId}/attack`)
     },
-    [loadRaid],
+    [router],
   )
 
   useEffect(() => {
@@ -49,22 +58,40 @@ export default function RaidDetailPage({
 
   return (
     <div className="w-full">
-      <Card className="p-[10px] rounded w-full">
+      <Card className="p-[10px] rounded w-full ff-score-all font-bold">
         {!raid && <div>Loading...</div>}
         {raid && (
           <div className="ff-score-all font-bold">
             <div className="">
               <div key={createKey()} className="flex items-center gap-[10px]">
-                <img
-                  className="w-[100px]"
-                  src={toAPIHostURL(raid.monsters[0]?.monster?.thumbnail)}
-                />
+                <div className="p-[1px] border border-blueGray-400 rounded shadow-md">
+                  <div
+                    className="w-[100px] h-[100px] bg-cover border border-blue-950 rounded"
+                    style={{
+                      backgroundImage: `url(${toAPIHostURL(raid.monsters[0]?.monster?.thumbnail)})`,
+                    }}
+                  />
+                </div>
                 <div className="flex flex-col">
                   <div className="text-[24px]">{raid.name}</div>
                   <div className="p-[2px] bg-red-200">
                     <div className="w-[300px] bg-red-300 p-[5px] text-white ff-score font-bold flex items-center justify-center">
                       {formatNumber(raid.monsters[0].currentHp)} /{' '}
                       {formatNumber(raid.monsters[0].monster?.hp || 0)}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>저항</div>
+                    <div>{raid.monsters[0].monster!.resist}%</div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>이동 속도</div>
+                    <div>{raid.monsters[0].monster!.speed}</div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>충돌 피해</div>
+                    <div>
+                      {formatNumber(raid.monsters[0].monster!.collisionDamage)}
                     </div>
                   </div>
                   <div>도주까지 {getLeftTime(raid.expiredAt)}</div>
@@ -75,12 +102,16 @@ export default function RaidDetailPage({
               * 레이드 몬스터에게 입힐 수 있는 최대 피해량은 레이드 몬스터 최대
               체력의 20%입니다.
             </div>
+            <div>
+              * 기록 전투 갱신을 위한 공격은 도주가 1분이내로 남았을때는
+              불가능합니다.
+            </div>
             <div className="mt-[10px]">
               <div
                 className="w-full flex items-center justify-center bg-green-800 text-white h-[30px] cursor-pointer"
                 onClick={() => attackRaid(raid._id!)}
               >
-                공격하기
+                공격하기(기록 전투 갱신)
               </div>
             </div>
 
