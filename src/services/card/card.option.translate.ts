@@ -75,6 +75,11 @@ export const cardOptionTranslate = (text: string) => {
     return '마법 스킬의 피해 증가(%)'
   if (text === `${keyName}:IncreasedDurationWithSkill`)
     return '스킬의 지속시간 증가(ms)'
+  if (text === `${keyName}:EssenceOfStrike`) return '타격의 정수'
+  if (text === `${keyName}:ArmorOfStr`) return '힘에서 방어로'
+  if (text === `${keyName}:ArmorOfDex`) return '민첩에서 방어로'
+  if (text === `${keyName}:ArmorOfLuk`) return '행운에서 방어로'
+  if (text === `${keyName}:IncreasedArmor`) return '방어력 증가(%)'
 
   return text
 }

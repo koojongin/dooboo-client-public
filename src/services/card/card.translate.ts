@@ -78,6 +78,11 @@ export const cardTranslate = (text: string) => {
   if (text === `${keyName}:kazusa`) return '카즈사'
   if (text === `${keyName}:karin`) return '카린'
   if (text === `${keyName}:nonomi`) return '노노미'
+  if (text === `${keyName}:nagisa`) return '나기사'
+  if (text === `${keyName}:pina`) return '피나'
+  if (text === `${keyName}:shizuko`) return '시즈코'
+  if (text === `${keyName}:shigure`) return '시구레'
+  if (text === `${keyName}:utaha`) return '우타하'
 
   return text
 }

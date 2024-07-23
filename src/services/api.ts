@@ -1,8 +1,12 @@
 import axios from 'axios'
 import Swal from 'sweetalert2'
 
+const host =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+    ? 'localhost'
+    : 'dooboo.online'
 const api = axios.create({
-  baseURL: `http://dooboo.online:${process.env.NEXT_PUBLIC_SERVER_PORT}`,
+  baseURL: `http://${host}:${process.env.NEXT_PUBLIC_SERVER_PORT}`,
 })
 
 // 요청 인터셉터

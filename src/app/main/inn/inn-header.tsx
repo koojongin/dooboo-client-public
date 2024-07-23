@@ -36,9 +36,9 @@ const staticMenus = [
     thumbnail: '/images/icon_deck.webp',
   },
   {
-    name: '업적',
-    url: '/main/inn/archievement',
-    thumbnail: '/images/icon_deck.webp',
+    name: '연구',
+    url: '/main/inn/research',
+    thumbnail: '/images/menu/icon_research.png',
   },
 ]
 export default function InnHeader() {
@@ -69,7 +69,7 @@ export default function InnHeader() {
           return (
             <div
               key={createKey()}
-              className={`group w-[100px] h-[100px] relative flex items-center justify-center rounded cursor-pointer border border-4 ${pathname.indexOf(menu.url) >= 0 ? 'border-blue-800' : 'border-transparent'}`}
+              className={`group w-[100px] h-[100px] relative flex items-center justify-center rounded cursor-pointer border-4 ${pathname.indexOf(menu.url) >= 0 ? 'border-blue-800' : 'border-transparent'}`}
               onClick={() => goToRoute(menu.url)}
             >
               {menu.name === '카드' && (
@@ -83,7 +83,7 @@ export default function InnHeader() {
               {menu.name !== '카드' && (
                 <img className="w-full h-full" src={menu.thumbnail} />
               )}
-              <div className="group-hover:bg-blueGray-600 w-full ff-ba ff-skew absolute bg-gradient-to-r from-slate-400/60 via-slate-300/70 to-slate-500/90 w-full text-white bottom-0 py-[3px] flex justify-center items-center">
+              <div className="group-hover:bg-blueGray-600 ff-ba ff-skew absolute bg-gradient-to-r from-slate-400/60 via-slate-300/70 to-slate-500/90 w-full text-white bottom-0 py-[3px] flex justify-center items-center">
                 {menu.name}
               </div>
             </div>

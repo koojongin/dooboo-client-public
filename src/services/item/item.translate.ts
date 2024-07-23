@@ -18,7 +18,7 @@ export const itemTranslate = (text: string) => {
   if (text === 'INCREASED_DAMAGE_OF_PHYSICAL_WITH_SKILL')
     return '물리 스킬 피해 증가(%)'
   if (text === 'INCREASED_ATTACK_SPEED') return '공격 속도 증가(%)'
-  if (text === 'REGENERATE_MANA') return '초당 마나회복(+)'
+  if (text === 'REGENERATE_MANA') return '초당 MP 회복량(+)'
   if (text === 'ADDED_MANA_ON_KILL') return '처치 시 MP 회복(+)'
   if (text === 'ADDED_LIFE_ON_KILL') return '처치 시 HP 회복(+)'
   if (text === 'ADDED_MANA') return 'MP 추가(+)'
