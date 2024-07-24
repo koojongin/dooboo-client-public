@@ -40,7 +40,7 @@ export enum GameEvent {
 
 export enum GameConfig {
   QueueResolveTime = 1000 * 30,
-  Version = 5,
+  Version = 6,
   CROW_PRESERVE_TIME = 1000 * 15,
   RAID_PRESERVE_TIME = 1000 * 10,
   Width = 1080,

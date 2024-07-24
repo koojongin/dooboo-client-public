@@ -257,8 +257,12 @@ export class GamePlayer
     return weapon
   }
 
-  onDamaged(damage: number) {
-    this.currentHp -= Math.max(0, damage - this.scene.resultOfMe.stat.armor)
+  onDamaged(damage: number, isTrueDamage?: boolean) {
+    if (isTrueDamage) {
+      this.currentHp -= Math.max(0, damage)
+    } else {
+      this.currentHp -= Math.max(0, damage - this.scene.resultOfMe.stat.armor)
+    }
     if (this.currentHp <= 0) {
       this.currentHp = this.maxHp
       const convertedScene: any = this.scene

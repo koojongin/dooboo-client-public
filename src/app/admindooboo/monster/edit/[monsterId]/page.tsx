@@ -39,6 +39,7 @@ export default function Page({
     isHide: true,
     speed: 30,
     collisionDamage: 30,
+    collisionTrueDamage: 0,
     name: '',
     hp: 1,
     gold: 1,
@@ -405,7 +406,25 @@ export default function Page({
                     />
                   </div>
                 </div>
+
+                <div>
+                  <div>collisionTrueDamage</div>
+                  <div>
+                    <input
+                      className="border p-[4px]"
+                      type="number"
+                      value={monster.collisionTrueDamage}
+                      onChange={(e) =>
+                        setMonster({
+                          ...monster,
+                          collisionTrueDamage: parseInt(e.target.value, 10),
+                        })
+                      }
+                    />
+                  </div>
+                </div>
               </div>
+
               <Button
                 className="mt-6 text-md"
                 size="sm"

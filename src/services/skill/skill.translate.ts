@@ -35,6 +35,10 @@ export const skillTranslate = (text: string) => {
 
   if (text === `${keyName}:added-hp`) return 'HP 추가'
   if (text === `${keyName}:added-mp`) return 'MP 추가'
+  if (text === `${keyName}:added-regenerate-hp-on-kill`)
+    return '처치 시 HP 회복'
+  if (text === `${keyName}:added-regenerate-mp-on-kill`)
+    return '처치 시 MP 회복'
   if (text === `${keyName}:added-regenerate-hp`) return 'HP 재생량 추가'
   if (text === `${keyName}:added-regenerate-mp`) return 'MP 재생량 추가'
   if (text === `${keyName}:increased-damage-of-lightning-with-skill`)

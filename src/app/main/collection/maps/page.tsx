@@ -108,7 +108,7 @@ export default function CollectionMapsPage() {
                   className="flex border-b border-blue-gray-50 py-[6px]"
                 >
                   {/* MonsterDiv Start */}
-                  <div className="flex gap-[1px] flex-col justify-start items-start">
+                  <div className="flex gap-[1px] flex-col justify-start items-start flex items-center ff-score-all font-bold">
                     <div className="flex gap-[10px] justify-center items-start min-w-[250px]">
                       <div
                         className="w-[80px] h-[80px] min-w-[80px] bg-cover bg-center border border-blue-950 rounded p-[4px] bg-clip-content shadow"
@@ -141,7 +141,23 @@ export default function CollectionMapsPage() {
                         <div className="text-blue-900">
                           충돌 피해:{monster.collisionDamage.toLocaleString()}
                         </div>
-                        <div className="text-blue-900">
+                        <div className="text-red-900 flex items-center flex-wrap">
+                          <Tooltip
+                            content={
+                              <div>방어력을 무시하고 피해를 입습니다.</div>
+                            }
+                          >
+                            <div className="flex items-center cursor-pointer">
+                              <div>고정 충돌 피해</div>
+                              <div className="flex items-center justify-center bg-gray-800 text-white rounded-full text-[12px] w-[14px] h-[14px]">
+                                <i className="fa-solid fa-question text-[10px]" />
+                              </div>
+                              <div>:</div>
+                            </div>
+                          </Tooltip>
+                          {monster.collisionTrueDamage.toLocaleString()}
+                        </div>
+                        <div className="text-blue-500">
                           이동속도:{monster.speed}
                         </div>
                       </div>

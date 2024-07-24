@@ -4,6 +4,7 @@ import { DropTableItem } from '@/interfaces/drop-table.interface'
 export interface Monster extends MongooseDocument {
   resist: number // 0
   collisionDamage: number // 0
+  collisionTrueDamage: number // 0
   armor: number // 0
   experience: number // 5
   gold: number // 1

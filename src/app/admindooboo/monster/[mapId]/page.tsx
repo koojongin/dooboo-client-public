@@ -75,6 +75,7 @@ export default function AdminMonsterByMapPage({
                     'resist',
                     'speed',
                     'collisionDamage',
+                    '고뎀',
                     'drop',
                   ].map((head) => {
                     return <th key={createKey()}>{head}</th>
@@ -110,6 +111,7 @@ export default function AdminMonsterByMapPage({
                       <td>{monster.resist}</td>
                       <td>{monster.speed}</td>
                       <td>{monster.collisionDamage}</td>
+                      <td>{monster.collisionTrueDamage}</td>
                       <td>{monster.drop ? monster.drop.items.length : ''}</td>
                     </tr>
                   )

@@ -92,6 +92,7 @@ export class GameMonster
     const bounceSpeed = 10
     this.setVelocity(destinationX * bounceSpeed, destinationY * bounceSpeed)
     this.scene.player.onDamaged(this.mData.collisionDamage)
+    this.scene.player.onDamaged(this.mData.collisionTrueDamage, true)
   }
 
   update() {
